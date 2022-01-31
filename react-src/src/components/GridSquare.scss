@@ -1,0 +1,46 @@
+.grid-square-wrapper {
+  &:active {
+    .grid-square {
+      transform: scale(0.9);
+    }
+  }
+  &:hover {
+    .grid-square-select-start {
+      background-color: #b3ffb3;
+    }
+    .grid-square-select-end {
+      background-color: #ffc2c2;
+    }
+    .grid-square-select-wall {
+      opacity: 0.3;
+    }
+    // .grid-square-default {
+    //   background-color: #ffb8b8;
+    // }
+    .grid-square-start {
+      background-color: #00e600;
+    }
+    .grid-square-end {
+      background-color: #ff3838;
+    }
+  }
+}
+
+.grid-square {
+  @apply border-slate-400;
+  border-width: 0 0 1px 1px;
+}
+.grid-square-default {
+  background-color: white;
+}
+.grid-square-start {
+  background-color: #00f000;
+}
+.grid-square-end {
+  background-color: #ff6b6b;
+}
+
+.wall {
+  opacity: 0;
+  border: 0px;
+}
