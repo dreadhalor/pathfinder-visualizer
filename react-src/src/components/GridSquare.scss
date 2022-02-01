@@ -5,23 +5,22 @@
     }
   }
   &:hover {
-    .grid-square-select-start {
-      background-color: #b3ffb3;
-    }
-    .grid-square-select-end {
-      background-color: #ffc2c2;
-    }
-    .grid-square-select-wall {
-      opacity: 0.3;
-    }
-    // .grid-square-default {
-    //   background-color: #ffb8b8;
-    // }
-    .grid-square-start {
-      background-color: #00e600;
-    }
-    .grid-square-end {
-      background-color: #ff3838;
+    .grid-square {
+      &.select-start {
+        background-color: #b3ffb3;
+      }
+      &.val-start {
+        background-color: #00f000;
+      }
+      &.select-end {
+        background-color: #ffc2c2;
+      }
+      &.val-end {
+        background-color: #ff4d4d;
+      }
+      &.select-wall:not(.val-wall) {
+        opacity: 0.6;
+      }
     }
   }
 }
@@ -29,18 +28,16 @@
 .grid-square {
   @apply border-slate-400;
   border-width: 0 0 1px 1px;
-}
-.grid-square-default {
   background-color: white;
 }
-.grid-square-start {
-  background-color: #00f000;
+.val-start {
+  background-color: #38ff38;
 }
-.grid-square-end {
+.val-end {
   background-color: #ff6b6b;
 }
 
-.wall {
+.val-wall {
   opacity: 0;
   border: 0px;
 }

@@ -1,9 +1,17 @@
-const TopNav = ({ active_type }) => {
+import { useEffect } from 'react';
+
+const TopNav = ({ active_type, setMode }) => {
   const changeMode = (event) => {
     let value = parseInt(event.target.value);
-    //console.log(value);
     active_type.active = value;
+    setMode(value);
   };
+
+  useEffect(() => {
+    //christ this is all very hacky, I'm definitely just barely learning React
+    setMode(1);
+  }, [setMode]);
+
   return (
     <div className='border-b bg-slate-200 flex flex-row justify-around'>
       <span className='flex-1'></span>
