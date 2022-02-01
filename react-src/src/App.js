@@ -1,6 +1,5 @@
 import './App.scss';
 import { v4 as uuidv4 } from 'uuid';
-import Grid from './components/Grid';
 import TopNav from './components/TopNav';
 import { useEffect } from 'react';
 import GridPane from './components/GridPane';
@@ -24,8 +23,8 @@ function App() {
   };
 
   const initializeGrid = () => {
-    let new_grid = checkLocalStorage();
-    overwriteGrid(JSON.parse(new_grid));
+    let stored_grid = checkLocalStorage();
+    if (stored_grid) overwriteGrid(JSON.parse(stored_grid));
   };
 
   const checkLocalStorage = () => {
@@ -34,15 +33,17 @@ function App() {
   };
 
   const overwriteGrid = (new_grid) => {
-    for (let i = 0; i < rows; i++) {
-      for (let j = 0; j < cols; j++) {
-        let square = grid[i][j];
-        square.uuid = new_grid[i][j].uuid;
-        square.val = new_grid[i][j].val;
-        square.setVal(square.val);
+    if (new_grid) {
+      for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+          let square = grid[i][j];
+          square.uuid = new_grid[i][j].uuid;
+          square.val = new_grid[i][j].val;
+          square.setVal(square.val);
+        }
       }
+      setValueFunctions();
     }
-    setValueFunctions();
   };
 
   const setValueFunctions = () => {
@@ -125,6 +126,7 @@ function App() {
   };
 
   const solve = () => {
+    resetPath();
     let maze_copy = JSON.parse(convertGridToVals());
     let start = getStartNode();
     let end = null;

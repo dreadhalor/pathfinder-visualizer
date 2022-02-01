@@ -13,7 +13,7 @@ const TopNav = ({ active_type, setMode }) => {
   }, []);
 
   return (
-    <div className='border-b bg-slate-200 flex flex-row justify-around'>
+    <div className='border-b border-slate-500 bg-slate-200 flex flex-row justify-around'>
       <span className='flex-1'></span>
       <p className='font-bold'>Tile type:</p>
       <div onChange={changeMode}>

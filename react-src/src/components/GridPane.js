@@ -3,9 +3,9 @@ import GridOverlay from './GridOverlay';
 
 const GridPane = ({ grid, rows, cols, active_type, beginSolveFxn }) => {
   return (
-    <div className='w-full flex-1 relative'>
+    <div className='w-full flex-1 relative min-h-0'>
       <GridOverlay beginSolveFxn={beginSolveFxn} />
-      <div className='w-full h-full flex'>
+      <div className='w-full h-full flex overflow-auto p-4'>
         <Grid grid={grid} rows={rows} cols={cols} active_type={active_type} />
       </div>
     </div>
