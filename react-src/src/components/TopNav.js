@@ -1,25 +1,28 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 const TopNav = ({ active_type, setMode }) => {
   const changeMode = (event) => {
     let value = parseInt(event.target.value);
     active_type.active = value;
-    setMode(value);
+    setMyMode(value);
   };
+
+  const [myMode, setMyMode] = useState(active_type.active);
 
   useEffect(() => {
     //christ this is all very hacky, I'm definitely just barely learning React
-    setMode(active_type.active);
-  }, []);
+    setMode(myMode);
+  }, [myMode]);
 
   return (
     <div className='border-b border-slate-500 bg-slate-200 flex flex-row justify-around'>
       <span className='flex-1'></span>
       <p className='font-bold'>Tile type:</p>
-      <div onChange={changeMode}>
+      <div>
         <span className='px-1'>
           <input
-            defaultChecked
+            checked={myMode === 1}
+            onChange={changeMode}
             type='radio'
             className='mr-1'
             id='start'
@@ -30,6 +33,8 @@ const TopNav = ({ active_type, setMode }) => {
         </span>
         <span className='px-1'>
           <input
+            checked={myMode === 2}
+            onChange={changeMode}
             type='radio'
             className='mr-1'
             id='end'
@@ -40,6 +45,8 @@ const TopNav = ({ active_type, setMode }) => {
         </span>
         <span className='px-1'>
           <input
+            checked={myMode === 3}
+            onChange={changeMode}
             type='radio'
             className='mr-1'
             id='wall'

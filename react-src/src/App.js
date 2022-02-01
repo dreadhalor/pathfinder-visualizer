@@ -5,6 +5,8 @@ import { useEffect } from 'react';
 import GridPane from './components/GridPane';
 
 function App() {
+  const localStorageName = 'grid';
+
   let rows = 25,
     cols = 40;
   let grid = [];
@@ -19,7 +21,8 @@ function App() {
   useEffect(() => initializeGrid(), []);
 
   const saveGrid = () => {
-    window.localStorage.setItem('gofuckyourself', JSON.stringify(grid));
+    window.localStorage.setItem(localStorageName, JSON.stringify(grid));
+    window.localStorage.removeItem('gofuckyourself');
   };
 
   const initializeGrid = () => {
@@ -28,8 +31,9 @@ function App() {
   };
 
   const checkLocalStorage = () => {
-    let test = window.localStorage.getItem('gofuckyourself');
-    return test;
+    let replace_this = window.localStorage.getItem('gofuckyourself');
+    let test = window.localStorage.getItem(localStorageName);
+    return replace_this ?? test;
   };
 
   const overwriteGrid = (new_grid) => {
