@@ -9,8 +9,8 @@ const TopNav = ({ active_type, setMode }) => {
 
   useEffect(() => {
     //christ this is all very hacky, I'm definitely just barely learning React
-    setMode(1);
-  }, [setMode]);
+    setMode(active_type.active);
+  }, []);
 
   return (
     <div className='border-b bg-slate-200 flex flex-row justify-around'>

@@ -6,13 +6,17 @@ const GridSquare = ({ square, active_type }) => {
     if (!square.setVal) square.setVal = setVal;
     square.setValue(square.uuid, active_type.active);
     setVal(square.val);
-    setClass(val, mode);
+    //setClass(val, mode);
   };
 
+  const [pathVal, setPathVal] = useState(0);
+  const getPathVal = () => pathVal;
   const [val, setVal] = useState(0);
   const [mode, setMode] = useState(0);
   square.setMode = setMode;
   square.setVal = setVal;
+  square.setPathVal = setPathVal;
+  square.getPathVal = getPathVal;
   const [myClass, setClass] = useState('');
 
   useEffect(() => {
@@ -45,11 +49,19 @@ const GridSquare = ({ square, active_type }) => {
         default:
           break;
       }
+      result += ' ';
+      switch (pathVal) {
+        case 1:
+          result += 'on-path';
+          break;
+        default:
+          break;
+      }
       return result;
     };
 
     setClass(getClass());
-  }, [val, mode]);
+  }, [val, mode, pathVal]);
 
   const gridSquareStyle = {
     width: '25px',
