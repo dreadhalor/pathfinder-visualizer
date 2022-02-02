@@ -8,7 +8,7 @@ let animation_queue = [];
 
 function App() {
   const localStorageName = 'grid';
-  const useDirections = true;
+  const useDirections = false;
 
   let rows = 25,
     cols = 40;
@@ -17,7 +17,7 @@ function App() {
     for (let i = 0; i < rows; i++) {
       let row = [];
       for (let j = 0; j < cols; j++) {
-        row.push({ uuid: uuidv4(), val: 0, pathVal: 0, mode: 1 });
+        row.push({ uuid: uuidv4(), val: 0, mode: 1 });
       }
       new_grid.push(row);
     }
@@ -28,14 +28,17 @@ function App() {
   const [grid, setGrid] = useState(createNewGrid());
   const [active_type, setActiveType] = useState(1);
 
-  const animation_delay = 10;
-  const flushAnimationQueue = () => (animation_queue = []);
+  const animation_delay = 5;
+  const flushAnimationQueue = () => {
+    animation_queue = [];
+    executeOnAllTiles((tile) => tile.setPathVal(0));
+  };
   const animate = () => animateAll();
   function animateAll() {
     let animation = animation_queue.shift();
     if (animation) {
       animation();
-      updateGridState();
+      //updateGridState();
       setTimeout(animateAll, animation_delay);
     }
     // for (let i = 0; i < animation_queue.length; i++) {
@@ -47,6 +50,14 @@ function App() {
     // }
     //animation_queue = [];
   }
+
+  const executeOnAllTiles = (func) => {
+    for (let i = 0; i < rows; i++) {
+      for (let j = 0; j < cols; j++) {
+        func(grid[i][j]);
+      }
+    }
+  };
 
   const updateGridState = () => {
     let new_grid = [];
@@ -120,8 +131,9 @@ function App() {
     setSolved(false);
     for (let i = 0; i < rows; i++) {
       for (let j = 0; j < cols; j++) {
-        if (grid[i][j].pathVal !== 0) {
-          grid[i][j].pathVal = 0;
+        let pathVal = grid[i][j].getPathVal();
+        if (pathVal === 1 || pathVal === 2) {
+          grid[i][j].setPathVal(3);
           if (useDirections) grid[i][j].direction = null;
         }
       }
@@ -142,7 +154,7 @@ function App() {
           console.log('val reset');
           square.val = 0;
         } else if (cell_match) {
-          if (square.val || square.pathVal === 1) resetPath();
+          if (square.val || square.getPathVal() === 1) resetPath();
           square.val = val;
         } else if (val_match) {
           if (val === 1 || val === 2) {
@@ -205,7 +217,7 @@ function App() {
       pathMap.set(JSON.stringify(start), null);
       //animation_queue.push(() => grid[start[0]][start[1]].setPathVal(2));
       animation_queue.push(() => {
-        grid[start[0]][start[1]].pathVal = 2;
+        grid[start[0]][start[1]].setPathVal(2);
         //updateGridState();
       });
     }
@@ -224,7 +236,7 @@ function App() {
         pathMap.set(JSON.stringify([r - 1, c]), [r, c]);
         animation = () => {
           //grid[r - 1][c].setPathVal(2);
-          grid[r - 1][c].pathVal = 2;
+          grid[r - 1][c].setPathVal(2);
           if (useDirections) grid[r - 1][c].direction = '↓';
           //updateGridState();
         };
@@ -240,7 +252,7 @@ function App() {
         pathMap.set(JSON.stringify([r + 1, c]), [r, c]);
         animation = () => {
           //grid[r + 1][c].setPathVal(2);
-          grid[r + 1][c].pathVal = 2;
+          grid[r + 1][c].setPathVal(2);
           if (useDirections) grid[r + 1][c].direction = '↑';
           //updateGridState();
         };
@@ -252,7 +264,7 @@ function App() {
         pathMap.set(JSON.stringify([r, c - 1]), [r, c]);
         animation = () => {
           //grid[r][c - 1].setPathVal(2);
-          grid[r][c - 1].pathVal = 2;
+          grid[r][c - 1].setPathVal(2);
           if (useDirections) grid[r][c - 1].direction = '→';
           //updateGridState();
         };
@@ -268,7 +280,7 @@ function App() {
         pathMap.set(JSON.stringify([r, c + 1]), [r, c]);
         animation = () => {
           //grid[r][c + 1].setPathVal(2);
-          grid[r][c + 1].pathVal = 2;
+          grid[r][c + 1].setPathVal(2);
           if (useDirections) grid[r][c + 1].direction = '←';
           //updateGridState();
         };
@@ -293,7 +305,7 @@ function App() {
         let [r, c] = reverse_path[i];
         //animation_queue.push(() => grid[r][c].setPathVal(1));
         animation_queue.push(() => {
-          grid[r][c].pathVal = 1;
+          grid[r][c].setPathVal(1);
           //updateGridState();
         });
       }

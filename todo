@@ -1,4 +1,6 @@
 * fix the stupid 'unlisted dependency' crap React keeps pulling with every time I use useEffect
+  * turns out React is just whiny, it's actually fine & an acceptable practice
 * GridPane padding on the right & ONLY THE RIGHT doesn't work on Safari, who the hell knows why
   * literally top, left & BOTTOM work PERFECTLY FINE, WHAT?!
-* The animation timing gets really weird if you restart the animation before it finishes
+* the animation is fucked when managed by a global grid state, figure out a way to break up that state into individual objects ASAP
+  * for now we just did the workaround where we make the tile a smart component & manually pass its state change method to the parent

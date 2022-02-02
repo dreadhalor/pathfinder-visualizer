@@ -9,11 +9,11 @@
       &.select-start {
         background-color: #b3ffb3;
       }
-      &.val-start {
-        background-color: #00f000;
-      }
       &.select-end {
         background-color: #ffc2c2;
+      }
+      &.val-start {
+        background-color: #00f000;
       }
       &.val-end {
         background-color: #ff4d4d;
@@ -50,17 +50,21 @@
 
 .animate {
   animation-name: pop;
-  animation-duration: 0.2s;
+  animation-duration: 0.3s;
 }
 .animate2 {
   animation-name: pop2;
-  animation-duration: 0.2s;
+  animation-duration: 0.3s;
+}
+.reset {
+  transition-property: background-color;
+  transition-duration: 0.3s;
 }
 
 @keyframes pop {
   0% {
     border-width: 1px;
-    background-color: white;
+    filter: brightness(0.8);
     //box-shadow: 1px 1px;
   }
   50% {

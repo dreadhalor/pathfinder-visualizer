@@ -7,6 +7,10 @@ const GridSquare = ({ square, active_type }) => {
   };
 
   const [myClass, setClass] = useState('');
+  const [pathVal, setPathVal] = useState(0);
+  const getPathVal = () => pathVal;
+  square.getPathVal = getPathVal;
+  square.setPathVal = setPathVal;
 
   useEffect(() => {
     const getClass = () => {
@@ -39,7 +43,10 @@ const GridSquare = ({ square, active_type }) => {
           break;
       }
       result += ' ';
-      switch (square.pathVal) {
+      switch (pathVal) {
+        case 3:
+          result += 'reset';
+          break;
         case 1:
           result += 'on-path animate2';
           break;
@@ -53,7 +60,9 @@ const GridSquare = ({ square, active_type }) => {
     };
 
     setClass(getClass());
-  }, [square.val, square.mode, square.pathVal]);
+  }, [square.val, square.mode, pathVal]);
+
+  const reset = () => setPathVal(0); //lol this will scale horribly
 
   const gridSquareStyle = {
     width: '25px',
@@ -61,7 +70,11 @@ const GridSquare = ({ square, active_type }) => {
   };
 
   return (
-    <div className='grid-square-wrapper text-slate-600' onClick={clicked}>
+    <div
+      className='grid-square-wrapper text-slate-600'
+      onClick={clicked}
+      onTransitionEnd={reset}
+    >
       <div className={myClass} style={gridSquareStyle}>
         {square.direction && square.direction}
       </div>
