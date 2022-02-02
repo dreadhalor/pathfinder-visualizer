@@ -151,7 +151,6 @@ function App() {
         let cell_match = square.uuid === square_uuid;
         let val_match = square.val === val;
         if (cell_match && val_match) {
-          console.log('val reset');
           square.val = 0;
         } else if (cell_match) {
           if (square.val || square.getPathVal() === 1) resetPath();
