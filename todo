@@ -1,3 +1,4 @@
 * fix the stupid 'unlisted dependency' crap React keeps pulling with every time I use useEffect
 * GridPane padding on the right & ONLY THE RIGHT doesn't work on Safari, who the hell knows why
   * literally top, left & BOTTOM work PERFECTLY FINE, WHAT?!
+* The animation timing gets really weird if you restart the animation before it finishes

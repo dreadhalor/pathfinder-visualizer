@@ -10,10 +10,10 @@ const Grid = ({ grid, rows, cols, active_type }) => {
 
   return (
     <div className='border border-slate-600' style={gridStyle}>
-      {grid.map((row) =>
-        row.map((square) => (
+      {grid.map((row, rowIndex) =>
+        row.map((square, colIndex) => (
           <GridSquare
-            key={square.uuid}
+            key={JSON.stringify([rowIndex, colIndex])}
             square={square}
             active_type={active_type}
           />

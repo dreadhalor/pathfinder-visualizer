@@ -3,10 +3,9 @@ import './GridSquare.scss';
 
 const GridSquare = ({ square, active_type }) => {
   const clicked = () => {
-    if (!square.setVal) square.setVal = setVal;
-    square.setValue(square.uuid, active_type.active);
+    //square.setVal = setVal;
+    square.setValue(square.uuid, active_type);
     setVal(square.val);
-    //setClass(val, mode);
   };
 
   const [pathVal, setPathVal] = useState(0);
@@ -52,7 +51,10 @@ const GridSquare = ({ square, active_type }) => {
       result += ' ';
       switch (pathVal) {
         case 1:
-          result += 'on-path';
+          result += 'on-path animate2';
+          break;
+        case 2:
+          result += 'traversed animate';
           break;
         default:
           break;
