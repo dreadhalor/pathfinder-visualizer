@@ -60,7 +60,7 @@
 @keyframes pop {
   0% {
     border-width: 1px;
-    //background-color: skyblue;
+    background-color: white;
     //box-shadow: 1px 1px;
   }
   50% {
@@ -68,13 +68,12 @@
     //box-shadow: 1px 1px;
   }
   100% {
-    box-shadow: 1px 1px;
+    box-shadow: 1px 1px black;
   }
 }
 @keyframes pop2 {
   0% {
     border-width: 1px;
-    //background-color: skyblue;
     //box-shadow: 1px 2px;
   }
   50% {

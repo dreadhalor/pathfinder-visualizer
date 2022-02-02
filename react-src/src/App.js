@@ -8,6 +8,7 @@ let animation_queue = [];
 
 function App() {
   const localStorageName = 'grid';
+  const useDirections = true;
 
   let rows = 25,
     cols = 40;
@@ -16,7 +17,7 @@ function App() {
     for (let i = 0; i < rows; i++) {
       let row = [];
       for (let j = 0; j < cols; j++) {
-        row.push({ uuid: uuidv4(), val: 0 });
+        row.push({ uuid: uuidv4(), val: 0, pathVal: 0, mode: 1 });
       }
       new_grid.push(row);
     }
@@ -27,22 +28,57 @@ function App() {
   const [grid, setGrid] = useState(createNewGrid());
   const [active_type, setActiveType] = useState(1);
 
-  const animation_delay = 5;
+  const animation_delay = 10;
   const flushAnimationQueue = () => (animation_queue = []);
   const animate = () => animateAll();
   function animateAll() {
     let animation = animation_queue.shift();
     if (animation) {
       animation();
+      updateGridState();
       setTimeout(animateAll, animation_delay);
     }
+    // for (let i = 0; i < animation_queue.length; i++) {
+    //   let animation = animation_queue[i];
+    //   setTimeout(() => {
+    //     animation();
+    //     updateGridState();
+    //   }, animation_delay * i);
+    // }
+    //animation_queue = [];
   }
+
+  const updateGridState = () => {
+    let new_grid = [];
+    for (let i = 0; i < rows; i++) {
+      let row = [];
+      for (let j = 0; j < cols; j++) {
+        row.push(grid[i][j]);
+      }
+      new_grid.push(row);
+    }
+    setGrid(new_grid);
+  };
 
   useEffect(() => initializeGrid(), []);
 
   const saveGrid = () => {
-    window.localStorage.setItem(localStorageName, JSON.stringify(grid));
+    window.localStorage.setItem(
+      localStorageName,
+      JSON.stringify(getGridModel())
+    );
     window.localStorage.removeItem('gofuckyourself');
+  };
+
+  const getGridModel = () => {
+    return grid.map((row) =>
+      row.map((square) => {
+        return {
+          uuid: square.uuid,
+          val: square.val,
+        };
+      })
+    );
   };
 
   const initializeGrid = () => {
@@ -63,9 +99,10 @@ function App() {
           let square = grid[i][j];
           square.uuid = new_grid[i][j].uuid;
           square.val = new_grid[i][j].val;
-          square.setVal(square.val);
+          //square.setVal(square.val);
         }
       }
+      updateGridState();
       setValueFunctions();
     }
   };
@@ -83,11 +120,13 @@ function App() {
     setSolved(false);
     for (let i = 0; i < rows; i++) {
       for (let j = 0; j < cols; j++) {
-        if (grid[i][j].getPathVal() !== 0) {
-          grid[i][j].setPathVal(0);
+        if (grid[i][j].pathVal !== 0) {
+          grid[i][j].pathVal = 0;
+          if (useDirections) grid[i][j].direction = null;
         }
       }
     }
+    updateGridState();
   };
 
   const setValue = (square_uuid, val) => {
@@ -100,27 +139,30 @@ function App() {
         let cell_match = square.uuid === square_uuid;
         let val_match = square.val === val;
         if (cell_match && val_match) {
+          console.log('val reset');
           square.val = 0;
         } else if (cell_match) {
-          if (square.val || square.getPathVal() === 1) resetPath();
+          if (square.val || square.pathVal === 1) resetPath();
           square.val = val;
         } else if (val_match) {
           if (val === 1 || val === 2) {
             square.val = 0;
-            square.setVal(0); //change eventually so state is more centralized
+            //square.setVal(0); //change eventually so state is more centralized
           }
         }
       }
     }
+    updateGridState();
     saveGrid();
   };
 
   const setMode = (mode) => {
     for (let i = 0; i < rows; i++) {
       for (let j = 0; j < cols; j++) {
-        grid[i][j].setMode(mode);
+        grid[i][j].mode = mode;
       }
     }
+    updateGridState();
   };
 
   // let active_type = {
@@ -161,20 +203,32 @@ function App() {
     if (start) {
       queue.push(start);
       pathMap.set(JSON.stringify(start), null);
-      animation_queue.push(() => grid[start[0]][start[1]].setPathVal(2));
+      //animation_queue.push(() => grid[start[0]][start[1]].setPathVal(2));
+      animation_queue.push(() => {
+        grid[start[0]][start[1]].pathVal = 2;
+        //updateGridState();
+      });
     }
     let unsolved = true;
     while (queue.length > 0) {
+      let round_animations = [];
       let [r, c] = queue.shift();
       if (maze_copy[r][c] === 2) {
         end = [r, c];
         queue = [];
         break;
       }
+      let animation = null;
       if (unsolved && r > 0 && isValidNeighbor(maze_copy, pathMap, r - 1, c)) {
         queue.push([r - 1, c]);
         pathMap.set(JSON.stringify([r - 1, c]), [r, c]);
-        animation_queue.push(() => grid[r - 1][c].setPathVal(2));
+        animation = () => {
+          //grid[r - 1][c].setPathVal(2);
+          grid[r - 1][c].pathVal = 2;
+          if (useDirections) grid[r - 1][c].direction = '↓';
+          //updateGridState();
+        };
+        round_animations.push(animation);
         if (maze_copy[r - 1][c] === 2) unsolved = false;
       }
       if (
@@ -184,13 +238,25 @@ function App() {
       ) {
         queue.push([r + 1, c]);
         pathMap.set(JSON.stringify([r + 1, c]), [r, c]);
-        animation_queue.push(() => grid[r + 1][c].setPathVal(2));
+        animation = () => {
+          //grid[r + 1][c].setPathVal(2);
+          grid[r + 1][c].pathVal = 2;
+          if (useDirections) grid[r + 1][c].direction = '↑';
+          //updateGridState();
+        };
+        round_animations.push(animation);
         if (maze_copy[r + 1][c] === 2) unsolved = false;
       }
       if (unsolved && c > 0 && isValidNeighbor(maze_copy, pathMap, r, c - 1)) {
         queue.push([r, c - 1]);
         pathMap.set(JSON.stringify([r, c - 1]), [r, c]);
-        animation_queue.push(() => grid[r][c - 1].setPathVal(2));
+        animation = () => {
+          //grid[r][c - 1].setPathVal(2);
+          grid[r][c - 1].pathVal = 2;
+          if (useDirections) grid[r][c - 1].direction = '→';
+          //updateGridState();
+        };
+        round_animations.push(animation);
         if (maze_copy[r][c - 1] === 2) unsolved = false;
       }
       if (
@@ -200,9 +266,19 @@ function App() {
       ) {
         queue.push([r, c + 1]);
         pathMap.set(JSON.stringify([r, c + 1]), [r, c]);
-        animation_queue.push(() => grid[r][c + 1].setPathVal(2));
+        animation = () => {
+          //grid[r][c + 1].setPathVal(2);
+          grid[r][c + 1].pathVal = 2;
+          if (useDirections) grid[r][c + 1].direction = '←';
+          //updateGridState();
+        };
+        round_animations.push(animation);
         if (maze_copy[r][c + 1] === 2) unsolved = false;
       }
+      if (round_animations.length > 0)
+        animation_queue.push(() => {
+          for (let animation of round_animations) animation();
+        });
     }
     if (end) {
       //solution found
@@ -215,13 +291,17 @@ function App() {
       }
       for (let i = 0; i < reverse_path.length; i++) {
         let [r, c] = reverse_path[i];
-        animation_queue.push(() => grid[r][c].setPathVal(1));
+        //animation_queue.push(() => grid[r][c].setPathVal(1));
+        animation_queue.push(() => {
+          grid[r][c].pathVal = 1;
+          //updateGridState();
+        });
       }
       animate();
     } else alert('No solution found!');
   };
 
-  setValueFunctions();
+  //setValueFunctions();
 
   return (
     <div className='App site-bg-empty w-full h-full flex flex-col'>

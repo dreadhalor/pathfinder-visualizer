@@ -3,25 +3,15 @@ import './GridSquare.scss';
 
 const GridSquare = ({ square, active_type }) => {
   const clicked = () => {
-    //square.setVal = setVal;
     square.setValue(square.uuid, active_type);
-    setVal(square.val);
   };
 
-  const [pathVal, setPathVal] = useState(0);
-  const getPathVal = () => pathVal;
-  const [val, setVal] = useState(0);
-  const [mode, setMode] = useState(0);
-  square.setMode = setMode;
-  square.setVal = setVal;
-  square.setPathVal = setPathVal;
-  square.getPathVal = getPathVal;
   const [myClass, setClass] = useState('');
 
   useEffect(() => {
     const getClass = () => {
       let result = 'grid-square ';
-      switch (val) {
+      switch (square.val) {
         case 1:
           result += 'val-start';
           break;
@@ -35,7 +25,7 @@ const GridSquare = ({ square, active_type }) => {
           break;
       }
       result += ' ';
-      switch (mode) {
+      switch (square.mode) {
         case 1:
           result += 'select-start';
           break;
@@ -49,7 +39,7 @@ const GridSquare = ({ square, active_type }) => {
           break;
       }
       result += ' ';
-      switch (pathVal) {
+      switch (square.pathVal) {
         case 1:
           result += 'on-path animate2';
           break;
@@ -63,7 +53,7 @@ const GridSquare = ({ square, active_type }) => {
     };
 
     setClass(getClass());
-  }, [val, mode, pathVal]);
+  }, [square.val, square.mode, square.pathVal]);
 
   const gridSquareStyle = {
     width: '25px',
@@ -71,8 +61,10 @@ const GridSquare = ({ square, active_type }) => {
   };
 
   return (
-    <div className='grid-square-wrapper' onClick={clicked}>
-      <div className={myClass} style={gridSquareStyle}></div>
+    <div className='grid-square-wrapper text-slate-600' onClick={clicked}>
+      <div className={myClass} style={gridSquareStyle}>
+        {square.direction && square.direction}
+      </div>
     </div>
   );
 };
