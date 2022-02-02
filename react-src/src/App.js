@@ -4,6 +4,8 @@ import TopNav from './components/TopNav';
 import { useEffect, useState } from 'react';
 import GridPane from './components/GridPane';
 
+let animation_queue = [];
+
 function App() {
   const localStorageName = 'grid';
 
@@ -25,52 +27,18 @@ function App() {
   const [grid, setGrid] = useState(createNewGrid());
   const [active_type, setActiveType] = useState(1);
 
-  const animation_delay = 100;
-  let animation_queue = [];
-  let animating = false;
-  const flushAnimation = () => {
-    console.log('flushed animation');
-    animating = false;
-    console.log('animating is: ' + animating);
-    animation_queue = [];
-    console.log('queue length: ' + animation_queue.length);
-  };
-  function animate() {
-    console.log('animate func is called');
-    if (!animating) {
-      console.log(
-        'running animate with ' + animation_queue.length + ' animations'
-      );
-      animating = true;
-      animateAll();
-    } else console.log('failed to call animate() again!');
-    console.log('animate() done');
-  }
+  const animation_delay = 5;
+  const flushAnimationQueue = () => (animation_queue = []);
+  const animate = () => animateAll();
   function animateAll() {
-    console.log(animation_queue);
-    if (animating) {
-      let animation = animation_queue.shift();
-      if (animation) {
-        animation();
-        setTimeout(animateAll, animation_delay);
-        console.log('animateAll iteration over');
-      }
-    } else flushAnimation();
+    let animation = animation_queue.shift();
+    if (animation) {
+      animation();
+      setTimeout(animateAll, animation_delay);
+    }
   }
 
-  // const grid = [];
-  // for (let i = 0; i < rows; i++) {
-  //   let row = [];
-  //   for (let j = 0; j < cols; j++) {
-  //     row.push({ uuid: uuidv4(), val: 0 });
-  //   }
-  //   grid.push(row);
-  // }
-
-  useEffect(() => {
-    console.log('initializing');
-    initializeGrid();
-  }, []);
+  useEffect(() => initializeGrid(), []);
 
   const saveGrid = () => {
     window.localStorage.setItem(localStorageName, JSON.stringify(grid));
@@ -111,7 +79,7 @@ function App() {
   };
 
   const resetPath = () => {
-    flushAnimation();
+    flushAnimationQueue();
     setSolved(false);
     for (let i = 0; i < rows; i++) {
       for (let j = 0; j < cols; j++) {
@@ -123,7 +91,9 @@ function App() {
   };
 
   const setValue = (square_uuid, val) => {
-    if (val === 1 || val === 2) resetPath();
+    if (val === 1 || val === 2 || (val === 3 && animation_queue.length > 0)) {
+      resetPath();
+    }
     for (let i = 0; i < rows; i++) {
       for (let j = 0; j < cols; j++) {
         let square = grid[i][j];
@@ -236,7 +206,6 @@ function App() {
     }
     if (end) {
       //solution found
-      //console.log(solved);
       setSolved(true);
       let reverse_path = [end];
       let next = pathMap.get(JSON.stringify(end));
@@ -244,15 +213,10 @@ function App() {
         reverse_path.push(next);
         next = pathMap.get(JSON.stringify(next));
       }
-      let shortest_path = reverse_path.slice(0).reverse();
       for (let i = 0; i < reverse_path.length; i++) {
         let [r, c] = reverse_path[i];
         animation_queue.push(() => grid[r][c].setPathVal(1));
       }
-      // for (let [r, c] of shortest_path) {
-      //   grid[r][c].setPathVal(1);
-      // }
-
       animate();
     } else alert('No solution found!');
   };
