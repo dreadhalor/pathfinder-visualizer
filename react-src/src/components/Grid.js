@@ -8,8 +8,24 @@ const Grid = ({ grid, rows, cols, active_type }) => {
     gridTemplateColumns: `repeat(${cols}, auto)`,
   };
 
+  const mouseDown = (event) => {
+    event.preventDefault();
+    console.log('mousedown');
+  };
+  const mouseUp = (event) => {
+    event.preventDefault();
+    console.log('mousedown');
+  };
+
+  console.log('no ur gay');
+
   return (
-    <div className='border border-slate-600' style={gridStyle}>
+    <div
+      className='border border-slate-600'
+      style={gridStyle}
+      onMouseDown={mouseDown}
+      onMouseUp={mouseUp}
+    >
       {grid.map((row, rowIndex) =>
         row.map((square, colIndex) => (
           <GridSquare
