@@ -1,9 +1,20 @@
 import { useEffect, useState } from 'react';
 import './GridSquare.scss';
 
-const GridSquare = ({ square, active_type }) => {
-  const clicked = (e) => {
-    square.setValue(square.uuid, active_type);
+const GridSquare = ({ square, active_type, gridMouseDown }) => {
+  const clicked = (disallow_toggle = false) => {
+    if (disallow_toggle && square?.val === active_type) return;
+    square.setValue(square.uuid, active_type, disallow_toggle);
+  };
+  const ensureVal = (val) => {
+    let valid = val === 3 || val === 0;
+    if (valid && square.val !== val) square.setValue(square.uuid, val, true);
+  };
+  const checkDrawing = (e) => {
+    if (gridMouseDown) {
+      if (e.buttons === 2 || e.shiftKey) ensureVal(0);
+      else ensureVal(active_type);
+    }
   };
 
   const [myClass, setClass] = useState('');
@@ -69,58 +80,13 @@ const GridSquare = ({ square, active_type }) => {
     height: '25px',
   };
 
-  const dragStart = (event) => {
-    event.stopPropagation();
-    const canvas = document.createElement('canvas');
-    event.dataTransfer.setData('text', square.val);
-    event.dataTransfer.setDragImage(canvas, 0, 0);
-    event.dataTransfer.effectAllowed = 'none';
-    //console.log(event.dataTransfer.getData('text'));
-    console.log('dragstart');
-  };
-  const dragEnd = (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    console.log('dragend');
-  };
-  const drop = (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    var data = event.dataTransfer.getData('text');
-    event.dataTransfer.clearData();
-    console.log(data);
-    console.log('drop');
-  };
-  const dragOver = (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    console.log('dragover');
-  };
-  const dragEnter = (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    console.log('dragenter');
-  };
-  const dragLeave = (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    console.log('dragleave');
-  };
-
-  const whatever = false;
-
   return (
     <div
       className='grid-square-wrapper text-slate-600'
-      onClick={clicked}
+      onClick={(e) => clicked()}
       onTransitionEnd={reset}
-      //draggable
-      // onDragStart={(e) => dragStart(e)}
-      // onDragEnd={(e) => dragEnd(e)}
-      // onDrop={(e) => drop(e)}
-      // onDragOver={(e) => dragOver(e)}
-      // onDragEnter={(e) => dragEnter(e)}
-      // onDragLeave={(e) => dragLeave(e)}
+      onPointerEnter={(e) => checkDrawing(e)}
+      onPointerMove={(e) => checkDrawing(e)}
     >
       <div className={myClass} style={gridSquareStyle}>
         {square.direction && square.direction}

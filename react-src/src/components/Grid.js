@@ -1,6 +1,6 @@
 import GridSquare from './GridSquare';
 
-const Grid = ({ grid, rows, cols, active_type }) => {
+const Grid = ({ grid, rows, cols, active_type, mouseDown }) => {
   const gridStyle = {
     margin: 'auto',
     display: 'grid',
@@ -8,30 +8,15 @@ const Grid = ({ grid, rows, cols, active_type }) => {
     gridTemplateColumns: `repeat(${cols}, auto)`,
   };
 
-  const mouseDown = (event) => {
-    event.preventDefault();
-    console.log('mousedown');
-  };
-  const mouseUp = (event) => {
-    event.preventDefault();
-    console.log('mousedown');
-  };
-
-  console.log('no ur gay');
-
   return (
-    <div
-      className='border border-slate-600'
-      style={gridStyle}
-      onMouseDown={mouseDown}
-      onMouseUp={mouseUp}
-    >
+    <div className='border border-slate-600' style={gridStyle}>
       {grid.map((row, rowIndex) =>
         row.map((square, colIndex) => (
           <GridSquare
             key={JSON.stringify([rowIndex, colIndex])}
             square={square}
             active_type={active_type}
+            gridMouseDown={mouseDown}
           />
         ))
       )}

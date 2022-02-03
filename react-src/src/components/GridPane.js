@@ -1,4 +1,5 @@
-import Grid from './Grid';
+//import Grid from './Grid';
+import GridMouseWrapper from './GridMouseWrapper';
 import GridOverlay from './GridOverlay';
 
 const GridPane = ({
@@ -18,7 +19,12 @@ const GridPane = ({
         resetPath={resetPath}
       />
       <div className='w-full h-full flex overflow-auto p-4'>
-        <Grid grid={grid} rows={rows} cols={cols} active_type={active_type} />
+        <GridMouseWrapper
+          grid={grid}
+          rows={rows}
+          cols={cols}
+          active_type={active_type}
+        />
       </div>
     </div>
   );

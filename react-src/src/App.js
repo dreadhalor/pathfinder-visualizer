@@ -96,6 +96,7 @@ function App() {
   };
 
   const initializeGrid = () => {
+    setValueFunctions();
     let stored_grid = checkLocalStorage();
     if (stored_grid) overwriteGrid(JSON.parse(stored_grid));
   };
@@ -113,7 +114,6 @@ function App() {
           let square = grid[i][j];
           square.uuid = new_grid[i][j].uuid;
           square.val = new_grid[i][j].val;
-          //square.setVal(square.val);
         }
       }
       updateGridState();
@@ -144,7 +144,7 @@ function App() {
     updateGridState();
   };
 
-  const setValue = (square_uuid, val) => {
+  const setValue = (square_uuid, val, disallow_toggle) => {
     if (val === 1 || val === 2 || (val === 3 && animation_queue.length > 0)) {
       resetPath();
     }
@@ -153,10 +153,10 @@ function App() {
         let square = grid[i][j];
         let cell_match = square.uuid === square_uuid;
         let val_match = square.val === val;
-        if (cell_match && val_match) {
+        if (cell_match && val_match && !disallow_toggle) {
           square.val = 0;
         } else if (cell_match) {
-          if (square.val || square.getPathVal() === 1) resetPath();
+          if ((val && square.val) || square.getPathVal() === 1) resetPath();
           square.val = val;
         } else if (val_match) {
           if (val === 1 || val === 2) {
@@ -178,10 +178,6 @@ function App() {
     }
     updateGridState();
   };
-
-  // let active_type = {
-  //   active: 1,
-  // };
 
   const getStartNodes = () => {
     let result = [];
@@ -329,7 +325,10 @@ function App() {
   //setValueFunctions();
 
   return (
-    <div className='App site-bg-empty w-full h-full flex flex-col'>
+    <div
+      className='App site-bg-empty w-full h-full flex flex-col'
+      onContextMenu={(e) => e.preventDefault()}
+    >
       <TopNav
         active_type={active_type}
         setActiveType={setActiveType}
