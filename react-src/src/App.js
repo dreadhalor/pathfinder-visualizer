@@ -8,7 +8,10 @@ let animation_queue = [];
 
 function App() {
   const localStorageName = 'grid';
-  const useDirections = false;
+  const useArrows = {
+    on_path: false,
+    on_traversed: false,
+  };
 
   let rows = 25,
     cols = 40;
@@ -134,7 +137,7 @@ function App() {
         let pathVal = grid[i][j].getPathVal();
         if (pathVal === 1 || pathVal === 2) {
           grid[i][j].setPathVal(3);
-          if (useDirections) grid[i][j].direction = null;
+          if (grid[i][j].direction) grid[i][j].direction = null;
         }
       }
     }
@@ -236,7 +239,7 @@ function App() {
         animation = () => {
           //grid[r - 1][c].setPathVal(2);
           grid[r - 1][c].setPathVal(2);
-          if (useDirections) grid[r - 1][c].direction = '↓';
+          if (useArrows.on_traversed) grid[r - 1][c].direction = '↓';
           //updateGridState();
         };
         round_animations.push(animation);
@@ -252,7 +255,7 @@ function App() {
         animation = () => {
           //grid[r + 1][c].setPathVal(2);
           grid[r + 1][c].setPathVal(2);
-          if (useDirections) grid[r + 1][c].direction = '↑';
+          if (useArrows.on_traversed) grid[r + 1][c].direction = '↑';
           //updateGridState();
         };
         round_animations.push(animation);
@@ -264,7 +267,7 @@ function App() {
         animation = () => {
           //grid[r][c - 1].setPathVal(2);
           grid[r][c - 1].setPathVal(2);
-          if (useDirections) grid[r][c - 1].direction = '→';
+          if (useArrows.on_traversed) grid[r][c - 1].direction = '→';
           //updateGridState();
         };
         round_animations.push(animation);
@@ -280,7 +283,7 @@ function App() {
         animation = () => {
           //grid[r][c + 1].setPathVal(2);
           grid[r][c + 1].setPathVal(2);
-          if (useDirections) grid[r][c + 1].direction = '←';
+          if (useArrows.on_traversed) grid[r][c + 1].direction = '←';
           //updateGridState();
         };
         round_animations.push(animation);
@@ -305,6 +308,17 @@ function App() {
         //animation_queue.push(() => grid[r][c].setPathVal(1));
         animation_queue.push(() => {
           grid[r][c].setPathVal(1);
+          if (useArrows.on_path) {
+            let child = reverse_path[i - 1];
+            if (child) {
+              let [c_r, c_c] = child;
+              let diff = [r - c_r, c - c_c];
+              if (diff[0] === 1) grid[r][c].direction = '↑';
+              else if (diff[0] === -1) grid[r][c].direction = '↓';
+              else if (diff[1] === 1) grid[r][c].direction = '←';
+              else if (diff[1] === -1) grid[r][c].direction = '→';
+            }
+          }
           //updateGridState();
         });
       }
