@@ -30,7 +30,7 @@ const MouseDetector = ({ className, children }) => {
         setPressY(null);
         setButtons(0);
       } else if (event.buttons) {
-        console.log(event.buttons);
+        //console.log(event.buttons);
         setPointerDown(true);
         setDrag(true);
       }
@@ -49,7 +49,7 @@ const MouseDetector = ({ className, children }) => {
     }
   };
   const handleClick = (event) => {
-    if (pointerEvent.buttons === 1) {
+    if (buttons === 1) {
       if (drag) {
         let dragLeftClick = clickFunctions.dragLeftClick;
         if (dragLeftClick) dragLeftClick();
@@ -62,7 +62,7 @@ const MouseDetector = ({ className, children }) => {
           if (leftClick) leftClick();
         }
       }
-    } else if (pointerEvent.buttons === 2) {
+    } else if (buttons === 2) {
       if (drag) {
         let dragRightClick = clickFunctions.dragRightClick;
         if (dragRightClick) dragRightClick();
