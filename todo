@@ -4,3 +4,5 @@
   * literally top, left & BOTTOM work PERFECTLY FINE, WHAT?!
 * the animation is fucked when managed by a global grid state, figure out a way to break up that state into individual objects ASAP
   * for now we just did the workaround where we make the tile a smart component & manually pass its state change method to the parent
+* right click doesn't work directly on tiles
+* mouseup on a source mousedown tile that was set to a wall by drawing will convert it back to blank

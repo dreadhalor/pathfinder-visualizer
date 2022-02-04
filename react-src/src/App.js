@@ -29,7 +29,7 @@ function App() {
 
   const [solved, setSolved] = useState(false);
   const [grid, setGrid] = useState(createNewGrid());
-  const [active_type, setActiveType] = useState(1);
+  const [active_type, setActiveType] = useState(3);
 
   const animation_delay = 5;
   const flushAnimationQueue = () => {

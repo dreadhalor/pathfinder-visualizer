@@ -1,19 +1,26 @@
 import { useEffect, useState } from 'react';
 import './GridSquare.scss';
 
-const GridSquare = ({ square, active_type, gridMouseDown }) => {
+const GridSquare = ({
+  square,
+  pointerDown,
+  pointerOver,
+  clickFunctions,
+  drag,
+  pointerEvent,
+}) => {
   const clicked = (disallow_toggle = false) => {
-    if (disallow_toggle && square?.val === active_type) return;
-    square.setValue(square.uuid, active_type, disallow_toggle);
+    if (disallow_toggle && square?.val === square?.mode) return;
+    square.setValue(square.uuid, square.mode, disallow_toggle);
   };
   const ensureVal = (val) => {
     let valid = val === 3 || val === 0;
     if (valid && square.val !== val) square.setValue(square.uuid, val, true);
   };
-  const checkDrawing = (e) => {
-    if (gridMouseDown) {
-      if (e.buttons === 2 || e.shiftKey) ensureVal(0);
-      else ensureVal(active_type);
+  const checkDrawing = () => {
+    if (drag) {
+      if (pointerEvent.buttons === 2 || pointerEvent.shiftKey) ensureVal(0);
+      else ensureVal(square.mode);
     }
   };
 
@@ -22,6 +29,15 @@ const GridSquare = ({ square, active_type, gridMouseDown }) => {
   const getPathVal = () => pathVal;
   square.getPathVal = getPathVal;
   square.setPathVal = setPathVal;
+
+  useEffect(() => {
+    clickFunctions.click = () => clicked();
+    clickFunctions.dragClick = () => {
+      if (square.mode === 1 || square.mode === 2) clicked();
+    };
+  }, []);
+
+  useEffect(() => checkDrawing(), [drag]);
 
   useEffect(() => {
     const getClass = () => {
@@ -40,6 +56,8 @@ const GridSquare = ({ square, active_type, gridMouseDown }) => {
           break;
       }
       result += ' ';
+      if (pointerDown) result += 'active ';
+      if (pointerOver) result += 'hover ';
       switch (square.mode) {
         case 1:
           result += 'select-start';
@@ -71,7 +89,7 @@ const GridSquare = ({ square, active_type, gridMouseDown }) => {
     };
 
     setClass(getClass());
-  }, [square.val, square.mode, pathVal]);
+  }, [square.val, square.mode, pathVal, pointerDown, pointerOver]);
 
   const reset = () => setPathVal(0); //lol this will scale horribly
 
@@ -82,11 +100,11 @@ const GridSquare = ({ square, active_type, gridMouseDown }) => {
 
   return (
     <div
-      className='grid-square-wrapper text-slate-600'
-      onClick={(e) => clicked()}
+      className='text-slate-600'
+      //onClick={(e) => clicked()}
       onTransitionEnd={reset}
-      onPointerEnter={(e) => checkDrawing(e)}
-      onPointerMove={(e) => checkDrawing(e)}
+      // onPointerEnter={(e) => checkDrawing(e)}
+      // onPointerMove={(e) => checkDrawing(e)}
     >
       <div className={myClass} style={gridSquareStyle}>
         {square.direction && square.direction}

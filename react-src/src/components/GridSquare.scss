@@ -1,27 +1,21 @@
-.grid-square-wrapper {
-  &:active {
-    .grid-square {
-      transform: scale(0.9);
-    }
+.active {
+  transform: scale(0.9);
+}
+.hover {
+  &.select-start {
+    background-color: #b3ffb3;
   }
-  &:hover {
-    .grid-square {
-      &.select-start {
-        background-color: #b3ffb3;
-      }
-      &.select-end {
-        background-color: #ffc2c2;
-      }
-      &.val-start {
-        background-color: #00f000;
-      }
-      &.val-end {
-        background-color: #ff4d4d;
-      }
-      &.select-wall:not(.val-wall) {
-        opacity: 0.6;
-      }
-    }
+  &.select-end {
+    background-color: #ffc2c2;
+  }
+  &.val-start {
+    background-color: #00f000;
+  }
+  &.val-end {
+    background-color: #ff4d4d;
+  }
+  &.select-wall:not(.val-wall) {
+    opacity: 0.6;
   }
 }
 
