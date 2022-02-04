@@ -23,6 +23,8 @@
   @apply border-slate-400;
   border-width: 0 0 1px 1px;
   background-color: white;
+  height: 100%;
+  width: 100%;
 }
 .on-path {
   background-color: yellow;
@@ -42,43 +44,45 @@
   border: 0px;
 }
 
+$standard-duration: 0.3s;
 .animate {
   animation-name: pop;
-  animation-duration: 0.3s;
+  animation-duration: $standard-duration;
 }
 .animate2 {
   animation-name: pop2;
-  animation-duration: 0.3s;
+  animation-duration: $standard-duration;
 }
 .reset {
   transition-property: background-color;
-  transition-duration: 0.3s;
+  transition-duration: $standard-duration;
 }
 
 @keyframes pop {
   0% {
     border-width: 1px;
     filter: brightness(0.8);
-    //box-shadow: 1px 1px;
+    box-shadow: 1px 1px 1px 1px black;
   }
   50% {
+    z-index: 10;
     transform: scale(1.3);
-    //box-shadow: 1px 1px;
+    box-shadow: 2px 2px 2px 2px black;
   }
   100% {
-    box-shadow: 1px 1px black;
+    box-shadow: 1px 1px 1px 1px black;
   }
 }
 @keyframes pop2 {
   0% {
     border-width: 1px;
-    //box-shadow: 1px 2px;
+    box-shadow: 1px 1px 1px 1px black;
   }
   50% {
     transform: scale(1.3);
-    //box-shadow: 1px 1px;
+    box-shadow: 2px 2px 2px 2px black;
   }
   100% {
-    //box-shadow: 1px 1px;
+    box-shadow: 1px 1px 1px 1px black;
   }
 }

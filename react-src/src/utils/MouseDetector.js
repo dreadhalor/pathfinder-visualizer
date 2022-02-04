@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 const MouseDetector = ({ className, children }) => {
   const [pointerDown, setPointerDown] = useState(false);
@@ -20,6 +20,7 @@ const MouseDetector = ({ className, children }) => {
   });
 
   const togglePointerOver = (event, val) => {
+    //console.log('pointer over: ' + val);
     setPointerEvent(event);
     if (val !== pointerOver) setPointerOver(val);
     if (val !== pointerDown) {
@@ -30,20 +31,23 @@ const MouseDetector = ({ className, children }) => {
         setPressY(null);
         setButtons(0);
       } else if (event.buttons) {
-        //console.log(event.buttons);
+        setButtons(event.buttons);
         setPointerDown(true);
         setDrag(true);
       }
     }
   };
   const togglePointerDown = (event, val) => {
+    //console.log('pointer down: ' + val);
     setPointerEvent(event);
     if (val !== pointerDown) {
       setPointerDown(val);
-      if (val && !pressX && !pressY) {
-        setPressX(event.screenX);
-        setPressY(event.screenY);
+      if (val) {
         setButtons(event.buttons);
+        if (!pressX && !pressY) {
+          setPressX(event.screenX);
+          setPressY(event.screenY);
+        }
       }
       if (!val && pointerOver) handleClick(event);
     }
