@@ -9,10 +9,14 @@ const MouseDetector = ({ className, children }) => {
   const [drag, setDrag] = useState(false);
   const [pressX, setPressX] = useState(null);
   const [pressY, setPressY] = useState(null);
+  const [buttons, setButtons] = useState(0);
 
   const [clickFunctions, setClickFunctions] = useState({
-    click: null,
-    dragClick: null,
+    leftClick: null,
+    shiftLeftClick: null,
+    rightClick: null,
+    dragLeftClick: null,
+    dragRightClick: null,
   });
 
   const togglePointerOver = (event, val) => {
@@ -24,7 +28,9 @@ const MouseDetector = ({ className, children }) => {
         setDrag(false);
         setPressX(null);
         setPressY(null);
+        setButtons(0);
       } else if (event.buttons) {
+        console.log(event.buttons);
         setPointerDown(true);
         setDrag(true);
       }
@@ -37,18 +43,36 @@ const MouseDetector = ({ className, children }) => {
       if (val && !pressX && !pressY) {
         setPressX(event.screenX);
         setPressY(event.screenY);
+        setButtons(event.buttons);
       }
-      if (!val && pointerOver) {
-        if (drag) {
-          let dragClick = clickFunctions.dragClick;
-          if (dragClick) dragClick();
+      if (!val && pointerOver) handleClick(event);
+    }
+  };
+  const handleClick = (event) => {
+    if (pointerEvent.buttons === 1) {
+      if (drag) {
+        let dragLeftClick = clickFunctions.dragLeftClick;
+        if (dragLeftClick) dragLeftClick();
+      } else {
+        if (event.shiftKey) {
+          let shiftLeftClick = clickFunctions.shiftLeftClick;
+          if (shiftLeftClick) shiftLeftClick();
         } else {
-          let click = clickFunctions.click;
-          if (click) click();
+          let leftClick = clickFunctions.leftClick;
+          if (leftClick) leftClick();
         }
+      }
+    } else if (pointerEvent.buttons === 2) {
+      if (drag) {
+        let dragRightClick = clickFunctions.dragRightClick;
+        if (dragRightClick) dragRightClick();
+      } else {
+        let rightClick = clickFunctions.rightClick;
+        if (rightClick) rightClick();
       }
     }
   };
+
   const dragLimit = 1;
   const pointerMoved = (event) => {
     setPointerEvent(event);

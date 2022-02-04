@@ -19,10 +19,11 @@ const GridSquare = ({
   };
   const checkDrawing = () => {
     if (drag) {
-      if (pointerEvent.buttons === 2 || pointerEvent.shiftKey) ensureVal(0);
+      if (pointerEvent.buttons === 2 || pointerEvent.shiftKey) erase();
       else ensureVal(square.mode);
     }
   };
+  const erase = () => ensureVal(0);
 
   const [myClass, setClass] = useState('');
   const [pathVal, setPathVal] = useState(0);
@@ -31,10 +32,13 @@ const GridSquare = ({
   square.setPathVal = setPathVal;
 
   useEffect(() => {
-    clickFunctions.click = () => clicked();
-    clickFunctions.dragClick = () => {
+    clickFunctions.leftClick = clicked;
+    clickFunctions.rightClick = erase;
+    clickFunctions.shiftLeftClick = erase;
+    clickFunctions.dragLeftClick = () => {
       if (square.mode === 1 || square.mode === 2) clicked();
     };
+    clickFunctions.dragRightClick = erase;
   }, []);
 
   useEffect(() => checkDrawing(), [drag]);
