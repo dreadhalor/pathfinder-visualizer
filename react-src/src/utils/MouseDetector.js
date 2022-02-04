@@ -16,7 +16,10 @@ const MouseDetector = ({ className, children }) => {
     shiftLeftClick: null,
     rightClick: null,
     dragLeftClick: null,
+    shiftDragLeftClick: null,
     dragRightClick: null,
+    shiftPreDragExit: null, //pre-drag click doesn't detect shift like 1/100 times & I physically can't explain it & I hate React
+    preDragExit: null,
   });
 
   const togglePointerOver = (event, val) => {
@@ -24,9 +27,18 @@ const MouseDetector = ({ className, children }) => {
     if (val !== pointerOver) setPointerOver(val);
     if (val !== pointerDown) {
       if (!val) {
-        if (pointerDown) setDrag(true); //in case the user drag-exits from the border of the component & doesn't fully trigger the drag event
+        if (pointerDown && !drag) {
+          //in case the user drag-exits from the border of the component & doesn't fully trigger the drag event
+          if (event.shiftKey) {
+            let shiftPreDragExit = clickFunctions.shiftPreDragExit;
+            if (shiftPreDragExit) shiftPreDragExit();
+          } else {
+            let preDragExit = clickFunctions.preDragExit;
+            if (preDragExit) preDragExit();
+          }
+        }
         setPointerDown(false);
-        setTimeout(() => setDrag(false), 5); //THE PEAK OF JANK
+        setDrag(false);
         setPressX(null);
         setPressY(null);
         setButtons(0);
@@ -54,8 +66,13 @@ const MouseDetector = ({ className, children }) => {
   const handleClick = (event) => {
     if (buttons === 1) {
       if (drag) {
-        let dragLeftClick = clickFunctions.dragLeftClick;
-        if (dragLeftClick) dragLeftClick();
+        if (event.shiftKey) {
+          let shiftDragLeftClick = clickFunctions.shiftDragLeftClick;
+          if (shiftDragLeftClick) shiftDragLeftClick();
+        } else {
+          let dragLeftClick = clickFunctions.dragLeftClick;
+          if (dragLeftClick) dragLeftClick();
+        }
       } else {
         if (event.shiftKey) {
           let shiftLeftClick = clickFunctions.shiftLeftClick;

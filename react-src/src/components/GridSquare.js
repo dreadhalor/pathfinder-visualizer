@@ -17,9 +17,10 @@ const GridSquare = ({
     let valid = val === 3 || val === 0;
     if (valid && square.val !== val) square.setValue(square.uuid, val, true);
   };
-  const checkDrawing = () => {
-    if (drag) {
-      if (pointerEvent.buttons === 2 || pointerEvent.shiftKey) erase();
+  const checkDrawing = (override = false, shift) => {
+    if (drag || override) {
+      if (pointerEvent.buttons === 2 || (shift ?? pointerEvent.shiftKey))
+        erase();
       else ensureVal(square.mode);
     }
   };
@@ -35,10 +36,13 @@ const GridSquare = ({
     clickFunctions.leftClick = clicked;
     clickFunctions.rightClick = erase;
     clickFunctions.shiftLeftClick = erase;
+    clickFunctions.shiftDragLeftClick = erase;
     clickFunctions.dragLeftClick = () => {
       if (square.mode === 1 || square.mode === 2) clicked();
     };
     clickFunctions.dragRightClick = erase;
+    clickFunctions.preDragExit = () => checkDrawing(true, false);
+    clickFunctions.shiftPreDragExit = () => checkDrawing(true, true);
   }, []);
 
   useEffect(() => checkDrawing(), [drag]);
