@@ -33,7 +33,7 @@ function App() {
   const [active_type, setActiveType] = useState(1);
 
   const animation_delay = 5;
-  const animation_threads = 5;
+  const animation_threads = 4;
   const flushAnimationQueue = () => {
     animation_queue = [];
     executeOnAllTiles((tile) => tile.setPathVal(0));
