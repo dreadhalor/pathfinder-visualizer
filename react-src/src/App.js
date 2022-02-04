@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import GridPane from './components/GridPane';
 
 let animation_queue = [];
+let count = 0;
 
 function App() {
   const localStorageName = 'grid';
@@ -32,16 +33,21 @@ function App() {
   const [active_type, setActiveType] = useState(1);
 
   const animation_delay = 5;
+  const animation_threads = 5;
   const flushAnimationQueue = () => {
     animation_queue = [];
     executeOnAllTiles((tile) => tile.setPathVal(0));
   };
-  const animate = () => animateAll();
+  const animate = () => {
+    for (let i = 0; i < animation_threads; i++) {
+      setTimeout(animateAll, animation_delay * i);
+    }
+  };
   function animateAll() {
     let animation = animation_queue.shift();
     if (animation) {
       animation();
-      setTimeout(animateAll, animation_delay);
+      setTimeout(animateAll, animation_delay * animation_threads);
     }
   }
 
