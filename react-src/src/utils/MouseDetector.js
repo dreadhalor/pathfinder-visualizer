@@ -20,13 +20,13 @@ const MouseDetector = ({ className, children }) => {
   });
 
   const togglePointerOver = (event, val) => {
-    //console.log('pointer over: ' + val);
     setPointerEvent(event);
     if (val !== pointerOver) setPointerOver(val);
     if (val !== pointerDown) {
       if (!val) {
+        if (pointerDown) setDrag(true); //in case the user drag-exits from the border of the component & doesn't fully trigger the drag event
         setPointerDown(false);
-        setDrag(false);
+        setTimeout(() => setDrag(false), 5); //THE PEAK OF JANK
         setPressX(null);
         setPressY(null);
         setButtons(0);
@@ -38,7 +38,6 @@ const MouseDetector = ({ className, children }) => {
     }
   };
   const togglePointerDown = (event, val) => {
-    //console.log('pointer down: ' + val);
     setPointerEvent(event);
     if (val !== pointerDown) {
       setPointerDown(val);
@@ -77,7 +76,7 @@ const MouseDetector = ({ className, children }) => {
     }
   };
 
-  const dragLimit = 1;
+  const dragLimit = 3;
   const pointerMoved = (event) => {
     setPointerEvent(event);
     if (
@@ -103,11 +102,11 @@ const MouseDetector = ({ className, children }) => {
   return (
     <div
       className={className}
-      onPointerDown={(e) => togglePointerDown(e, true)}
-      onPointerUp={(e) => togglePointerDown(e, false)}
-      onPointerEnter={(e) => togglePointerOver(e, true)}
-      onPointerLeave={(e) => togglePointerOver(e, false)}
-      onPointerMove={(e) => pointerMoved(e)}
+      onMouseDown={(e) => togglePointerDown(e, true)}
+      onMouseUp={(e) => togglePointerDown(e, false)}
+      onMouseEnter={(e) => togglePointerOver(e, true)}
+      onMouseLeave={(e) => togglePointerOver(e, false)}
+      onMouseMove={(e) => pointerMoved(e)}
     >
       {childrenWithProps}
     </div>

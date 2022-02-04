@@ -95,24 +95,17 @@ const GridSquare = ({
     setClass(getClass());
   }, [square.val, square.mode, pathVal, pointerDown, pointerOver]);
 
-  const reset = () => {
-    setPathVal(0);
-  }; //lol this will scale horribly
-
+  const reset = () => setPathVal(0); //lol this will scale horribly
   const gridSquareSize = {
     width: '25px',
     height: '25px',
-    overflow: 'visible',
   };
 
   return (
     <div
       style={gridSquareSize}
       className='text-slate-600'
-      //onClick={(e) => clicked()}
       onTransitionEnd={reset}
-      // onPointerEnter={(e) => checkDrawing(e)}
-      // onPointerMove={(e) => checkDrawing(e)}
     >
       <div className={myClass}>{square.direction && square.direction}</div>
     </div>

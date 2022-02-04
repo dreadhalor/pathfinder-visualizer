@@ -4,4 +4,12 @@
   * literally top, left & BOTTOM work PERFECTLY FINE, WHAT?!
 * the animation is fucked when managed by a global grid state, figure out a way to break up that state into individual objects ASAP
   * for now we just did the workaround where we make the tile a smart component & manually pass its state change method to the parent
-* Right click now works on tiles, but it also will place
+* transform: scale(0.9) fucks with the mouse detection & makes it flicker when on the border of a wall that's set to opacity any less than 1
+  * opacity 1 is fine, 0.99 is fucked, anything else <1 is fucked
+  * removing the border math also somehow works just fine
+  * it's fixed when putting it into another nested container but then it fucks the animation
+  * there is sub-pixel math going on because I can switch from one box to another without visibly moving the mouse
+  * truly this is one of the largest conundrums I've ever had
+  * I miss Angular so much
+* the mouse detection is kinda fucked, all the border detection is offset to the left
+* fix the drag-out-from-border detection, the current solution is janky as hell
