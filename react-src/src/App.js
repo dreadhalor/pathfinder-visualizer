@@ -41,17 +41,8 @@ function App() {
     let animation = animation_queue.shift();
     if (animation) {
       animation();
-      //updateGridState();
       setTimeout(animateAll, animation_delay);
     }
-    // for (let i = 0; i < animation_queue.length; i++) {
-    //   let animation = animation_queue[i];
-    //   setTimeout(() => {
-    //     animation();
-    //     updateGridState();
-    //   }, animation_delay * i);
-    // }
-    //animation_queue = [];
   }
 
   const executeOnAllTiles = (func) => {

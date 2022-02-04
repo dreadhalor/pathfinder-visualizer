@@ -44,7 +44,7 @@
   //border: 0px;
 }
 
-$standard-duration: 0.3s;
+$standard-duration: 0.5s;
 .animate {
   animation-name: pop;
   animation-duration: $standard-duration;
@@ -60,23 +60,21 @@ $standard-duration: 0.3s;
 
 @keyframes pop {
   0% {
-    z-index: 10;
     border-width: 1px;
-    filter: brightness(0.8);
+    filter: brightness(0.5);
     box-shadow: 1px 1px 1px 1px black;
   }
   50% {
-    z-index: 20;
     transform: scale(1.3);
     box-shadow: 2px 2px 2px 2px black;
   }
   100% {
-    z-index: 10;
     box-shadow: 1px 1px 1px 1px black;
   }
 }
 @keyframes pop2 {
   0% {
+    background-color: #ff6b6b;
     border-width: 1px;
     box-shadow: 1px 1px 1px 1px black;
   }
