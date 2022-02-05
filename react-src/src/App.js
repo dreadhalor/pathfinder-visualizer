@@ -319,8 +319,6 @@ function App() {
     } else alert('No solution found!');
   };
 
-  //setValueFunctions();
-
   return (
     <div
       className='App site-bg-empty w-full h-full flex flex-col'

@@ -31,6 +31,10 @@ const GridSquare = ({
   const getPathVal = () => pathVal;
   square.getPathVal = getPathVal;
   square.setPathVal = setPathVal;
+  const [val, setVal] = useState(0);
+  const getVal = () => val;
+  square.componentGetVal = getVal;
+  square.componentSetVal = setVal;
 
   useEffect(() => {
     clickFunctions.leftClick = clicked;

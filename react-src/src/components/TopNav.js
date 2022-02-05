@@ -17,8 +17,8 @@ const TopNav = ({ active_type, setActiveType, setMode }) => {
   return (
     <div className='border-b border-slate-500 bg-slate-200 flex flex-row justify-around'>
       <span className='flex-1'></span>
-      <p className='font-bold'>Tile type:</p>
-      <div>
+      <p className='font-bold my-auto'>Tile type:</p>
+      <div className='my-auto'>
         <span className='px-1'>
           <input
             checked={myMode === 1}
@@ -56,6 +56,12 @@ const TopNav = ({ active_type, setActiveType, setMode }) => {
           <label htmlFor='wall'>Wall</label>
         </span>
       </div>
+      <button
+        type='button'
+        className='rounded-md px-1 m-2 bg-blue-300 hover:bg-blue-400 active:bg-blue-500'
+      >
+        Generate Maze
+      </button>
       <span className='flex-1'></span>
     </div>
   );
