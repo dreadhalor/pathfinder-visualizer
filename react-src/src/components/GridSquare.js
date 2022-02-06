@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import './GridSquare.scss';
 
 const GridSquare = React.memo(
@@ -13,24 +13,34 @@ const GridSquare = React.memo(
     pointerEvent,
     setValue,
   }) => {
+    const myMode = useRef(mode);
+    useEffect(() => {
+      console.log('useRef val: ' + myMode.current);
+      myMode.current = mode;
+    }, [mode]);
     const clicked = (disallow_toggle = false) => {
+      if (mode === 3) return;
+      console.log('clicked fxn, mode is: ' + mode);
       if (disallow_toggle && square?.val === mode) return;
-      console.log('val I will send from Square to App is ' + mode);
-      setValue(square.uuid, mode, disallow_toggle);
+      // console.log('val I will send from Square to App is ' + mode);
+      setValue(square.uuid, myMode.current, disallow_toggle);
     };
     const ensureVal = (val) => {
       let valid = val === 3 || val === 0;
       if (valid && valForCheck !== val) setValue(square.uuid, val, true);
     };
     const checkDrawing = (override = false, shift) => {
-      console.log(valForCheck);
+      // console.log(valForCheck);
       if (drag || override) {
         if (pointerEvent.buttons === 2 || (shift ?? pointerEvent.shiftKey))
           erase();
         else ensureVal(mode);
       }
     };
-    const erase = () => ensureVal(0);
+    const erase = () => {
+      console.log('ensure val 0');
+      ensureVal(0);
+    };
 
     //console.log('square rendered, mode is: ' + mode);
 
@@ -41,9 +51,16 @@ const GridSquare = React.memo(
     square.setPathVal = setPathVal;
 
     useEffect(() => {
-      clickFunctions.current.leftClick = clicked;
+      clickFunctions.current.leftClick = () => {
+        console.log('left click, mode is: ' + mode);
+
+        clicked();
+      };
       clickFunctions.current.rightClick = erase;
-      clickFunctions.current.shiftLeftClick = erase;
+      clickFunctions.current.shiftLeftClick = () => {
+        console.log('shift left click is erase');
+        erase();
+      };
       clickFunctions.current.shiftDragLeftClick = erase;
       clickFunctions.current.dragLeftClick = () => {
         if (mode === 1 || mode === 2) clicked();
@@ -54,7 +71,10 @@ const GridSquare = React.memo(
       clickFunctions.current.shiftPreDragExit = () => checkDrawing(true, true);
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-    useEffect(() => checkDrawing(), [drag]);
+    useEffect(() => {
+      checkDrawing();
+      //console.log('mode? it is ' + mode);
+    }, [drag]);
 
     useEffect(() => {
       const getClass = () => {
@@ -116,6 +136,7 @@ const GridSquare = React.memo(
 
     return (
       <div
+        onClick={clicked}
         style={gridSquareSize}
         className='text-slate-600'
         onTransitionEnd={reset}
@@ -127,16 +148,17 @@ const GridSquare = React.memo(
   (prevProps, nextProps) => {
     const checks = [
       'valForCheck',
-      //'mode',
+      'mode',
       'pointerDown',
       'pointerOver',
       'pointerEvent',
       'drag',
       'setValue',
+      'square',
     ];
     for (let field of checks) {
       if (prevProps[field] !== nextProps[field]) {
-        console.log(nextProps.mode);
+        //console.log(prevProps.mode);
         return false;
       }
     }

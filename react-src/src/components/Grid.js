@@ -15,6 +15,7 @@ const Grid = ({ grid, mode, rows, cols, setValue }) => {
         row.map((square, colIndex) => (
           <MouseDetector key={square.uuid}>
             <GridSquare
+              //key={square.uuid}
               square={square}
               valForCheck={square.val}
               mode={mode}
