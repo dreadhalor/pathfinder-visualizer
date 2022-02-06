@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 
 const MouseDetector = ({ className, children }) => {
   const [pointerDown, setPointerDown] = useState(false);
@@ -11,13 +11,14 @@ const MouseDetector = ({ className, children }) => {
   const [pressY, setPressY] = useState(null);
   const [buttons, setButtons] = useState(0);
 
-  const [clickFunctions, setClickFunctions] = useState({
+  const clickFunctions = useRef({
     leftClick: null,
     shiftLeftClick: null,
     rightClick: null,
     dragLeftClick: null,
     shiftDragLeftClick: null,
     dragRightClick: null,
+    rightPreDragExit: null,
     shiftPreDragExit: null, //pre-drag click doesn't detect shift like 1/100 times & I physically can't explain it & I hate React
     preDragExit: null,
   });
@@ -30,10 +31,13 @@ const MouseDetector = ({ className, children }) => {
         if (pointerDown && !drag) {
           //in case the user drag-exits from the border of the component & doesn't fully trigger the drag event
           if (event.shiftKey) {
-            let shiftPreDragExit = clickFunctions.shiftPreDragExit;
+            let shiftPreDragExit = clickFunctions.current.shiftPreDragExit;
             if (shiftPreDragExit) shiftPreDragExit();
+          } else if (event.buttons === 2) {
+            let rightPreDragExit = clickFunctions.current.rightPreDragExit;
+            if (rightPreDragExit) rightPreDragExit();
           } else {
-            let preDragExit = clickFunctions.preDragExit;
+            let preDragExit = clickFunctions.current.preDragExit;
             if (preDragExit) preDragExit();
           }
         }
@@ -67,27 +71,27 @@ const MouseDetector = ({ className, children }) => {
     if (buttons === 1) {
       if (drag) {
         if (event.shiftKey) {
-          let shiftDragLeftClick = clickFunctions.shiftDragLeftClick;
+          let shiftDragLeftClick = clickFunctions.current.shiftDragLeftClick;
           if (shiftDragLeftClick) shiftDragLeftClick();
         } else {
-          let dragLeftClick = clickFunctions.dragLeftClick;
+          let dragLeftClick = clickFunctions.current.dragLeftClick;
           if (dragLeftClick) dragLeftClick();
         }
       } else {
         if (event.shiftKey) {
-          let shiftLeftClick = clickFunctions.shiftLeftClick;
+          let shiftLeftClick = clickFunctions.current.shiftLeftClick;
           if (shiftLeftClick) shiftLeftClick();
         } else {
-          let leftClick = clickFunctions.leftClick;
+          let leftClick = clickFunctions.current.leftClick;
           if (leftClick) leftClick();
         }
       }
     } else if (buttons === 2) {
       if (drag) {
-        let dragRightClick = clickFunctions.dragRightClick;
+        let dragRightClick = clickFunctions.current.dragRightClick;
         if (dragRightClick) dragRightClick();
       } else {
-        let rightClick = clickFunctions.rightClick;
+        let rightClick = clickFunctions.current.rightClick;
         if (rightClick) rightClick();
       }
     }

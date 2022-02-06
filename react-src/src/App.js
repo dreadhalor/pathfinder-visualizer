@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react';
 import GridPane from './components/GridPane';
 
 let animation_queue = [];
-let count = 0;
 
 function App() {
   const localStorageName = 'grid';
@@ -14,14 +13,16 @@ function App() {
     on_traversed: false,
   };
 
-  let rows = 25,
+  const [mode, setMode] = useState(3);
+
+  const rows = 25,
     cols = 40;
   const createNewGrid = () => {
     let new_grid = [];
     for (let i = 0; i < rows; i++) {
       let row = [];
       for (let j = 0; j < cols; j++) {
-        row.push({ uuid: uuidv4(), val: 0, mode: 1 });
+        row.push({ uuid: uuidv4(), val: 0, mode });
       }
       new_grid.push(row);
     }
@@ -30,14 +31,10 @@ function App() {
 
   const [solved, setSolved] = useState(false);
   const [grid, setGrid] = useState(createNewGrid());
-  const [active_type, setActiveType] = useState(1);
 
   const animation_delay = 5;
   const animation_threads = 4;
-  const flushAnimationQueue = () => {
-    animation_queue = [];
-    executeOnAllTiles((tile) => tile.setPathVal(0));
-  };
+  const flushAnimationQueue = () => (animation_queue = []);
   const animate = () => {
     for (let i = 0; i < animation_threads; i++) {
       setTimeout(animateAll, animation_delay * i);
@@ -50,6 +47,19 @@ function App() {
       setTimeout(animateAll, animation_delay * animation_threads);
     }
   }
+  const checkSetSquarePathVal = (square) => {
+    let pathVal = square.getPathVal();
+    if (pathVal) {
+      square.setPathVal(3);
+      if (square.direction) square.direction = null;
+    }
+    return square;
+  };
+  const resetPath = () => {
+    flushAnimationQueue();
+    setSolved(false);
+    executeOnAllTiles((tile) => checkSetSquarePathVal(tile));
+  };
 
   const executeOnAllTiles = (func) => {
     for (let i = 0; i < rows; i++) {
@@ -59,19 +69,7 @@ function App() {
     }
   };
 
-  const updateGridState = () => {
-    let new_grid = [];
-    for (let i = 0; i < rows; i++) {
-      let row = [];
-      for (let j = 0; j < cols; j++) {
-        row.push(grid[i][j]);
-      }
-      new_grid.push(row);
-    }
-    setGrid(new_grid);
-  };
-
-  useEffect(() => initializeGrid(), []);
+  useEffect(() => initializeGrid(), []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const saveGrid = () => {
     window.localStorage.setItem(
@@ -105,76 +103,67 @@ function App() {
   };
 
   const overwriteGrid = (new_grid) => {
-    if (new_grid) {
-      for (let i = 0; i < rows; i++) {
-        for (let j = 0; j < cols; j++) {
-          let square = grid[i][j];
-          square.uuid = new_grid[i][j].uuid;
-          square.val = new_grid[i][j].val;
-        }
-      }
-      updateGridState();
-      setValueFunctions();
-    }
+    setGrid((prev_grid) =>
+      prev_grid.map((row, row_index) =>
+        row.map((square, col_index) => {
+          square.uuid = new_grid[row_index][col_index].uuid;
+          square.val = new_grid[row_index][col_index].val;
+          return square;
+        })
+      )
+    );
   };
 
-  const setValueFunctions = () => {
-    for (let i = 0; i < rows; i++) {
-      for (let j = 0; j < cols; j++) {
-        grid[i][j].setValue = setValue;
-      }
-    }
-  };
+  const setValueFunctions = () =>
+    executeOnAllTiles((tile) => (tile.setValue = setValue));
 
-  const resetPath = () => {
-    flushAnimationQueue();
-    setSolved(false);
-    for (let i = 0; i < rows; i++) {
-      for (let j = 0; j < cols; j++) {
-        let pathVal = grid[i][j].getPathVal();
-        if (pathVal === 1 || pathVal === 2) {
-          grid[i][j].setPathVal(3);
-          if (grid[i][j].direction) grid[i][j].direction = null;
-        }
-      }
+  const checkSetSquareValue = (
+    candidate_square,
+    square_uuid,
+    val,
+    disallow_toggle
+  ) => {
+    let cell_match = candidate_square.uuid === square_uuid;
+    let val_match = candidate_square.val === val;
+    if (cell_match && val_match && !disallow_toggle) {
+      console.log('toggling back to 0');
+      candidate_square.val = 0;
+    } else if (cell_match) {
+      if ((val && candidate_square.val) || candidate_square.getPathVal() === 1)
+        resetPath();
+      // if (candidate_square.getPathVal() === 1) resetPath();
+      console.log(candidate_square.val + ' trying to be set to ' + val);
+      candidate_square.val = val;
+      console.log(candidate_square.val + ' is the new val');
+    } else if (val_match) {
+      if (val === 1 || val === 2) candidate_square.val = 0;
     }
-    updateGridState();
+    return candidate_square;
   };
-
   const setValue = (square_uuid, val, disallow_toggle) => {
     if (val === 1 || val === 2 || (val === 3 && animation_queue.length > 0)) {
       resetPath();
     }
-    for (let i = 0; i < rows; i++) {
-      for (let j = 0; j < cols; j++) {
-        let square = grid[i][j];
-        let cell_match = square.uuid === square_uuid;
-        let val_match = square.val === val;
-        if (cell_match && val_match && !disallow_toggle) {
-          square.val = 0;
-        } else if (cell_match) {
-          if ((val && square.val) || square.getPathVal() === 1) resetPath();
-          square.val = val;
-        } else if (val_match) {
-          if (val === 1 || val === 2) {
-            square.val = 0;
-            //square.setVal(0); //change eventually so state is more centralized
-          }
-        }
-      }
-    }
-    updateGridState();
+    setGrid((prev_grid) =>
+      prev_grid.map((row) =>
+        row.map((square) =>
+          checkSetSquareValue(square, square_uuid, val, disallow_toggle)
+        )
+      )
+    );
     saveGrid();
   };
 
-  const setMode = (mode) => {
-    for (let i = 0; i < rows; i++) {
-      for (let j = 0; j < cols; j++) {
-        grid[i][j].mode = mode;
-      }
-    }
-    updateGridState();
-  };
+  // const setMode = (mode) => {
+  //   setGrid((prev_grid) =>
+  //     prev_grid.map((row) =>
+  //       row.map((square) => {
+  //         square.mode = mode;
+  //         return square;
+  //       })
+  //     )
+  //   );
+  // };
 
   const getStartNodes = () => {
     let result = [];
@@ -210,11 +199,7 @@ function App() {
     if (start) {
       queue.push(start);
       pathMap.set(JSON.stringify(start), null);
-      //animation_queue.push(() => grid[start[0]][start[1]].setPathVal(2));
-      animation_queue.push(() => {
-        grid[start[0]][start[1]].setPathVal(2);
-        //updateGridState();
-      });
+      animation_queue.push(() => grid[start[0]][start[1]].setPathVal(2));
     }
     let unsolved = true;
     while (queue.length > 0) {
@@ -233,7 +218,6 @@ function App() {
           //grid[r - 1][c].setPathVal(2);
           grid[r - 1][c].setPathVal(2);
           if (useArrows.on_traversed) grid[r - 1][c].direction = '↓';
-          //updateGridState();
         };
         round_animations.push(animation);
         if (maze_copy[r - 1][c] === 2) unsolved = false;
@@ -249,7 +233,6 @@ function App() {
           //grid[r + 1][c].setPathVal(2);
           grid[r + 1][c].setPathVal(2);
           if (useArrows.on_traversed) grid[r + 1][c].direction = '↑';
-          //updateGridState();
         };
         round_animations.push(animation);
         if (maze_copy[r + 1][c] === 2) unsolved = false;
@@ -261,7 +244,6 @@ function App() {
           //grid[r][c - 1].setPathVal(2);
           grid[r][c - 1].setPathVal(2);
           if (useArrows.on_traversed) grid[r][c - 1].direction = '→';
-          //updateGridState();
         };
         round_animations.push(animation);
         if (maze_copy[r][c - 1] === 2) unsolved = false;
@@ -277,7 +259,6 @@ function App() {
           //grid[r][c + 1].setPathVal(2);
           grid[r][c + 1].setPathVal(2);
           if (useArrows.on_traversed) grid[r][c + 1].direction = '←';
-          //updateGridState();
         };
         round_animations.push(animation);
         if (maze_copy[r][c + 1] === 2) unsolved = false;
@@ -312,7 +293,6 @@ function App() {
               else if (diff[1] === -1) grid[r][c].direction = '→';
             }
           }
-          //updateGridState();
         });
       }
       animate();
@@ -324,16 +304,12 @@ function App() {
       className='App site-bg-empty w-full h-full flex flex-col'
       onContextMenu={(e) => e.preventDefault()}
     >
-      <TopNav
-        active_type={active_type}
-        setActiveType={setActiveType}
-        setMode={setMode}
-      />
+      <TopNav mode={mode} setMode={setMode} />
       <GridPane
         grid={grid}
         rows={rows}
+        mode={mode}
         cols={cols}
-        active_type={active_type}
         beginSolveFxn={solve}
         solved={solved}
         resetPath={resetPath}

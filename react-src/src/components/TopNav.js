@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 
-const TopNav = ({ active_type, setActiveType, setMode }) => {
+const TopNav = ({ mode, setMode }) => {
   const changeMode = (event) => {
     let value = parseInt(event.target.value);
-    setActiveType(value);
+    setMode(value);
     setMyMode(value);
   };
 
-  const [myMode, setMyMode] = useState(active_type);
+  const [myMode, setMyMode] = useState(mode);
 
   useEffect(() => {
     //christ this is all very hacky, I'm definitely just barely learning React

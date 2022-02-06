@@ -1,7 +1,8 @@
+import React from 'react';
 import MouseDetector from '../utils/MouseDetector';
 import GridSquare from './GridSquare';
 
-const Grid = ({ grid, rows, cols, active_type }) => {
+const Grid = ({ grid, mode, rows, cols }) => {
   const gridStyle = {
     margin: 'auto',
     display: 'grid',
@@ -13,8 +14,8 @@ const Grid = ({ grid, rows, cols, active_type }) => {
     <div className='border border-slate-600' style={gridStyle}>
       {grid.map((row, rowIndex) =>
         row.map((square, colIndex) => (
-          <MouseDetector key={JSON.stringify([rowIndex, colIndex])}>
-            <GridSquare square={square} active_type={active_type} />
+          <MouseDetector key={square.uuid}>
+            <GridSquare square={square} valForCheck={square.val} mode={mode} />
           </MouseDetector>
         ))
       )}
