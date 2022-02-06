@@ -9,6 +9,7 @@ const GridPane = ({
   beginSolveFxn,
   solved,
   resetPath,
+  setValue,
 }) => {
   return (
     <div className='w-full flex-1 relative min-h-0'>
@@ -18,7 +19,13 @@ const GridPane = ({
         resetPath={resetPath}
       />
       <div className='w-full h-full flex overflow-auto p-4'>
-        <Grid grid={grid} rows={rows} cols={cols} mode={mode} />
+        <Grid
+          grid={grid}
+          rows={rows}
+          cols={cols}
+          mode={mode}
+          setValue={setValue}
+        />
       </div>
     </div>
   );

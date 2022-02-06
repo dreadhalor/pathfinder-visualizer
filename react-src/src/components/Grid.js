@@ -1,8 +1,7 @@
-import React from 'react';
 import MouseDetector from '../utils/MouseDetector';
 import GridSquare from './GridSquare';
 
-const Grid = ({ grid, mode, rows, cols }) => {
+const Grid = ({ grid, mode, rows, cols, setValue }) => {
   const gridStyle = {
     margin: 'auto',
     display: 'grid',
@@ -15,7 +14,12 @@ const Grid = ({ grid, mode, rows, cols }) => {
       {grid.map((row, rowIndex) =>
         row.map((square, colIndex) => (
           <MouseDetector key={square.uuid}>
-            <GridSquare square={square} valForCheck={square.val} mode={mode} />
+            <GridSquare
+              square={square}
+              valForCheck={square.val}
+              mode={mode}
+              setValue={setValue}
+            />
           </MouseDetector>
         ))
       )}

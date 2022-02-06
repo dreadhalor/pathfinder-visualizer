@@ -13,8 +13,6 @@ function App() {
     on_traversed: false,
   };
 
-  const [mode, setMode] = useState(3);
-
   const rows = 25,
     cols = 40;
   const createNewGrid = () => {
@@ -22,7 +20,7 @@ function App() {
     for (let i = 0; i < rows; i++) {
       let row = [];
       for (let j = 0; j < cols; j++) {
-        row.push({ uuid: uuidv4(), val: 0, mode });
+        row.push({ uuid: uuidv4(), val: 0 });
       }
       new_grid.push(row);
     }
@@ -31,6 +29,7 @@ function App() {
 
   const [solved, setSolved] = useState(false);
   const [grid, setGrid] = useState(createNewGrid());
+  const [mode, setMode] = useState(3);
 
   const animation_delay = 5;
   const animation_threads = 4;
@@ -91,7 +90,7 @@ function App() {
   };
 
   const initializeGrid = () => {
-    setValueFunctions();
+    //setValueFunctions();
     let stored_grid = checkLocalStorage();
     if (stored_grid) overwriteGrid(JSON.parse(stored_grid));
   };
@@ -141,9 +140,14 @@ function App() {
     return candidate_square;
   };
   const setValue = (square_uuid, val, disallow_toggle) => {
-    if (val === 1 || val === 2 || (val === 3 && animation_queue.length > 0)) {
+    if (
+      mode === 1 ||
+      mode === 2 ||
+      (mode === 3 && animation_queue.length > 0)
+    ) {
       resetPath();
     }
+    console.log('the mode is ' + mode + ' & the val is ' + val);
     setGrid((prev_grid) =>
       prev_grid.map((row) =>
         row.map((square) =>
@@ -313,6 +317,7 @@ function App() {
         beginSolveFxn={solve}
         solved={solved}
         resetPath={resetPath}
+        setValue={setValue}
       />
     </div>
   );

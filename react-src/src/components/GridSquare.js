@@ -11,16 +11,19 @@ const GridSquare = React.memo(
     clickFunctions,
     drag,
     pointerEvent,
+    setValue,
   }) => {
     const clicked = (disallow_toggle = false) => {
       if (disallow_toggle && square?.val === mode) return;
-      square.setValue(square.uuid, mode, disallow_toggle);
+      console.log('val I will send from Square to App is ' + mode);
+      setValue(square.uuid, mode, disallow_toggle);
     };
     const ensureVal = (val) => {
       let valid = val === 3 || val === 0;
-      if (valid && square.val !== val) square.setValue(square.uuid, val, true);
+      if (valid && valForCheck !== val) setValue(square.uuid, val, true);
     };
     const checkDrawing = (override = false, shift) => {
+      console.log(valForCheck);
       if (drag || override) {
         if (pointerEvent.buttons === 2 || (shift ?? pointerEvent.shiftKey))
           erase();
@@ -29,7 +32,7 @@ const GridSquare = React.memo(
     };
     const erase = () => ensureVal(0);
 
-    //console.log('square rendered');
+    //console.log('square rendered, mode is: ' + mode);
 
     const [myClass, setClass] = useState('');
     const [pathVal, setPathVal] = useState(0);
@@ -56,7 +59,7 @@ const GridSquare = React.memo(
     useEffect(() => {
       const getClass = () => {
         let result = 'grid-square ';
-        switch (square.val) {
+        switch (valForCheck) {
           case 1:
             result += 'val-start';
             break;
@@ -103,7 +106,7 @@ const GridSquare = React.memo(
       };
 
       setClass(getClass());
-    }, [square.val, mode, pathVal, pointerDown, pointerOver]);
+    }, [valForCheck, mode, pathVal, pointerDown, pointerOver]);
 
     const reset = () => setPathVal(0); //lol this will scale horribly
     const gridSquareSize = {
@@ -122,9 +125,20 @@ const GridSquare = React.memo(
     );
   },
   (prevProps, nextProps) => {
-    const checks = ['valForCheck', 'pointerDown', 'pointerOver', 'drag'];
+    const checks = [
+      'valForCheck',
+      //'mode',
+      'pointerDown',
+      'pointerOver',
+      'pointerEvent',
+      'drag',
+      'setValue',
+    ];
     for (let field of checks) {
-      if (prevProps[field] !== nextProps[field]) return false;
+      if (prevProps[field] !== nextProps[field]) {
+        console.log(nextProps.mode);
+        return false;
+      }
     }
     return true;
   }
