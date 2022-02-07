@@ -79,11 +79,9 @@ const MouseDetector = ({ className, children }) => {
         }
       } else {
         if (event.shiftKey) {
-          console.log('shift left click');
           let shiftLeftClick = clickFunctions.current.shiftLeftClick;
           if (shiftLeftClick) shiftLeftClick();
         } else {
-          console.log('left click');
           let leftClick = clickFunctions.current.leftClick;
           if (leftClick) leftClick();
         }

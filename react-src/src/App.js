@@ -52,20 +52,22 @@ function App() {
       square.setPathVal(3);
       if (square.direction) square.direction = null;
     }
-    return square;
+    return Promise.resolve(square);
   };
   const resetPath = () => {
     flushAnimationQueue();
     setSolved(false);
-    executeOnAllTiles((tile) => checkSetSquarePathVal(tile));
+    return executeOnAllTiles((tile) => checkSetSquarePathVal(tile));
   };
 
   const executeOnAllTiles = (func) => {
+    let promises = [];
     for (let i = 0; i < rows; i++) {
       for (let j = 0; j < cols; j++) {
-        func(grid[i][j]);
+        promises.push(func(grid[i][j]));
       }
     }
+    return Promise.all(promises);
   };
 
   useEffect(() => initializeGrid(), []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -124,50 +126,31 @@ function App() {
   ) => {
     let cell_match = candidate_square.uuid === square_uuid;
     let val_match = candidate_square.val === val;
-    if (cell_match && val_match && !disallow_toggle) {
-      console.log('toggling back to 0');
-      candidate_square.val = 0;
-    } else if (cell_match) {
-      if ((val && candidate_square.val) || candidate_square.getPathVal() === 1)
-        resetPath();
-      // if (candidate_square.getPathVal() === 1) resetPath();
-      console.log(candidate_square.val + ' trying to be set to ' + val);
+    if (cell_match && val_match && !disallow_toggle) candidate_square.val = 0;
+    else if (cell_match) {
+      if (candidate_square.getPathVal() === 1) resetPath();
       candidate_square.val = val;
-      console.log(candidate_square.val + ' is the new val');
-    } else if (val_match) {
-      if (val === 1 || val === 2) candidate_square.val = 0;
-    }
+    } else if (val_match) if (val === 1 || val === 2) candidate_square.val = 0;
     return candidate_square;
   };
   const setValue = (square_uuid, val, disallow_toggle) => {
-    if (
-      mode === 1 ||
-      mode === 2 ||
-      (mode === 3 && animation_queue.length > 0)
-    ) {
-      resetPath();
-    }
-    console.log('the mode is ' + mode + ' & the val is ' + val);
-    setGrid((prev_grid) =>
-      prev_grid.map((row) =>
-        row.map((square) =>
-          checkSetSquareValue(square, square_uuid, val, disallow_toggle)
-        )
-      )
-    );
-    saveGrid();
+    Promise.resolve()
+      .then(() => {
+        if (val === 1 || val === 2 || (val === 3 && animation_queue.length > 0))
+          return resetPath();
+        return Promise.resolve();
+      })
+      .then(() => {
+        return setGrid((prev_grid) =>
+          prev_grid.map((row, row_index) =>
+            row.map((square, col_index) =>
+              checkSetSquareValue(square, square_uuid, val, disallow_toggle)
+            )
+          )
+        );
+      })
+      .then(() => saveGrid());
   };
-
-  // const setMode = (mode) => {
-  //   setGrid((prev_grid) =>
-  //     prev_grid.map((row) =>
-  //       row.map((square) => {
-  //         square.mode = mode;
-  //         return square;
-  //       })
-  //     )
-  //   );
-  // };
 
   const getStartNodes = () => {
     let result = [];

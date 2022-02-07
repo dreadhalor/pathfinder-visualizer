@@ -15,14 +15,10 @@ const GridSquare = React.memo(
   }) => {
     const myMode = useRef(mode);
     useEffect(() => {
-      console.log('useRef val: ' + myMode.current);
       myMode.current = mode;
     }, [mode]);
     const clicked = (disallow_toggle = false) => {
-      if (mode === 3) return;
-      console.log('clicked fxn, mode is: ' + mode);
-      if (disallow_toggle && square?.val === mode) return;
-      // console.log('val I will send from Square to App is ' + mode);
+      if (disallow_toggle && square?.val === myMode.current) return;
       setValue(square.uuid, myMode.current, disallow_toggle);
     };
     const ensureVal = (val) => {
@@ -30,40 +26,28 @@ const GridSquare = React.memo(
       if (valid && valForCheck !== val) setValue(square.uuid, val, true);
     };
     const checkDrawing = (override = false, shift) => {
-      // console.log(valForCheck);
       if (drag || override) {
         if (pointerEvent.buttons === 2 || (shift ?? pointerEvent.shiftKey))
           erase();
-        else ensureVal(mode);
+        else ensureVal(myMode.current);
       }
     };
-    const erase = () => {
-      console.log('ensure val 0');
-      ensureVal(0);
-    };
-
-    //console.log('square rendered, mode is: ' + mode);
+    const erase = () => ensureVal(0);
 
     const [myClass, setClass] = useState('');
     const [pathVal, setPathVal] = useState(0);
+    const pathValRef = useRef(pathVal);
     const getPathVal = () => pathVal;
     square.getPathVal = getPathVal;
     square.setPathVal = setPathVal;
 
     useEffect(() => {
-      clickFunctions.current.leftClick = () => {
-        console.log('left click, mode is: ' + mode);
-
-        clicked();
-      };
+      clickFunctions.current.leftClick = clicked;
       clickFunctions.current.rightClick = erase;
-      clickFunctions.current.shiftLeftClick = () => {
-        console.log('shift left click is erase');
-        erase();
-      };
+      clickFunctions.current.shiftLeftClick = erase;
       clickFunctions.current.shiftDragLeftClick = erase;
       clickFunctions.current.dragLeftClick = () => {
-        if (mode === 1 || mode === 2) clicked();
+        if (myMode.current === 1 || myMode.current === 2) clicked();
       };
       clickFunctions.current.dragRightClick = erase;
       clickFunctions.current.rightPreDragExit = () => checkDrawing(true, true);
@@ -71,10 +55,14 @@ const GridSquare = React.memo(
       clickFunctions.current.shiftPreDragExit = () => checkDrawing(true, true);
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+    useEffect(checkDrawing, [drag]);
     useEffect(() => {
-      checkDrawing();
-      //console.log('mode? it is ' + mode);
-    }, [drag]);
+      pathValRef.current = pathVal;
+      if (pathVal === 3)
+        setTimeout(() => {
+          if (pathValRef.current === 3) setPathVal(0);
+        }, 400);
+    }, [pathVal]);
 
     useEffect(() => {
       const getClass = () => {
@@ -95,7 +83,7 @@ const GridSquare = React.memo(
         result += ' ';
         if (pointerDown) result += 'active ';
         if (pointerOver) result += 'hover ';
-        switch (mode) {
+        switch (myMode.current) {
           case 1:
             result += 'select-start';
             break;
@@ -126,7 +114,7 @@ const GridSquare = React.memo(
       };
 
       setClass(getClass());
-    }, [valForCheck, mode, pathVal, pointerDown, pointerOver]);
+    }, [valForCheck, pathVal, pointerDown, pointerOver]);
 
     const reset = () => setPathVal(0); //lol this will scale horribly
     const gridSquareSize = {
@@ -136,31 +124,27 @@ const GridSquare = React.memo(
 
     return (
       <div
-        onClick={clicked}
         style={gridSquareSize}
         className='text-slate-600'
         onTransitionEnd={reset}
       >
-        <div className={myClass}>{square.direction && square.direction}</div>
+        <div className={myClass}>
+          {square.direction && square.direction}
+          {pathVal}
+        </div>
       </div>
     );
   },
   (prevProps, nextProps) => {
     const checks = [
       'valForCheck',
-      'mode',
       'pointerDown',
       'pointerOver',
       'pointerEvent',
       'drag',
-      'setValue',
-      'square',
     ];
     for (let field of checks) {
-      if (prevProps[field] !== nextProps[field]) {
-        //console.log(prevProps.mode);
-        return false;
-      }
+      if (prevProps[field] !== nextProps[field]) return false;
     }
     return true;
   }
