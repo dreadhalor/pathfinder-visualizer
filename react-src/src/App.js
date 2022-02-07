@@ -1,8 +1,11 @@
 import './App.scss';
 import { v4 as uuidv4 } from 'uuid';
 import TopNav from './components/TopNav';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import GridPane from './components/GridPane';
+import MouseDetector from './utils/MouseDetector';
+import GridSquare from './components/GridSquare';
+import GridSquare2 from './components/GridSquare2';
 
 let animation_queue = [];
 
@@ -151,6 +154,30 @@ function App() {
       })
       .then(() => saveGrid());
   };
+
+  const createGridSquare = () => {
+    const uuid = uuidv4();
+    return (
+      <MouseDetector key={uuid}>
+        <GridSquare2 uuid={uuid} val={0} mode={mode} setValue={setValue} />
+      </MouseDetector>
+    );
+  };
+
+  const createNewGridNewMethod = () => {
+    let new_grid = [];
+    for (let i = 0; i < rows; i++) {
+      let row = [];
+      for (let j = 0; j < cols; j++) {
+        row.push(createGridSquare());
+      }
+      new_grid.push(row);
+    }
+    return new_grid;
+  };
+  const newGridVersion = useRef(createNewGridNewMethod());
+
+  console.log(newGridVersion);
 
   const getStartNodes = () => {
     let result = [];

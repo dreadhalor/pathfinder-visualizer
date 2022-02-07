@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './GridSquare.scss';
 
-const GridSquare = React.memo(
+const GridSquare2 = React.memo(
   ({
     square,
     valForCheck,
@@ -58,10 +58,10 @@ const GridSquare = React.memo(
     useEffect(checkDrawing, [drag]);
     useEffect(() => {
       pathValRef.current = pathVal;
-      // if (pathVal === 3)
-      //   setTimeout(() => {
-      //     if (pathValRef.current === 3) setPathVal(0);
-      //   }, 300);
+      if (pathVal === 3)
+        setTimeout(() => {
+          if (pathValRef.current === 3) setPathVal(0);
+        }, 400);
     }, [pathVal]);
 
     useEffect(() => {
@@ -150,4 +150,4 @@ const GridSquare = React.memo(
   }
 );
 
-export default GridSquare;
+export default GridSquare2;
