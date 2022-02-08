@@ -3,12 +3,13 @@ import './App.scss';
 import { v4 as uuidv4 } from 'uuid';
 import GridSquare from './components/GridSquare';
 import TopNav from './components/TopNav';
-import { bfs } from './utilities/bfs';
+import { bfs } from './utilities/solvers/bfs';
 import { kruskals } from './utilities/maze-generation/kruskals';
+import { ellers } from './utilities/maze-generation/ellers';
 
 function App() {
   const rows = 25,
-    cols = 40;
+    cols = 25;
   const createNewGrid = (num_rows, num_cols) => {
     let new_grid = [];
     for (let i = 0; i < num_rows; i++) {
@@ -111,6 +112,15 @@ function App() {
       gridRef.current[r][c].setVal(0);
     });
   };
+  const generateEllers = () => {
+    resetPath();
+    let result = ellers(gridRef.current);
+    gridRef.current.forEach((row) => row.forEach((tile) => tile.setVal(3)));
+    result.forEach((tile) => {
+      let [r, c] = tile;
+      gridRef.current[r][c].setVal(0);
+    });
+  };
 
   return (
     <div className='App site-bg-empty w-full h-full flex flex-col'>
@@ -121,6 +131,7 @@ function App() {
         solvedRef={solved}
         clearPath={resetPath}
         generateKruskals={generateKruskals}
+        generateEllers={generateEllers}
       />
       <div className='w-full flex-1 relative min-h-0'>
         {/* <div className='absolute w-full flex flex-col pointer-events-none z-10'>
