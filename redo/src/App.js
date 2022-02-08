@@ -9,7 +9,7 @@ import { ellers } from './utilities/maze-generation/ellers';
 
 function App() {
   const rows = 25,
-    cols = 25;
+    cols = 40;
   const createNewGrid = (num_rows, num_cols) => {
     let new_grid = [];
     for (let i = 0; i < num_rows; i++) {

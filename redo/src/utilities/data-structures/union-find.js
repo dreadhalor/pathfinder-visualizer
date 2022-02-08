@@ -1,9 +1,10 @@
+//THIS IS BROKEN SOMEHOW BUT I CAN'T TELL HOW
 export class UnionFind {
   constructor(elements = []) {
     // Number of disconnected components
     this.count = elements.length;
 
-    // Keep Track of connected components
+    // Keep track of connected components
     this.parentsMap = new Map();
 
     // Initialize the data structure such that all elements have themselves as parents
@@ -41,16 +42,12 @@ export class UnionFind {
   // Returns final parent of a node
   find(a) {
     if (!this.parentsMap.has(a)) return null;
-    while (this.parentsMap.get(a) !== a) {
-      a = this.parentsMap.get(a);
-    }
+    while (this.parentsMap.get(a) !== a) a = this.parentsMap.get(a);
     return a;
   }
 
   // Checks connectivity of the 2 nodes
-  connected(a, b) {
-    return this.find(a) === this.find(b);
-  }
+  connected = (a, b) => this.find(a) === this.find(b);
 
   sets() {
     let setMap = new Map();
@@ -61,6 +58,4 @@ export class UnionFind {
     }
     return setMap.values();
   }
-
-  elements = () => this.parentsMap.keys();
 }

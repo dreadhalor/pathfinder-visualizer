@@ -76,7 +76,7 @@ const TopNav = (
         className='my-1 mx-1 font-bold bg-blue-300 hover:bg-blue-400 p-1 rounded-lg'
         onClick={generateEllers}
       >
-        Generate Ellers's
+        Generate Eller's
       </button>
       <span className='flex-1'></span>
     </div>
