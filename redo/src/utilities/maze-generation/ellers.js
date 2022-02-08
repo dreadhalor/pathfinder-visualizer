@@ -1,3 +1,4 @@
+import { shuffle } from 'lodash';
 import { EllersSet } from '../data-structures/ellers-set';
 import {
   getFullEdges,
@@ -52,11 +53,8 @@ const diceRoll = (sides) => {
 const pickN = (list, n) => {
   let m = list.length;
   let options = [];
-  for (let i = 0; i < m; i++) options[i] = i;
-  let choices = [];
-  for (let i = 0; i < n; i++) {
-    let next_choice = diceRoll(options.length) - 1;
-    choices.push(options.splice(next_choice, 1)[0]);
-  }
+  for (let i = 0; i < m; i++) options.push(i);
+  options = shuffle(options);
+  let choices = options.slice(0, n);
   return choices.map((index) => list[index]);
 };

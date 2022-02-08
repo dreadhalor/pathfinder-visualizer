@@ -129,14 +129,17 @@ function App() {
   const generateDFS = () => {
     resetPath();
     let animation_queue = [];
-    let result = recursive_backtracking({
-      grid: gridRef.current,
-      carve_animation: (node) => {
-        node.setVal(0);
-        //node.setPathVal(1);
-      },
-      animation_queue,
-    });
+    // let result = recursive_backtracking({
+    //   grid: gridRef.current,
+    //   carve_animation: (node) => {
+    //     node.setVal(0);
+    //     //node.setPathVal(1);
+    //   },
+    //   animation_queue,
+    // });
+    let result = recursive_backtracking(gridRef.current);
+    //console.log(result);
+    //console.log(test);
     gridRef.current.forEach((row) => row.forEach((tile) => tile.setVal(3)));
     //playAnimations(animation_queue, 10);
     result.forEach((tile) => {

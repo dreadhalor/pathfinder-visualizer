@@ -1,11 +1,12 @@
 import { shuffle } from 'lodash';
-import { getAdjacencyList, getFullEdges, expandEdge } from '../maze-structures';
+import {
+  getAdjacencyList,
+  getFullEdges,
+  expandEdge,
+  getNodeAdjacencyList,
+} from '../maze-structures';
 
-export const recursive_backtracking = ({
-  grid,
-  carve_animation,
-  animation_queue,
-}) => {
+export const crappy_version = ({ grid, carve_animation, animation_queue }) => {
   let adjacency_list = getAdjacencyList(grid);
   let starting_index = Math.floor(Math.random() * adjacency_list.size);
   let [starting_node, neighbors] = [...adjacency_list.entries()][
@@ -113,4 +114,39 @@ export const recursive_backtracking = ({
 const isValidNeighbor = (node, visited) => {
   //console.log(!visited.has(JSON.stringify(node)));
   return !visited.has(JSON.stringify(node));
+};
+
+export const recursive_backtracking = (grid) => {
+  let rows = grid.length,
+    cols = grid[0].length;
+  let node_rows = Math.ceil(rows / 2),
+    node_cols = Math.ceil(cols / 2);
+  let adjacency_list = getNodeAdjacencyList(node_rows, node_cols);
+  let starting_index = Math.floor(Math.random() * adjacency_list.size);
+  let starting_node_id = [...adjacency_list.keys()][starting_index];
+  let pathMap = new Map();
+  let visited = new Set();
+  let stack = [starting_node_id];
+  while (stack.length > 0) {
+    let node_id = stack.pop();
+    visited.add(node_id);
+    let shuffled_neighbors = shuffle(adjacency_list.get(node_id));
+    for (let neighbor of shuffled_neighbors) {
+      if (valid(neighbor, visited)) {
+        pathMap.set(neighbor.id, node_id);
+        stack.push(neighbor.id);
+      }
+    }
+  }
+  let edges = [];
+  for (let [child, parent] of pathMap.entries()) {
+    parent = JSON.parse(parent).map((coord) => coord * 2);
+    child = JSON.parse(child).map((coord) => coord * 2);
+    edges.push([JSON.stringify(parent), JSON.stringify(child)]);
+  }
+  let result = getFullEdges(edges).flat(1);
+  return result;
+};
+const valid = (node, visited) => {
+  return !visited.has(node.id);
 };

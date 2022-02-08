@@ -1,3 +1,5 @@
+import { Node } from './data-structures/node';
+
 const getDimensions = (grid) => {
   return [grid?.length ?? 0, grid?.[0]?.length ?? 0];
 };
@@ -22,6 +24,21 @@ export const getAdjacencyList = (grid) => {
       if (j < cols - 2) neighbors.push([i, j + 2]);
       if (j > 1) neighbors.push([i, j - 2]);
       adjacencyList.set(JSON.stringify([i, j]), neighbors);
+    }
+  }
+  return adjacencyList;
+};
+export const getNodeAdjacencyList = (rows, cols) => {
+  let adjacencyList = new Map();
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      let node = new Node([i, j]);
+      let neighbors = [];
+      if (i < rows - 1) neighbors.push(new Node([i + 1, j]));
+      if (i > 0) neighbors.push(new Node([i - 1, j]));
+      if (j < cols - 1) neighbors.push(new Node([i, j + 1]));
+      if (j > 0) neighbors.push(new Node([i, j - 1]));
+      adjacencyList.set(node.id, neighbors);
     }
   }
   return adjacencyList;
