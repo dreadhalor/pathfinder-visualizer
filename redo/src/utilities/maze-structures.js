@@ -1,9 +1,32 @@
-import { Node } from './data-structures/node';
+import { GridAdjacencyList } from './data-structures/grid-adjacency-list';
 
 const getDimensions = (grid) => {
   return [grid?.length ?? 0, grid?.[0]?.length ?? 0];
 };
-export const getNodes = (grid) => {
+export const getNodesAndEdges = (grid) => {
+  const [rows, cols] = getDimensions(grid);
+  let nodes = [],
+    edges = [];
+  for (let i = 0; i < rows; i += 2) {
+    for (let j = 0; j < cols; j += 2) {
+      nodes.push([i, j]);
+      if (i < rows - 2) {
+        edges.push([
+          [i, j],
+          [i + 2, j],
+        ]);
+      }
+      if (j < cols - 2) {
+        edges.push([
+          [i, j],
+          [i, j + 2],
+        ]);
+      }
+    }
+  }
+  return [nodes, edges];
+};
+export const getPathNodes = (grid) => {
   const [rows, cols] = getDimensions(grid);
   let nodes = [];
   for (let i = 0; i < rows; i += 2) {
@@ -13,9 +36,30 @@ export const getNodes = (grid) => {
   }
   return nodes;
 };
-export const getAdjacencyList = (grid) => {
+export const getPathEdges = (grid) => {
   const [rows, cols] = getDimensions(grid);
-  let adjacencyList = new Map();
+  let edges = [];
+  for (let i = 0; i < rows; i += 2) {
+    for (let j = 0; j < cols; j += 2) {
+      //bidirectional, so only add edges topleft-to-bottomright to avoid cycles
+      if (i < rows - 2) {
+        edges.push([
+          [i, j],
+          [i + 2, j],
+        ]);
+      }
+      if (j < cols - 2) {
+        edges.push([
+          [i, j],
+          [i, j + 2],
+        ]);
+      }
+    }
+  }
+  return edges;
+};
+export const getMazeAdjacencyList = (rows, cols) => {
+  let adjacencyList = new GridAdjacencyList();
   for (let i = 0; i < rows; i += 2) {
     for (let j = 0; j < cols; j += 2) {
       let neighbors = [];
@@ -23,22 +67,7 @@ export const getAdjacencyList = (grid) => {
       if (i > 1) neighbors.push([i - 2, j]);
       if (j < cols - 2) neighbors.push([i, j + 2]);
       if (j > 1) neighbors.push([i, j - 2]);
-      adjacencyList.set(JSON.stringify([i, j]), neighbors);
-    }
-  }
-  return adjacencyList;
-};
-export const getNodeAdjacencyList = (rows, cols) => {
-  let adjacencyList = new Map();
-  for (let i = 0; i < rows; i++) {
-    for (let j = 0; j < cols; j++) {
-      let node = new Node([i, j]);
-      let neighbors = [];
-      if (i < rows - 1) neighbors.push(new Node([i + 1, j]));
-      if (i > 0) neighbors.push(new Node([i - 1, j]));
-      if (j < cols - 1) neighbors.push(new Node([i, j + 1]));
-      if (j > 0) neighbors.push(new Node([i, j - 1]));
-      adjacencyList.set(node.id, neighbors);
+      adjacencyList.set([i, j], neighbors);
     }
   }
   return adjacencyList;
@@ -150,7 +179,26 @@ export const expandEdge = (edge_tuple) => {
   }
   return full_edge;
 };
+export const expandEdge2 = (edge_tuple) => {
+  let [[node_r, node_c], [next_r, next_c]] = edge_tuple;
+  let full_edge = [];
+  if (node_r === next_r && node_c === next_c) full_edge.push([node_r, node_c]);
+  else if (node_r === next_r) {
+    if (node_c < next_c) {
+      for (let c = node_c; c <= next_c; c++) full_edge.push([node_r, c]);
+    } else for (let c = node_c; c >= next_c; c--) full_edge.push([node_r, c]);
+  } else {
+    if (node_r < next_r) {
+      for (let r = node_r; r <= next_r; r++) full_edge.push([r, node_c]);
+    } else for (let r = node_r; r >= next_r; r--) full_edge.push([r, node_c]);
+  }
+  return full_edge;
+};
 export const getFullEdges = (edges_as_tuples) => {
   let full_edges = edges_as_tuples.map((tuple) => expandEdge(tuple));
+  return full_edges;
+};
+export const getFullEdges2 = (edge_tuples) => {
+  let full_edges = edge_tuples.map((tuple) => expandEdge2(tuple));
   return full_edges;
 };

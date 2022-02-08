@@ -1,12 +1,12 @@
-import { UnionFind } from '../data-structures/union-find';
 import { shuffle } from 'lodash';
-import { getFullEdges, getStringifiedNodesAndEdges } from '../maze-structures';
+import { getFullEdges2, getNodesAndEdges } from '../maze-structures';
+import { GridUnionFind } from '../data-structures/grid-union-find';
 
 export const kruskals = (grid) => {
-  let [nodes, edges] = getStringifiedNodesAndEdges(grid);
+  let [nodes, edges] = getNodesAndEdges(grid);
   edges = shuffle(edges);
   let selected_edges = [];
-  let uf = new UnionFind(nodes);
+  let uf = new GridUnionFind(nodes);
   while (edges.length > 0) {
     let [n1, n2] = edges.shift();
     if (!uf.connected(n1, n2)) {
@@ -14,6 +14,6 @@ export const kruskals = (grid) => {
       uf.union(n1, n2);
     }
   }
-  let result = getFullEdges(selected_edges);
+  let result = getFullEdges2(selected_edges);
   return result.flat(1);
 };
