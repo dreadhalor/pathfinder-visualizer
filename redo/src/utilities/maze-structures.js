@@ -11,6 +11,21 @@ export const getNodes = (grid) => {
   }
   return nodes;
 };
+export const getAdjacencyList = (grid) => {
+  const [rows, cols] = getDimensions(grid);
+  let adjacencyList = new Map();
+  for (let i = 0; i < rows; i += 2) {
+    for (let j = 0; j < cols; j += 2) {
+      let neighbors = [];
+      if (i < rows - 2) neighbors.push([i + 2, j]);
+      if (i > 1) neighbors.push([i - 2, j]);
+      if (j < cols - 2) neighbors.push([i, j + 2]);
+      if (j > 1) neighbors.push([i, j - 2]);
+      adjacencyList.set(JSON.stringify([i, j]), neighbors);
+    }
+  }
+  return adjacencyList;
+};
 export const getStringifiedNodes = (grid) => {
   const [rows, cols] = getDimensions(grid);
   let nodes = [];
@@ -101,22 +116,20 @@ export const getStringifiedNodesAndEdgesByRow = (grid) => {
   }
   return [row_nodes, row_edges];
 };
-const expandEdge = (edge_tuple) => {
+export const expandEdge = (edge_tuple) => {
   let [stringified_n1, stringified_n2] = edge_tuple;
-  let [n1_r, n1_c] = JSON.parse(stringified_n1);
-  let [n2_r, n2_c] = JSON.parse(stringified_n2);
+  let [node_r, node_c] = JSON.parse(stringified_n1);
+  let [next_r, next_c] = JSON.parse(stringified_n2);
   let full_edge = [];
-  if (stringified_n1 === stringified_n2) full_edge.push([n1_r, n1_c]);
-  else if (n1_r === n2_r) {
-    let r = n1_r;
-    let min = Math.min(n1_c, n2_c),
-      max = Math.max(n1_c, n2_c);
-    for (let c = min; c <= max; c++) full_edge.push([r, c]);
-  } else if (n1_c === n2_c) {
-    let c = n1_c;
-    let min = Math.min(n1_r, n2_r),
-      max = Math.max(n1_r, n2_r);
-    for (let r = min; r <= max; r++) full_edge.push([r, c]);
+  if (stringified_n1 === stringified_n2) full_edge.push([node_r, node_c]);
+  else if (node_r === next_r) {
+    if (node_c < next_c) {
+      for (let c = node_c; c <= next_c; c++) full_edge.push([node_r, c]);
+    } else for (let c = node_c; c >= next_c; c--) full_edge.push([node_r, c]);
+  } else {
+    if (node_r < next_r) {
+      for (let r = node_r; r <= next_r; r++) full_edge.push([r, node_c]);
+    } else for (let r = node_r; r >= next_r; r--) full_edge.push([r, node_c]);
   }
   return full_edge;
 };

@@ -1,7 +1,15 @@
 import React, { useImperativeHandle, useState } from 'react';
 
 const TopNav = (
-  { modeRef, solve, clearPath, solvedRef, generateKruskals, generateEllers },
+  {
+    modeRef,
+    solve,
+    clearPath,
+    solvedRef,
+    generateKruskals,
+    generateEllers,
+    generateDFS,
+  },
   ref
 ) => {
   const changeMode = (event) => {
@@ -77,6 +85,12 @@ const TopNav = (
         onClick={generateEllers}
       >
         Generate Eller's
+      </button>
+      <button
+        className='my-1 mx-1 font-bold bg-blue-300 hover:bg-blue-400 p-1 rounded-lg'
+        onClick={generateDFS}
+      >
+        Generate DFS
       </button>
       <span className='flex-1'></span>
     </div>

@@ -13,3 +13,7 @@
   * I miss Angular so much
 * the mouse detection is kinda fucked, all the border detection is offset to the left
 * fix the drag-out-from-border detection, the current solution is janky as hell
+
+
+RECODE:
+* flushing the animation queue doesn't actually stop the animating if it's overwritten with a new animation (i.e. generating another maze before the previous generation animation finishes)

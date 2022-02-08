@@ -39,12 +39,10 @@ export const ellers = (grid) => {
           downpath_children.push(JSON.stringify([r + 2, c]));
         }
         //union the nodes in next_ellers_set
-        console.log(downpath_children);
         for (let i = 1; i < downpath_children.length; i++)
           next_ellers_set.union(downpath_children[0], downpath_children[i]);
       }
   }
-  console.log(ellers_set);
   return getFullEdges(selected_edges).flat(1);
 };
 
