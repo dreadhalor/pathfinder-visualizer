@@ -11,8 +11,8 @@ export const ellers = (grid) => {
     let row = rows[i];
     //add current row for generation (GridUnionFind is coded to ignore duplicates)
     sets.addMultiple(row);
-    let h = horizontals(row, sets, selected_edges, last_row);
-    let v = verticals(sets, selected_edges, last_row);
+    horizontals(row, sets, selected_edges, last_row);
+    verticals(sets, selected_edges, last_row);
     //clear current row in preparation for the next
     sets.removeMultiple(row);
   }

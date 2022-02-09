@@ -59,7 +59,7 @@ function App() {
 
   const animation_delay = 5;
   const animation_threads = 4;
-  const playAnimations = (animation_queue, speed) => {
+  const playAnimations = (animation_queue, speed = animation_delay) => {
     flushAnimationQueue();
     animationQueueRef.current = animation_queue;
     playThroughAnimationQueue(speed);
@@ -110,14 +110,32 @@ function App() {
       navRef.current.forceRender();
     }
   };
+  const finishAnimation = () => {
+    let animation_queue = [];
+    for (let i = 0; i < rows; i++) {
+      let finish_animation = [];
+      for (let j = 0; j < cols; j++) {
+        let tile = gridRef.current[i][j];
+        finish_animation.push(() => tile.animate(2));
+      }
+      animation_queue.push(() => {
+        for (let animation of finish_animation) animation();
+      });
+    }
+    return animation_queue;
+  };
+  const kruskalsAnimation = ([r, c]) => {
+    let tile = gridRef.current[r][c];
+    tile.setVal(0);
+    tile.animate(1);
+  };
   const generateKruskals = () => {
     resetPath();
-    let result = kruskals(gridRef.current);
+    let animation_queue = [];
+    let [result, animations] = kruskals(gridRef.current, kruskalsAnimation);
+    animation_queue = [...animations, ...finishAnimation()];
     gridRef.current.forEach((row) => row.forEach((tile) => tile.setVal(3)));
-    result.forEach((tile) => {
-      let [r, c] = tile;
-      gridRef.current[r][c].setVal(0);
-    });
+    playAnimations(animation_queue, 20);
   };
   const generateEllers = () => {
     resetPath();

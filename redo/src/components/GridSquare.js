@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import './GridSquare.scss';
 
 const GridSquare = ({ square, setValue, modeRef }) => {
@@ -44,9 +44,25 @@ const GridSquare = ({ square, setValue, modeRef }) => {
   const [val, setVal] = useState(0);
   const [pathVal, setPathVal] = useState(0);
 
+  const tileRef = useRef();
+
+  const animate = (num) => {
+    if (num === 1) {
+      tileRef.current.classList.remove('pop');
+      void tileRef.current.offsetWidth;
+      tileRef.current.classList.add('pop');
+    } else if (num === 2) {
+      tileRef.current.classList.remove('pop');
+      tileRef.current.classList.remove('finish');
+      void tileRef.current.offsetWidth;
+      tileRef.current.classList.add('finish');
+    }
+  };
+
   useEffect(() => {
     square.setVal = setVal;
     square.setPathVal = setPathVal;
+    square.animate = animate;
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
@@ -60,10 +76,27 @@ const GridSquare = ({ square, setValue, modeRef }) => {
     setValue(square.uuid);
   };
 
+  const animationEnd = (event) => {
+    let animation_name = event.animationName;
+    if (animation_name === 'just_pop') {
+      tileRef.current.classList.remove('pop');
+      void tileRef.current.offsetWidth;
+    } else if (animation_name === 'finished') {
+      tileRef.current.classList.remove('finish');
+      void tileRef.current.offsetWidth;
+    }
+  };
+
   //console.log('square rendered');
 
   return (
-    <div onClick={clicked} style={getStyle()} className={getClassName()}>
+    <div
+      ref={tileRef}
+      onClick={clicked}
+      style={getStyle()}
+      className={getClassName()}
+      onAnimationEnd={animationEnd}
+    >
       {val === 1 || val === 2 ? val : ''}
     </div>
   );
