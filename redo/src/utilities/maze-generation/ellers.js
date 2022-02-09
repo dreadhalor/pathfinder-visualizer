@@ -9,6 +9,7 @@ export const ellers = (grid) => {
   for (let i = 0; i < rows.length; i++) {
     let last_row = i === rows.length - 1;
     let row = rows[i];
+    //add current row for generation (GridUnionFind is coded to ignore duplicates)
     sets.addMultiple(row);
     let h = horizontals(row, sets, selected_edges, last_row);
     let v = verticals(sets, selected_edges, last_row);

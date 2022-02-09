@@ -6,8 +6,9 @@ import TopNav from './components/TopNav';
 import { bfs } from './utilities/solvers/bfs';
 import { kruskals } from './utilities/maze-generation/kruskals';
 import { ellers } from './utilities/maze-generation/ellers';
-import { recursive_backtracking } from './utilities/maze-generation/recursive-backtracking';
+import { recursiveBacktracking } from './utilities/maze-generation/recursive-backtracking';
 import { huntAndKill } from './utilities/maze-generation/hunt-and-kill';
+import { prims } from './utilities/maze-generation/prims';
 
 function App() {
   const rows = 25,
@@ -129,7 +130,7 @@ function App() {
   };
   const generateDFS = () => {
     resetPath();
-    let result = recursive_backtracking(gridRef.current);
+    let result = recursiveBacktracking(gridRef.current);
     gridRef.current.forEach((row) => row.forEach((tile) => tile.setVal(3)));
     result.forEach((tile) => {
       let [r, c] = tile;
@@ -145,6 +146,19 @@ function App() {
       gridRef.current[r][c].setVal(0);
     });
   };
+  const generatePrims = () => {
+    resetPath();
+    let [result, frontier] = prims(gridRef.current);
+    gridRef.current.forEach((row) => row.forEach((tile) => tile.setVal(3)));
+    result.forEach((tile) => {
+      let [r, c] = tile;
+      gridRef.current[r][c].setVal(0);
+    });
+    frontier.forEach((tile) => {
+      let [r, c] = tile;
+      gridRef.current[r][c].setVal(4);
+    });
+  };
 
   return (
     <div className='App site-bg-empty w-full h-full flex flex-col'>
@@ -158,6 +172,7 @@ function App() {
         generateEllers={generateEllers}
         generateDFS={generateDFS}
         generateHuntAndKill={generateHuntAndKill}
+        generatePrims={generatePrims}
       />
       <div className='w-full flex-1 relative min-h-0'>
         {/* <div className='absolute w-full flex flex-col pointer-events-none z-10'>

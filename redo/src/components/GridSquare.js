@@ -21,6 +21,9 @@ const GridSquare = ({ square, setValue, modeRef }) => {
   const traversed_style = {
     backgroundColor: 'lightblue',
   };
+  const frontier_style = {
+    backgroundColor: '#ffa3a3',
+  };
 
   const getStyle = () => {
     if (val === 2) return { ...gridSquareSize, ...end_style };
@@ -28,6 +31,7 @@ const GridSquare = ({ square, setValue, modeRef }) => {
     if (pathVal === 2) return { ...gridSquareSize, ...on_path_style };
     if (pathVal === 1) return { ...gridSquareSize, ...traversed_style };
     if (val === 3) return { ...gridSquareSize, ...wall_style };
+    if (val === 4) return { ...gridSquareSize, ...frontier_style };
     return gridSquareSize;
   };
   const getClassName = () => {
@@ -60,7 +64,7 @@ const GridSquare = ({ square, setValue, modeRef }) => {
 
   return (
     <div onClick={clicked} style={getStyle()} className={getClassName()}>
-      {val > 0 ? val : ''}
+      {val === 1 || val === 2 ? val : ''}
     </div>
   );
 };

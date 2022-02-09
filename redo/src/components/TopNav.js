@@ -10,6 +10,7 @@ const TopNav = (
     generateEllers,
     generateDFS,
     generateHuntAndKill,
+    generatePrims,
   },
   ref
 ) => {
@@ -75,29 +76,36 @@ const TopNav = (
       >
         {solvedRef.current ? 'Clear Path' : 'Solve It!'}
       </button>
+      <span className='my-auto font-bold'>Generate:</span>
       <button
         className='my-1 mx-1 font-bold bg-blue-300 hover:bg-blue-400 p-1 rounded-lg'
         onClick={generateKruskals}
       >
-        Generate Kruskal's
+        Kruskal's
       </button>
       <button
         className='my-1 mx-1 font-bold bg-blue-300 hover:bg-blue-400 p-1 rounded-lg'
         onClick={generateEllers}
       >
-        Generate Eller's
+        Eller's
       </button>
       <button
         className='my-1 mx-1 font-bold bg-blue-300 hover:bg-blue-400 p-1 rounded-lg'
         onClick={generateDFS}
       >
-        Generate DFS
+        DFS
       </button>
       <button
         className='my-1 mx-1 font-bold bg-blue-300 hover:bg-blue-400 p-1 rounded-lg'
         onClick={generateHuntAndKill}
       >
-        Generate Hunt and Kill
+        Hunt-and-Kill
+      </button>
+      <button
+        className='my-1 mx-1 font-bold bg-blue-300 hover:bg-blue-400 p-1 rounded-lg'
+        onClick={generatePrims}
+      >
+        Prim's
       </button>
       <span className='flex-1'></span>
     </div>

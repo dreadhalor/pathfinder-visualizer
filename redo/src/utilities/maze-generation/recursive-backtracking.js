@@ -3,7 +3,7 @@ import { GridAdjacencyList } from '../data-structures/grid-adjacency-list';
 import { GridSet } from '../data-structures/grid-set';
 import { getFullEdges, getMazeAdjacencyList } from '../maze-structures';
 
-export const recursive_backtracking = (grid) => {
+export const recursiveBacktracking = (grid) => {
   let adjacency_list = getMazeAdjacencyList(grid);
   let edges = new GridAdjacencyList();
   let visited = new GridSet();
