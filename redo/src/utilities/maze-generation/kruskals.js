@@ -1,5 +1,5 @@
 import { shuffle } from 'lodash';
-import { getFullEdges2, getNodesAndEdges } from '../maze-structures';
+import { getFullEdges, getNodesAndEdges } from '../maze-structures';
 import { GridUnionFind } from '../data-structures/grid-union-find';
 
 export const kruskals = (grid) => {
@@ -14,6 +14,6 @@ export const kruskals = (grid) => {
       uf.union(n1, n2);
     }
   }
-  let result = getFullEdges2(selected_edges);
+  let result = getFullEdges(selected_edges);
   return result.flat(1);
 };

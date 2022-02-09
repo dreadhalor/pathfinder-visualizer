@@ -1,19 +1,18 @@
 export class GridUnionFind {
   constructor(coords_set = []) {
-    this.count = coords_set.length; // Number of disconnected components
+    this.count = 0; // Number of disconnected components
     this.next_id = 0; // To keep track of set IDs
     this.setMap = new Map(); // Keep track of connected components
     // Initialize the data structure such that all elements have themselves as parents
-    for (let coords of coords_set)
-      this.setMap.set(JSON.stringify(coords), this.next_id++);
+    this.addMultiple(coords_set);
   }
 
   union(coords_a, coords_b) {
     let a_id = this.setMap.get(JSON.stringify(coords_a)),
       b_id = this.setMap.get(JSON.stringify(coords_b));
-    if (a_id !== b_id) {
-      let min = Math.min(a_id, b_id);
-      let max = Math.max(a_id, b_id);
+    let min = Math.min(a_id, b_id);
+    let max = Math.max(a_id, b_id);
+    if (min !== max) {
       for (let key of this.setMap.keys()) {
         if (this.setMap.get(key) === max) this.setMap.set(key, min);
       }
@@ -22,7 +21,25 @@ export class GridUnionFind {
   }
 
   // Add new node
-  add = (coords) => this.setMap.set(JSON.stringify(coords), this.next_id++);
+  add = (coords) => {
+    if (this.find(coords) !== undefined) return false;
+    this.setMap.set(JSON.stringify(coords), this.next_id++);
+    this.count++;
+    return true;
+  };
+  addMultiple = (coords_set) => {
+    for (let coords of coords_set) this.add(coords);
+  };
+
+  remove = (coords) => {
+    if (this.find(coords) !== undefined) {
+      this.setMap.delete(JSON.stringify(coords));
+      this.count--;
+    }
+  };
+  removeMultiple = (coords_set) => {
+    for (let coords of coords_set) this.remove(coords);
+  };
 
   // Find the set ID
   find = (coords) => this.setMap.get(JSON.stringify(coords));
@@ -40,5 +57,8 @@ export class GridUnionFind {
       reverseMap.get(id).push(JSON.parse(coords_str));
     }
     return reverseMap.values();
+  }
+  setIDs() {
+    return new Set(this.setMap.values());
   }
 }

@@ -7,6 +7,7 @@ import { bfs } from './utilities/solvers/bfs';
 import { kruskals } from './utilities/maze-generation/kruskals';
 import { ellers } from './utilities/maze-generation/ellers';
 import { recursive_backtracking } from './utilities/maze-generation/recursive-backtracking';
+import { huntAndKill } from './utilities/maze-generation/hunt-and-kill';
 
 function App() {
   const rows = 25,
@@ -128,20 +129,17 @@ function App() {
   };
   const generateDFS = () => {
     resetPath();
-    let animation_queue = [];
-    // let result = recursive_backtracking({
-    //   grid: gridRef.current,
-    //   carve_animation: (node) => {
-    //     node.setVal(0);
-    //     //node.setPathVal(1);
-    //   },
-    //   animation_queue,
-    // });
     let result = recursive_backtracking(gridRef.current);
-    //console.log(result);
-    //console.log(test);
     gridRef.current.forEach((row) => row.forEach((tile) => tile.setVal(3)));
-    //playAnimations(animation_queue, 10);
+    result.forEach((tile) => {
+      let [r, c] = tile;
+      gridRef.current[r][c].setVal(0);
+    });
+  };
+  const generateHuntAndKill = () => {
+    resetPath();
+    let result = huntAndKill(gridRef.current);
+    gridRef.current.forEach((row) => row.forEach((tile) => tile.setVal(3)));
     result.forEach((tile) => {
       let [r, c] = tile;
       gridRef.current[r][c].setVal(0);
@@ -159,6 +157,7 @@ function App() {
         generateKruskals={generateKruskals}
         generateEllers={generateEllers}
         generateDFS={generateDFS}
+        generateHuntAndKill={generateHuntAndKill}
       />
       <div className='w-full flex-1 relative min-h-0'>
         {/* <div className='absolute w-full flex flex-col pointer-events-none z-10'>

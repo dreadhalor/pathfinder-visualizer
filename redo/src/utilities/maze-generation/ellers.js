@@ -1,60 +1,54 @@
-import { shuffle } from 'lodash';
-import { EllersSet } from '../data-structures/ellers-set';
-import {
-  getFullEdges,
-  getStringifiedNodesAndEdgesByRow,
-} from '../maze-structures';
+import { GridUnionFind } from '../data-structures/grid-union-find';
+import { getFullEdges, getPathNodesByRow } from '../maze-structures';
+import { coinFlips, pickN } from '../randomizers';
 
 export const ellers = (grid) => {
-  let [node_rows, edge_rows] = getStringifiedNodesAndEdgesByRow(grid);
+  let rows = getPathNodesByRow(grid);
   let selected_edges = [];
-  let ellers_set = null,
-    next_ellers_set = null,
-    next_row = null;
-  for (let i = 0; i < node_rows.length; i++) {
-    let last_row = i === node_rows.length - 1;
-    let row = node_rows[i];
-    ellers_set = next_ellers_set ?? new EllersSet(row);
-    next_ellers_set = !last_row && new EllersSet(node_rows[i + 1]);
-    next_row = !last_row && node_rows[i + 1];
-
-    //randomly connect adjacent tiles (or all unconnected if last row)
-    for (let j = 0; j < row.length - 1; j++) {
-      let roll = diceRoll(2) === 2;
-      let n1 = row[j],
-        n2 = row[j + 1];
-      if (!ellers_set.connected(n1, n2) && (last_row || roll)) {
-        ellers_set.union(n1, n2);
-        selected_edges.push([n1, n2]);
-      }
-    }
-    if (next_row)
-      for (let set of ellers_set.sets()) {
-        let nodes = [...set];
-        let downpath_count = diceRoll(nodes.length);
-        let downpath_parents = pickN(nodes, downpath_count);
-        let downpath_children = [];
-        for (let parent of downpath_parents) {
-          let [r, c] = JSON.parse(parent);
-          selected_edges.push([parent, JSON.stringify([r + 2, c])]);
-          downpath_children.push(JSON.stringify([r + 2, c]));
-        }
-        //union the nodes in next_ellers_set
-        for (let i = 1; i < downpath_children.length; i++)
-          next_ellers_set.union(downpath_children[0], downpath_children[i]);
-      }
+  let sets = new GridUnionFind();
+  for (let i = 0; i < rows.length; i++) {
+    let last_row = i === rows.length - 1;
+    let row = rows[i];
+    sets.addMultiple(row);
+    let h = horizontals(row, sets, selected_edges, last_row);
+    let v = verticals(sets, selected_edges, last_row);
+    //clear current row in preparation for the next
+    sets.removeMultiple(row);
   }
   return getFullEdges(selected_edges).flat(1);
 };
 
-const diceRoll = (sides) => {
-  return Math.floor(Math.random() * sides) + 1;
+//randomly connect adjacent tiles (or all unconnected if last row)
+const horizontals = (row, sets, edges, last_row) => {
+  let count = 0;
+  for (let j = 0; j < row.length - 1; j++) {
+    let flip = coinFlips(1);
+    let n1 = row[j],
+      n2 = row[j + 1];
+    let connected = sets.connected(n1, n2);
+    if (!connected && (last_row || flip)) {
+      sets.union(n1, n2);
+      edges.push([n1, n2]);
+      count++;
+    }
+  }
+  return count;
 };
-const pickN = (list, n) => {
-  let m = list.length;
-  let options = [];
-  for (let i = 0; i < m; i++) options.push(i);
-  options = shuffle(options);
-  let choices = options.slice(0, n);
-  return choices.map((index) => list[index]);
+//connect downpaths
+const verticals = (sets, edges, last_row) => {
+  let count = 0;
+  if (last_row) return count;
+  for (let set of sets.sets()) {
+    let flip = coinFlips(set.length);
+    let downpath_parents = pickN(set, flip || 1);
+    for (let parent of downpath_parents) {
+      let [r, c] = parent;
+      let child = [r + 2, c];
+      sets.add(child);
+      sets.union(parent, child);
+      edges.push([parent, child]);
+      count++;
+    }
+  }
+  return count;
 };

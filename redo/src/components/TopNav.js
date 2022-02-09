@@ -9,6 +9,7 @@ const TopNav = (
     generateKruskals,
     generateEllers,
     generateDFS,
+    generateHuntAndKill,
   },
   ref
 ) => {
@@ -91,6 +92,12 @@ const TopNav = (
         onClick={generateDFS}
       >
         Generate DFS
+      </button>
+      <button
+        className='my-1 mx-1 font-bold bg-blue-300 hover:bg-blue-400 p-1 rounded-lg'
+        onClick={generateHuntAndKill}
+      >
+        Generate Hunt and Kill
       </button>
       <span className='flex-1'></span>
     </div>
