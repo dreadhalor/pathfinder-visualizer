@@ -57,12 +57,6 @@ const GridSquare = ({ square, setValue, modeRef }) => {
       tileRef.current.classList.remove('finish');
       void tileRef.current.offsetWidth;
       tileRef.current.classList.add('finish');
-    } else if (num === 3) {
-      tileRef.current.classList.remove('pop');
-      tileRef.current.classList.remove('finish');
-      tileRef.current.classList.remove('fade');
-      void tileRef.current.offsetWidth;
-      tileRef.current.classList.add('fade');
     }
   };
 

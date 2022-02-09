@@ -4,11 +4,13 @@ import { v4 as uuidv4 } from 'uuid';
 import GridSquare from './components/GridSquare';
 import TopNav from './components/TopNav';
 import { bfs } from './utilities/solvers/bfs';
-import { kruskals } from './utilities/maze-generation/kruskals';
-import { ellers } from './utilities/maze-generation/ellers';
-import { recursiveBacktracking } from './utilities/maze-generation/recursive-backtracking';
-import { huntAndKill } from './utilities/maze-generation/hunt-and-kill';
-import { prims } from './utilities/maze-generation/prims';
+import {
+  kruskals,
+  ellers,
+  recursiveBacktracking,
+  huntAndKill,
+  prims,
+} from './utilities/maze-generation';
 
 function App() {
   const rows = 25,
