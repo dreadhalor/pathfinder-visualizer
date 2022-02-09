@@ -1,5 +1,11 @@
 $standard-duration: 0.3s;
+.tile {
+  transition-property: opacity;
+  transition-duration: 0.4s;
+}
+
 .pop {
+  transition-property: none;
   animation-name: just_pop;
   animation-duration: $standard-duration;
 }
@@ -7,6 +13,7 @@ $standard-duration: 0.3s;
   animation-name: finished;
   animation-duration: $standard-duration;
 }
+
 .animate {
   animation-name: pop;
   animation-duration: $standard-duration;

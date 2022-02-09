@@ -132,7 +132,7 @@ function App() {
   const generateKruskals = () => {
     resetPath();
     let animation_queue = [];
-    let [result, animations] = kruskals(gridRef.current, kruskalsAnimation);
+    let [result, animations] = kruskals(gridRef.current, kruskalsAnimation); //eslint-disable-line no-unused-vars
     animation_queue = [...animations, ...finishAnimation()];
     gridRef.current.forEach((row) => row.forEach((tile) => tile.setVal(3)));
     playAnimations(animation_queue, 20);

@@ -35,7 +35,8 @@ const GridSquare = ({ square, setValue, modeRef }) => {
     return gridSquareSize;
   };
   const getClassName = () => {
-    let className = 'border border-slate-500 bg-white';
+    let className = 'tile border border-slate-500 bg-white';
+    if (val === 3) className += ' fade';
     if (pathVal === 1) className += ' animate';
     else if (pathVal === 2) className += ' animate2';
     return className;
@@ -56,6 +57,12 @@ const GridSquare = ({ square, setValue, modeRef }) => {
       tileRef.current.classList.remove('finish');
       void tileRef.current.offsetWidth;
       tileRef.current.classList.add('finish');
+    } else if (num === 3) {
+      tileRef.current.classList.remove('pop');
+      tileRef.current.classList.remove('finish');
+      tileRef.current.classList.remove('fade');
+      void tileRef.current.offsetWidth;
+      tileRef.current.classList.add('fade');
     }
   };
 
@@ -84,6 +91,10 @@ const GridSquare = ({ square, setValue, modeRef }) => {
     } else if (animation_name === 'finished') {
       tileRef.current.classList.remove('finish');
       void tileRef.current.offsetWidth;
+    } else if (animation_name === 'fade') {
+      tileRef.current.classList.remove('fade');
+      void tileRef.current.offsetWidth;
+      setVal(3);
     }
   };
 
