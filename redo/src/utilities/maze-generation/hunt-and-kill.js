@@ -121,6 +121,7 @@ const hunt = (
   let crossed_empty_cell = false;
   let node = hunt_start_ref.start || adjacency_list.at(0);
   let prev_scan = null;
+  traverse(node, animations, scan_animation);
   while (node) {
     scanned.add(node);
     if (visited.has(node)) {
