@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import './App.scss';
 import { v4 as uuidv4 } from 'uuid';
 import GridSquare from './components/GridSquare';
@@ -23,8 +23,14 @@ import {
 } from './utilities/animations';
 
 function App() {
-  const rows = 25,
-    cols = 39;
+  const [ignore, forceRenderCounter] = useState(0); // eslint-disable-line no-unused-vars
+  const forceRender = () =>
+    forceRenderCounter((prev_counter) => prev_counter + 1);
+
+  const [rows, setRows] = useState(25);
+  const [cols, setCols] = useState(39);
+  const [grid, setGrid] = useState();
+
   const createNewGrid = (num_rows, num_cols) => {
     let new_grid = [];
     for (let i = 0; i < num_rows; i++) {
@@ -36,11 +42,17 @@ function App() {
     }
     return new_grid;
   };
-  const gridRef = useRef(createNewGrid(rows, cols));
+  // const [grid, setGrid] = useState(createNewGrid(rows, cols));
+  //const grid = useRef();
+
+  const gridContainerRef = useRef();
   const mode = useRef(1);
   const solved = useRef(false);
   const navRef = useRef();
   const animatorRef = useRef(new Animator());
+  const finished = () =>
+    animatorRef.current.playAnimations([...finishAnimation(grid)]);
+  animatorRef.current.setFinishFunction(finished);
 
   const setValueCheck = (candidate_square, uuid, val) => {
     let tile_match = candidate_square.uuid === uuid;
@@ -55,10 +67,22 @@ function App() {
   const setValue = (square_uuid, val = mode.current) => {
     for (let i = 0; i < rows; i++) {
       for (let j = 0; j < cols; j++) {
-        setValueCheck(gridRef.current[i][j], square_uuid, val);
+        setValueCheck(grid[i][j], square_uuid, val);
       }
     }
   };
+
+  useLayoutEffect(() => {
+    let _rows = Math.floor(gridContainerRef.current.clientHeight / 25);
+    if (_rows % 2 === 0 && _rows > 0) _rows--;
+    let _cols = Math.floor(gridContainerRef.current.clientWidth / 25);
+    if (_cols % 2 === 0 && _cols > 0) _cols--;
+    if (!grid || grid.length < _rows || grid?.[0].length < _cols) {
+      setRows(_rows);
+      setCols(_cols);
+      setGrid(createNewGrid(_rows, _cols));
+    }
+  });
 
   //console.log('app rendered');
 
@@ -74,7 +98,7 @@ function App() {
     animatorRef.current.flushAnimationQueue();
     for (let i = 0; i < rows; i++) {
       for (let j = 0; j < cols; j++) {
-        if (gridRef.current[i][j].pathVal) gridRef.current[i][j].setPathVal(0);
+        if (grid[i][j].pathVal) grid[i][j].setPathVal(0);
       }
     }
     navRef.current.forceRender();
@@ -83,12 +107,12 @@ function App() {
     let start = null;
     for (let i = 0; i < rows; i++) {
       for (let j = 0; j < cols; j++) {
-        if (gridRef.current[i][j].val === 1) start = [i, j];
+        if (grid[i][j].val === 1) start = [i, j];
       }
     }
     let animation_queue = [];
     let end = bfs({
-      maze: gridRef.current,
+      maze: grid,
       start_coords: start,
       check_solved_func: (tile) => tile.val === 2,
       traversal_animation_func: (tile) => tile.setPathVal(1),
@@ -101,14 +125,13 @@ function App() {
       navRef.current.forceRender();
     }
   };
-  const connectAnimation = connectAnimationGenerator(gridRef);
-  const frontierAnimation = frontierAnimationGenerator(gridRef);
-  const wallAnimation = wallAnimationGenerator(gridRef);
-  const scanAnimation = scanAnimationGenerator(gridRef);
-  const traverseAnimation = traverseAnimationGenerator(gridRef);
-  const scanAnchorAnimation = scanAnchorAnimationGenerator(gridRef);
+  const connectAnimation = connectAnimationGenerator(grid);
+  const frontierAnimation = frontierAnimationGenerator(grid);
+  const wallAnimation = wallAnimationGenerator(grid);
+  const scanAnimation = scanAnimationGenerator(grid);
+  const traverseAnimation = traverseAnimationGenerator(grid);
+  const scanAnchorAnimation = scanAnchorAnimationGenerator(grid);
   const clearScanAnimation = (visited, path_set) => {
-    let grid = gridRef.current;
     for (let i = 0; i < grid.length; i++) {
       for (let j = 0; j < grid[0].length; j++) {
         let tile = grid[i][j];
@@ -124,41 +147,41 @@ function App() {
 
   const generateKruskals = () => {
     resetPath();
-    gridRef.current.forEach((row) => row.forEach((tile) => tile.setVal(3)));
-    let [result, animations] = kruskals(gridRef.current, connectAnimation); //eslint-disable-line no-unused-vars
-    let animation_queue = [...animations, ...finishAnimation(gridRef)];
+    grid.forEach((row) => row.forEach((tile) => tile.setVal(3)));
+    let [result, animations] = kruskals(grid, connectAnimation); //eslint-disable-line no-unused-vars
+    let animation_queue = [...animations, ...finishAnimation(grid)];
     animatorRef.current.playAnimations(animation_queue);
   };
   const generateEllers = () => {
     resetPath();
-    let result = ellers(gridRef.current);
-    gridRef.current.forEach((row) => row.forEach((tile) => tile.setVal(3)));
+    let result = ellers(grid);
+    grid.forEach((row) => row.forEach((tile) => tile.setVal(3)));
     result.forEach((tile) => {
       let [r, c] = tile;
-      gridRef.current[r][c].setVal(0);
+      grid[r][c].setVal(0);
     });
   };
   const generateDFS = () => {
     resetPath();
-    gridRef.current.forEach((row) => row.forEach((tile) => tile.setVal(3)));
+    grid.forEach((row) => row.forEach((tile) => tile.setVal(3)));
     //eslint-disable-next-line no-unused-vars
     let [result, animations] = recursiveBacktracking(
-      gridRef.current,
+      grid,
       frontierAnimation,
       connectAnimation
     );
-    let animation_queue = [...animations, ...finishAnimation(gridRef)];
+    let animation_queue = [...animations]; //, ...finishAnimation(grid)];
     // result.forEach((tile) => {
     //   let [r, c] = tile;
-    //   gridRef.current[r][c].setVal(0);
+    //   grid[r][c].setVal(0);
     // });
-    animatorRef.current.playAnimations(animation_queue);
+    animatorRef.current.playAnimations(animation_queue, 2, true);
   };
   const generateHuntAndKill = () => {
     resetPath();
-    gridRef.current.forEach((row) => row.forEach((tile) => tile.setVal(3)));
+    grid.forEach((row) => row.forEach((tile) => tile.setVal(3)));
     let [result, animations] = huntAndKill(
-      gridRef.current,
+      grid,
       connectAnimation,
       scanAnimation,
       clearScanAnimation,
@@ -166,26 +189,22 @@ function App() {
       traverseAnimation,
       scanAnimation
     );
-    let animation_queue = [...animations, ...finishAnimation(gridRef)];
+    let animation_queue = [...animations]; //, ...finishAnimation(grid)];
     // result.forEach((tile) => {
     //   let [r, c] = tile;
-    //   gridRef.current[r][c].setVal(0);
+    //   grid[r][c].setVal(0);
     // });
-    animatorRef.current.playAnimations(animation_queue);
+    animatorRef.current.playAnimations(animation_queue, 2, true);
   };
   const generatePrims = () => {
     resetPath();
-    gridRef.current.forEach((row) => row.forEach((tile) => tile.setVal(3)));
+    grid.forEach((row) => row.forEach((tile) => tile.setVal(3)));
     //eslint-disable-next-line no-unused-vars
-    let [result, animations] = prims(
-      gridRef.current,
-      frontierAnimation,
-      connectAnimation
-    );
-    let animation_queue = [...animations, ...finishAnimation(gridRef)];
+    let [result, animations] = prims(grid, frontierAnimation, connectAnimation);
+    let animation_queue = [...animations, ...finishAnimation(grid)];
     // result.forEach((tile) => {
     //   let [r, c] = tile;
-    //   gridRef.current[r][c].setVal(0);
+    //   grid[r][c].setVal(0);
     // });
     animatorRef.current.playAnimations(animation_queue);
   };
@@ -214,17 +233,20 @@ function App() {
           </button>
         </div> */}
         <div className='w-full h-full flex overflow-auto p-4'>
-          <div className='border border-slate-600' style={gridStyle}>
-            {gridRef.current.map((row) =>
-              row.map((square) => (
-                <GridSquare
-                  key={square.uuid}
-                  square={square}
-                  modeRef={mode}
-                  setValue={setValue}
-                />
-              ))
-            )}
+          <div ref={gridContainerRef} className='flex-1 h-auto flex'>
+            <div className='border border-slate-600' style={gridStyle}>
+              {grid &&
+                grid.map((row) =>
+                  row.map((square) => (
+                    <GridSquare
+                      key={square.uuid}
+                      square={square}
+                      modeRef={mode}
+                      setValue={setValue}
+                    />
+                  ))
+                )}
+            </div>
           </div>
         </div>
       </div>
