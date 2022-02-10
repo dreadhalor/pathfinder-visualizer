@@ -60,7 +60,7 @@ function App() {
     }
   };
 
-  console.log('app rendered');
+  //console.log('app rendered');
 
   const gridStyle = {
     margin: 'auto',
