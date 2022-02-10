@@ -1,6 +1,6 @@
 export class GridAdjacencyList {
-  constructor() {
-    this.list = new Map();
+  constructor(map) {
+    this.list = map || new Map();
   }
 
   get = (coords) => this.list.get(JSON.stringify(coords));
@@ -15,4 +15,5 @@ export class GridAdjacencyList {
     }
     return entries;
   };
+  clone = () => new GridAdjacencyList(this.list);
 }

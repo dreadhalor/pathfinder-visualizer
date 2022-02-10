@@ -1,59 +1,33 @@
 export class Animator {
   constructor() {
     this.animation_queue = [];
-    this.animation_delay = 5;
-    this.animation_threads = 1;
-    this.ontime = 0;
-    this.delayed = 0;
-    this.stamp = null;
+    this.delay = 0;
   }
 
-  playAnimations = (animation_queue, speed = this.animation_delay, num = 1) => {
+  playAnimations = (animation_queue, frames_per_refresh = 1) => {
     this.flushAnimationQueue();
     this.animation_queue = animation_queue;
-    this.playThroughAnimationQueue(speed, num);
+    // let threads = 2;
+    this.animationLoop(frames_per_refresh);
+    // for (let i = 0; i < threads; i++)
+    //   setTimeout(
+    //     () => this.animationLoop(frames_per_refresh),
+    //     1000 / 60 / threads
+    //   );
   };
   flushAnimationQueue = () => (this.animation_queue = []);
-  playThroughAnimationQueue = (speed = this.animation_delay, num = 1) => {
-    this.ontime = 0;
-    this.delayed = 0;
-    // let frames_per_second = 60;
-    // let seconds_per_frame = 1000 / frames_per_second;
-    //we want an animation to fire every n ms
-    // let threads_per_frame = animation_threads;
-    // let thread_stagger = seconds_per_frame / threads_per_frame;
-    for (let i = 0; i < this.animation_threads; i++) {
-      // setTimeout(() => animationLoop(speed), speed * i);
-      //setTimeout(() => animationLoop(speed), thread_stagger * i);
-      this.animationLoop(speed, null, num);
-    }
-  };
-  animationLoop(speed = this.animation_delay, timestamp, num = 1) {
-    //console.log(num);
-    if (this.stamp) {
-      let time = timestamp - this.stamp;
-      //console.log(time);
-      if (time < 17) this.ontime++;
-      else this.delayed++;
-      //console.log(ontime + ', ' + delayed);
-    }
-    this.stamp = timestamp;
-    let animations = this.animation_queue.splice(0, num);
-    //let animation = animation_queue.shift();
+  animationLoop(frames_per_refresh = 1) {
+    let animations = this.animation_queue.splice(0, frames_per_refresh);
     if (animations.length > 0) {
-      for (let animation of animations) {
-        if (animation) animation();
-      }
-      requestAnimationFrame((timestamp) =>
-        this.animationLoop(speed, timestamp, num)
-      );
+      for (let animation of animations) if (animation) animation();
+      if (this.delay) {
+        setTimeout(
+          () =>
+            requestAnimationFrame(() => this.animationLoop(frames_per_refresh)),
+          this.delay
+        );
+      } else
+        requestAnimationFrame(() => this.animationLoop(frames_per_refresh));
     }
-    // if (animation) {
-    //   animation();
-    //   requestAnimationFrame(
-    //     (timestamp) => animationLoop(speed, timestamp),
-    //     speed * animation_threads
-    //   );
-    //   // setTimeout(() => animationLoop(speed), speed * animation_threads);
   }
 }

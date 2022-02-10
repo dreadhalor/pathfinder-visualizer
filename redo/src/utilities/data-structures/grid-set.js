@@ -26,4 +26,9 @@ export class GridSet {
     return coords;
   };
   size = () => this.set.size;
+  clone = () => {
+    let copy = [...this.set];
+    copy = copy.map((coord_str) => JSON.parse(coord_str));
+    return new GridSet(copy);
+  };
 }

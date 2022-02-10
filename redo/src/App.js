@@ -12,6 +12,15 @@ import {
   prims,
 } from './utilities/maze-generation';
 import { Animator } from './utilities/animator';
+import {
+  connectAnimationGenerator,
+  finishAnimation,
+  frontierAnimationGenerator,
+  scanAnchorAnimationGenerator,
+  scanAnimationGenerator,
+  traverseAnimationGenerator,
+  wallAnimationGenerator,
+} from './utilities/animations';
 
 function App() {
   const rows = 25,
@@ -86,43 +95,39 @@ function App() {
       path_animation_func: (tile) => tile.setPathVal(2),
       animation_queue,
     });
-    animatorRef.current.playAnimations(animation_queue, null, 3);
+    animatorRef.current.playAnimations(animation_queue, 3);
     if (end) {
       solved.current = true;
       navRef.current.forceRender();
     }
   };
-  const finishAnimation = () => {
-    let animation_queue = [];
-    for (let i = 0; i < rows; i++) {
-      let finish_animation = [];
-      for (let j = 0; j < cols; j++) {
-        let tile = gridRef.current[i][j];
-        finish_animation.push(() => tile.animate(2));
+  const connectAnimation = connectAnimationGenerator(gridRef);
+  const frontierAnimation = frontierAnimationGenerator(gridRef);
+  const wallAnimation = wallAnimationGenerator(gridRef);
+  const scanAnimation = scanAnimationGenerator(gridRef);
+  const traverseAnimation = traverseAnimationGenerator(gridRef);
+  const scanAnchorAnimation = scanAnchorAnimationGenerator(gridRef);
+  const clearScanAnimation = (visited, path_set) => {
+    let grid = gridRef.current;
+    for (let i = 0; i < grid.length; i++) {
+      for (let j = 0; j < grid[0].length; j++) {
+        let tile = grid[i][j];
+        if (tile.val === 5 || tile.val === 6 || tile.val === 7) {
+          if (tile.val === 6 || tile.val === 7) {
+            tile.setVal(0);
+          } else if (path_set.has([i, j])) tile.setVal(0);
+          else tile.setVal(3);
+        }
       }
-      animation_queue.push(() => {
-        for (let animation of finish_animation) animation();
-      });
     }
-    return animation_queue;
   };
-  const connectAnimation = ([r, c]) => {
-    let tile = gridRef.current[r][c];
-    tile.setVal(0);
-    tile.animate(1);
-  };
-  const frontierAnimation = ([r, c]) => {
-    let tile = gridRef.current[r][c];
-    tile.setVal(4);
-    tile.animate(1);
-  };
+
   const generateKruskals = () => {
     resetPath();
     gridRef.current.forEach((row) => row.forEach((tile) => tile.setVal(3)));
-    let animation_queue = [];
     let [result, animations] = kruskals(gridRef.current, connectAnimation); //eslint-disable-line no-unused-vars
-    animation_queue = [...animations, ...finishAnimation()];
-    animatorRef.current.playAnimations(animation_queue, 100);
+    let animation_queue = [...animations, ...finishAnimation(gridRef)];
+    animatorRef.current.playAnimations(animation_queue);
   };
   const generateEllers = () => {
     resetPath();
@@ -136,34 +141,48 @@ function App() {
   const generateDFS = () => {
     resetPath();
     gridRef.current.forEach((row) => row.forEach((tile) => tile.setVal(3)));
+    //eslint-disable-next-line no-unused-vars
     let [result, animations] = recursiveBacktracking(
       gridRef.current,
-      frontierAnimation
+      frontierAnimation,
+      connectAnimation
     );
+    let animation_queue = [...animations, ...finishAnimation(gridRef)];
     // result.forEach((tile) => {
     //   let [r, c] = tile;
     //   gridRef.current[r][c].setVal(0);
     // });
-    animatorRef.current.playAnimations(animations);
+    animatorRef.current.playAnimations(animation_queue);
   };
   const generateHuntAndKill = () => {
     resetPath();
-    let result = huntAndKill(gridRef.current);
     gridRef.current.forEach((row) => row.forEach((tile) => tile.setVal(3)));
-    result.forEach((tile) => {
-      let [r, c] = tile;
-      gridRef.current[r][c].setVal(0);
-    });
+    let [result, animations] = huntAndKill(
+      gridRef.current,
+      connectAnimation,
+      scanAnimation,
+      clearScanAnimation,
+      wallAnimation,
+      traverseAnimation,
+      scanAnimation
+    );
+    let animation_queue = [...animations, ...finishAnimation(gridRef)];
+    // result.forEach((tile) => {
+    //   let [r, c] = tile;
+    //   gridRef.current[r][c].setVal(0);
+    // });
+    animatorRef.current.playAnimations(animation_queue);
   };
   const generatePrims = () => {
     resetPath();
     gridRef.current.forEach((row) => row.forEach((tile) => tile.setVal(3)));
+    //eslint-disable-next-line no-unused-vars
     let [result, animations] = prims(
       gridRef.current,
       frontierAnimation,
       connectAnimation
     );
-    let animation_queue = [...animations, ...finishAnimation()];
+    let animation_queue = [...animations, ...finishAnimation(gridRef)];
     // result.forEach((tile) => {
     //   let [r, c] = tile;
     //   gridRef.current[r][c].setVal(0);

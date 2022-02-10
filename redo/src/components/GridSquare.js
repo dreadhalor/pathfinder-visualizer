@@ -17,6 +17,7 @@ const GridSquare = ({ square, setValue, modeRef }) => {
   };
   const on_path_style = {
     backgroundColor: 'yellow',
+    boxSizing: 'border-box',
   };
   const traversed_style = {
     backgroundColor: 'lightblue',
@@ -24,12 +25,30 @@ const GridSquare = ({ square, setValue, modeRef }) => {
   const frontier_style = {
     backgroundColor: '#ffa3a3',
   };
+  const scan_style = {
+    backgroundColor: '#80ff91',
+    transitionProperty: 'none',
+  };
+  const scan_anchor_style = {
+    backgroundColor: '#00d000',
+    transitionProperty: 'none',
+  };
+  const scan_no_wall_borders = {
+    border: 0,
+  };
+  const scan_traverse_style = {
+    backgroundColor: '#0ae627',
+    // transitionProperty: 'none',
+  };
 
   const getStyle = () => {
     if (val === 2) return { ...gridSquareSize, ...end_style };
     if (val === 1) return { ...gridSquareSize, ...start_style };
     if (pathVal === 2) return { ...gridSquareSize, ...on_path_style };
     if (pathVal === 1) return { ...gridSquareSize, ...traversed_style };
+    if (val === 5) return { ...gridSquareSize, ...scan_style };
+    if (val === 6) return { ...gridSquareSize, ...scan_traverse_style };
+    if (val === 7) return { ...gridSquareSize, ...scan_anchor_style };
     if (val === 3) return { ...gridSquareSize, ...wall_style };
     if (val === 4) return { ...gridSquareSize, ...frontier_style };
     return gridSquareSize;
@@ -57,6 +76,12 @@ const GridSquare = ({ square, setValue, modeRef }) => {
       tileRef.current.classList.remove('finish');
       void tileRef.current.offsetWidth;
       tileRef.current.classList.add('finish');
+    } else if (num === 3) {
+      tileRef.current.classList.remove('pop');
+      tileRef.current.classList.remove('finish');
+      tileRef.current.classList.remove('reset');
+      void tileRef.current.offsetWidth;
+      tileRef.current.classList.add('reset');
     }
   };
 
@@ -84,6 +109,9 @@ const GridSquare = ({ square, setValue, modeRef }) => {
       void tileRef.current.offsetWidth;
     } else if (animation_name === 'finished') {
       tileRef.current.classList.remove('finish');
+      void tileRef.current.offsetWidth;
+    } else if (animation_name === 'reset') {
+      tileRef.current.classList.remove('reset');
       void tileRef.current.offsetWidth;
     }
   };

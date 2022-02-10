@@ -1,6 +1,6 @@
 import { GridAdjacencyList } from './data-structures/grid-adjacency-list';
 
-const getDimensions = (grid) => {
+export const getDimensions = (grid) => {
   return [grid?.length ?? 0, grid?.[0]?.length ?? 0];
 };
 export const getNodesAndEdges = (grid) => {
