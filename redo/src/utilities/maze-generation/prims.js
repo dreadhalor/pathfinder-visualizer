@@ -1,9 +1,14 @@
 import { shuffle } from 'lodash';
 import { GridAdjacencyList } from '../data-structures/grid-adjacency-list';
 import { GridSet } from '../data-structures/grid-set';
-import { getFullEdges, getMazeAdjacencyList } from '../maze-structures';
+import {
+  expandEdge,
+  getFullEdges,
+  getMazeAdjacencyList,
+} from '../maze-structures';
 
-export const prims = (grid) => {
+export const prims = (grid, frontierAnimation, connectAnimation) => {
+  let animations = [];
   const adjacency_list = getMazeAdjacencyList(grid);
   let edges = new GridAdjacencyList();
   let visited = new GridSet();
@@ -15,10 +20,28 @@ export const prims = (grid) => {
     visited.add(next);
     let neighbors = adjacency_list.get(next);
     let unvisited = neighbors.filter((node) => !visited.has(node));
-    frontier.addMultiple(unvisited);
     connector = shuffle(neighbors.filter((node) => visited.has(node)))[0];
-    if (connector) edges.set(next, connector);
+    if (connector)
+      connect(next, connector, edges, animations, connectAnimation);
+    addToFrontier(unvisited, frontier, animations, frontierAnimation);
   }
 
-  return [getFullEdges(edges.entries()).flat(1), frontier.toArray()];
+  return [getFullEdges(edges.entries()).flat(1), animations];
 };
+
+function addToFrontier(nodes, frontier, animations, frontierAnimation) {
+  let added = frontier.addMultiple(nodes);
+  if (frontierAnimation)
+    animations.push(() => {
+      for (let node of added) frontierAnimation(node);
+    });
+}
+//next, connector, edges, animations, connectAnimation
+function connect(n1, n2, edges, animations, connectAnimation) {
+  edges.set(n1, n2);
+  let edge = expandEdge([n1, n2]);
+  if (connectAnimation)
+    animations.push(() => {
+      for (let node of edge) connectAnimation(node);
+    });
+}

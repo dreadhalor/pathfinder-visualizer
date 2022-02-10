@@ -3,7 +3,8 @@ import { GridAdjacencyList } from '../data-structures/grid-adjacency-list';
 import { GridSet } from '../data-structures/grid-set';
 import { getFullEdges, getMazeAdjacencyList } from '../maze-structures';
 
-export const recursiveBacktracking = (grid) => {
+export const recursiveBacktracking = (grid, something_animation) => {
+  let animations = [];
   let adjacency_list = getMazeAdjacencyList(grid);
   let edges = new GridAdjacencyList();
   let visited = new GridSet();
@@ -11,6 +12,7 @@ export const recursiveBacktracking = (grid) => {
   let stack = [starting_node];
   while (stack.length > 0) {
     let node = stack.pop();
+    animations.push(() => something_animation(node));
     visited.add(node);
     let shuffled_unvisited_neighbors = shuffle(
       adjacency_list.get(node).filter((neighbor) => !visited.has(neighbor))
@@ -21,5 +23,7 @@ export const recursiveBacktracking = (grid) => {
     }
   }
   let result = getFullEdges(edges.entries()).flat(1);
-  return result;
+  return [result, animations];
 };
+
+function activateCell(cell) {}

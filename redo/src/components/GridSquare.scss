@@ -71,12 +71,16 @@ $standard-duration: 0.3s;
 }
 @keyframes just_pop {
   0% {
-    border-width: 1px;
-    box-shadow: 1px 1px 1px 1px black;
+    opacity: 0.5;
+    transform: scale(1.2);
+    box-shadow: 2px 2px 2px 2px black;
+  }
+  10% {
+    opacity: 1;
   }
   50% {
     transform: scale(1.3);
-    box-shadow: 2px 2px 2px 2px black;
+    box-shadow: 3px 3px 3px 3px black;
   }
   100% {
     box-shadow: 1px 1px 1px 1px black;
@@ -84,7 +88,6 @@ $standard-duration: 0.3s;
 }
 @keyframes finished {
   0% {
-    border-width: 1px;
     box-shadow: 1px 1px 1px 1px black;
   }
   50% {

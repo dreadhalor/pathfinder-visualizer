@@ -8,7 +8,13 @@ export class GridSet {
     return this;
   };
   addMultiple = (coords_set) => {
-    for (let coords of coords_set) this.add(coords);
+    let successes = [];
+    for (let coords of coords_set) {
+      let size = this.size();
+      this.add(coords);
+      if (this.size() > size) successes.push(coords);
+    }
+    return successes;
   };
   has = (coords) => this.set.has(JSON.stringify(coords));
   toArray = () => [...this.set].map((str) => JSON.parse(str));

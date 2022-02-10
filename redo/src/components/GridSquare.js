@@ -85,10 +85,6 @@ const GridSquare = ({ square, setValue, modeRef }) => {
     } else if (animation_name === 'finished') {
       tileRef.current.classList.remove('finish');
       void tileRef.current.offsetWidth;
-    } else if (animation_name === 'fade') {
-      tileRef.current.classList.remove('fade');
-      void tileRef.current.offsetWidth;
-      setVal(3);
     }
   };
 
