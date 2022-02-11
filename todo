@@ -17,3 +17,4 @@
 
 RECODE:
 * flushing the animation queue doesn't actually stop the animating if it's overwritten with a new animation (i.e. generating another maze before the previous generation animation finishes)
+* Fix Eller's algorithm animation horizontal connecting sync

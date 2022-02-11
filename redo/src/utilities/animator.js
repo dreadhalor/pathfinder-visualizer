@@ -6,11 +6,7 @@ export class Animator {
   }
 
   setFinishFunction = (fxn) => (this.complete = fxn);
-  playAnimations = (
-    animation_queue,
-    frames_per_refresh = 1,
-    finishFxn = false
-  ) => {
+  playAnimations = (animation_queue, frames_per_refresh = 1, finishFxn = false) => {
     this.flushAnimationQueue();
     this.animation_queue = animation_queue;
     // let threads = 2;
@@ -21,23 +17,21 @@ export class Animator {
     //     1000 / 60 / threads
     //   );
   };
+  animationsLeft = () => this.animation_queue.length;
   flushAnimationQueue = () => (this.animation_queue = []);
   animationLoop(frames_per_refresh = 1, finishFxn = false) {
-    let animations = this.animation_queue.splice(0, frames_per_refresh);
+    let calculated_local_delay = frames_per_refresh < 1 ? Math.floor(1 / frames_per_refresh) : 0;
+    let final_local_delay = this.delay || calculated_local_delay;
+    let fpr = frames_per_refresh >= 1 ? frames_per_refresh : 1;
+    let animations = this.animation_queue.splice(0, fpr);
     if (animations.length > 0) {
       for (let animation of animations) if (animation) animation();
-      if (this.delay) {
+      if (final_local_delay) {
         setTimeout(
-          () =>
-            requestAnimationFrame(() =>
-              this.animationLoop(frames_per_refresh, finishFxn)
-            ),
-          this.delay
+          () => requestAnimationFrame(() => this.animationLoop(frames_per_refresh, finishFxn)),
+          final_local_delay
         );
-      } else
-        requestAnimationFrame(() =>
-          this.animationLoop(frames_per_refresh, finishFxn)
-        );
+      } else requestAnimationFrame(() => this.animationLoop(frames_per_refresh, finishFxn));
     } else if (finishFxn) this.complete();
   }
 }

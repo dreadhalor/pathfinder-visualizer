@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import './GridSquare.scss';
 
-const GridSquare = ({ square, setValue, modeRef }) => {
+const GridSquare = ({ size, rows, square, setValue, modeRef }) => {
   const gridSquareSize = {
-    width: '25px',
-    height: '25px',
+    width: size,
+    height: size,
   };
   const wall_style = {
     opacity: 0,
@@ -42,14 +42,20 @@ const GridSquare = ({ square, setValue, modeRef }) => {
   };
 
   const getStyle = () => {
+    if ((displayVal ?? null) !== null) {
+      return {
+        ...gridSquareSize,
+        backgroundColor: getEllersBackground(),
+      };
+    }
     if (val === 2) return { ...gridSquareSize, ...end_style };
     if (val === 1) return { ...gridSquareSize, ...start_style };
+    if (val === 3) return { ...gridSquareSize, ...wall_style };
     if (pathVal === 2) return { ...gridSquareSize, ...on_path_style };
     if (pathVal === 1) return { ...gridSquareSize, ...traversed_style };
     if (val === 5) return { ...gridSquareSize, ...scan_style };
     if (val === 6) return { ...gridSquareSize, ...scan_traverse_style };
     if (val === 7) return { ...gridSquareSize, ...scan_anchor_style };
-    if (val === 3) return { ...gridSquareSize, ...wall_style };
     if (val === 4) return { ...gridSquareSize, ...frontier_style };
     return gridSquareSize;
   };
@@ -60,9 +66,28 @@ const GridSquare = ({ square, setValue, modeRef }) => {
     else if (pathVal === 2) className += ' animate2';
     return className;
   };
+  const getEllersBackground = () => {
+    const floor = [100, 100, 255];
+    const ceiling = [255, 255, 255];
+
+    let range = rows;
+    let increment = [];
+    let convenience_multiplier = 2;
+    for (let i = 0; i < floor.length; i++)
+      increment.push(Math.floor(((floor[i] - ceiling[i]) / range) * convenience_multiplier));
+
+    let results = [
+      Math.min(floor[0] - increment[0] * displayVal, 255),
+      Math.min(floor[1] - increment[1] * displayVal, 255),
+      Math.min(floor[2] - increment[2] * displayVal, 255),
+    ];
+
+    return `rgb(${results[0]},${results[1]},${results[2]})`;
+  };
 
   const [val, setVal] = useState(0);
   const [pathVal, setPathVal] = useState(0);
+  const [displayVal, setDisplayVal] = useState(null);
 
   const tileRef = useRef();
 
@@ -89,6 +114,7 @@ const GridSquare = ({ square, setValue, modeRef }) => {
     square.setVal = setVal;
     square.setPathVal = setPathVal;
     square.animate = animate;
+    square.setDisplayVal = setDisplayVal;
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
@@ -116,7 +142,7 @@ const GridSquare = ({ square, setValue, modeRef }) => {
     }
   };
 
-  //console.log('square rendered');
+  // console.log('square rendered, size: ' + size);
 
   return (
     <div
@@ -126,7 +152,7 @@ const GridSquare = ({ square, setValue, modeRef }) => {
       className={getClassName()}
       onAnimationEnd={animationEnd}
     >
-      {val === 1 || val === 2 ? val : ''}
+      {displayVal ?? ''}
     </div>
   );
 };

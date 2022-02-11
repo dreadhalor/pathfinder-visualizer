@@ -1,7 +1,6 @@
 export class GridUnionFind {
   constructor(coords_set = []) {
     this.count = 0; // Number of disconnected components
-    this.next_id = 0; // To keep track of set IDs
     this.setMap = new Map(); // Keep track of connected components
     // Initialize the data structure such that all elements have themselves as parents
     this.addMultiple(coords_set);
@@ -19,11 +18,17 @@ export class GridUnionFind {
     }
     return true;
   }
+  nextFreeID = () => {
+    let ids = this.setIDs();
+    let candidate_id = 0;
+    while (ids.has(candidate_id)) candidate_id++;
+    return candidate_id;
+  };
 
   // Add new node
   add = (coords) => {
     if (this.find(coords) !== undefined) return false;
-    this.setMap.set(JSON.stringify(coords), this.next_id++);
+    this.setMap.set(JSON.stringify(coords), this.nextFreeID());
     this.count++;
     return true;
   };
@@ -46,8 +51,7 @@ export class GridUnionFind {
 
   // Checks connectivity of the 2 nodes
   connected = (coords_a, coords_b) =>
-    this.setMap.get(JSON.stringify(coords_a)) ===
-    this.setMap.get(JSON.stringify(coords_b));
+    this.setMap.get(JSON.stringify(coords_a)) === this.setMap.get(JSON.stringify(coords_b));
 
   sets() {
     //very non-optimal but it works
@@ -60,5 +64,12 @@ export class GridUnionFind {
   }
   setIDs() {
     return new Set(this.setMap.values());
+  }
+  transferData(params) {
+    let { setMap, count } = params ?? {};
+    if (!setMap) return { setMap: this.setMap, count: this.count };
+    this.setMap = setMap;
+    this.count = count;
+    return this;
   }
 }

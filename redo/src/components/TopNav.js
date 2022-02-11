@@ -28,41 +28,41 @@ const TopNav = (
   return (
     <div
       ref={ref}
-      className='border-b border-slate-500 bg-slate-200 flex flex-row justify-around'
+      className='border-b border-slate-500 bg-slate-200 flex flex-row overflow-auto'
     >
       <span className='flex-1'></span>
-      <p className='font-bold my-auto'>Tile type:</p>
-      <div className='my-auto'>
-        <span className='px-1'>
+      <p className='font-bold my-auto ml-2'>Tile type:</p>
+      <div className='my-auto flex flex-row'>
+        <span className='px-1 flex flex-row'>
           <input
             checked={modeRef.current === 1}
             onChange={changeMode}
             type='radio'
-            className='mr-1'
+            className='mr-1 my-auto'
             id='start'
             name='tile_mode'
             value='1'
           />
           <label htmlFor='start'>Start</label>
         </span>
-        <span className='px-1'>
+        <span className='px-1 flex flex-row'>
           <input
             checked={modeRef.current === 2}
             onChange={changeMode}
             type='radio'
-            className='mr-1'
+            className='mr-1 my-auto'
             id='end'
             name='tile_mode'
             value='2'
           />
           <label htmlFor='end'>End</label>
         </span>
-        <span className='px-1'>
+        <span className='px-1 flex flex-row'>
           <input
             checked={modeRef.current === 3}
             onChange={changeMode}
             type='radio'
-            className='mr-1'
+            className='mr-1 my-auto'
             id='wall'
             name='tile_mode'
             value='3'

@@ -14,8 +14,10 @@ import {
 import { Animator } from './utilities/animator';
 import {
   connectAnimationGenerator,
+  displayValAnimationGenerator,
   finishAnimation,
   frontierAnimationGenerator,
+  popAnimationGenerator,
   scanAnchorAnimationGenerator,
   scanAnimationGenerator,
   traverseAnimationGenerator,
@@ -23,13 +25,10 @@ import {
 } from './utilities/animations';
 
 function App() {
-  const [ignore, forceRenderCounter] = useState(0); // eslint-disable-line no-unused-vars
-  const forceRender = () =>
-    forceRenderCounter((prev_counter) => prev_counter + 1);
-
   const [rows, setRows] = useState(25);
   const [cols, setCols] = useState(39);
-  const [grid, setGrid] = useState();
+  // const [grid, setGrid] = useState();
+  let squareSize = useRef(25);
 
   const createNewGrid = (num_rows, num_cols) => {
     let new_grid = [];
@@ -42,7 +41,7 @@ function App() {
     }
     return new_grid;
   };
-  // const [grid, setGrid] = useState(createNewGrid(rows, cols));
+  const [grid, setGrid] = useState(createNewGrid(5, 5));
   //const grid = useRef();
 
   const gridContainerRef = useRef();
@@ -50,8 +49,7 @@ function App() {
   const solved = useRef(false);
   const navRef = useRef();
   const animatorRef = useRef(new Animator());
-  const finished = () =>
-    animatorRef.current.playAnimations([...finishAnimation(grid)]);
+  const finished = () => animatorRef.current.playAnimations([...finishAnimation(grid)]);
   animatorRef.current.setFinishFunction(finished);
 
   const setValueCheck = (candidate_square, uuid, val) => {
@@ -59,28 +57,38 @@ function App() {
     let val_match = candidate_square.val === val;
     let exact_match = tile_match && val_match;
     if (exact_match) candidate_square.setVal(0);
-    else if (tile_match) candidate_square.setVal(val);
-    else if (val_match) {
+    else if (tile_match) {
+      if (val === 3 && candidate_square.pathVal === 2) resetPath();
+      candidate_square.setVal(val);
+    } else if (val_match) {
       if (val === 1 || val === 2) candidate_square.setVal(0);
     }
   };
   const setValue = (square_uuid, val = mode.current) => {
+    if (((val === 1 || val === 2) && solved.current) || animatorRef.current.animationsLeft() > 0)
+      resetPath();
     for (let i = 0; i < rows; i++) {
       for (let j = 0; j < cols; j++) {
         setValueCheck(grid[i][j], square_uuid, val);
       }
     }
   };
-
+  //eslint-disable-next-line react-hooks/exhaustive-deps
   useLayoutEffect(() => {
-    let _rows = Math.floor(gridContainerRef.current.clientHeight / 25);
+    let w = window.innerWidth - 20; //gridContainerRef.current.clientWidth;
+    //console.log(w);
+    let h = window.innerHeight - 120;
+    if (w < 600) squareSize.current = 20;
+    let _rows = Math.floor(h / squareSize.current);
     if (_rows % 2 === 0 && _rows > 0) _rows--;
-    let _cols = Math.floor(gridContainerRef.current.clientWidth / 25);
+    let _cols = Math.floor(w / squareSize.current);
     if (_cols % 2 === 0 && _cols > 0) _cols--;
-    if (!grid || grid.length < _rows || grid?.[0].length < _cols) {
-      setRows(_rows);
-      setCols(_cols);
-      setGrid(createNewGrid(_rows, _cols));
+    //eslint-disable-next-line react-hooks/exhaustive-deps
+    if (!grid || grid.length < _rows || grid[0]?.length < _cols) {
+      setRows(_rows); //eslint-disable-line react-hooks/exhaustive-deps
+      setCols(_cols); //eslint disable-line exhaustive-deps
+      setGrid(createNewGrid(_rows, _cols)); //eslint disable-line exhaustive-deps
+      //console.log(squareSize);
     }
   });
 
@@ -131,7 +139,9 @@ function App() {
   const scanAnimation = scanAnimationGenerator(grid);
   const traverseAnimation = traverseAnimationGenerator(grid);
   const scanAnchorAnimation = scanAnchorAnimationGenerator(grid);
-  const clearScanAnimation = (visited, path_set) => {
+  const displayValAnimation = displayValAnimationGenerator(grid);
+  const popAnimation = popAnimationGenerator(grid);
+  const clearScanAnimation = (path_set) => {
     for (let i = 0; i < grid.length; i++) {
       for (let j = 0; j < grid[0].length; j++) {
         let tile = grid[i][j];
@@ -154,27 +164,27 @@ function App() {
   };
   const generateEllers = () => {
     resetPath();
-    let result = ellers(grid);
+    let [result, animations] = ellers(
+      grid,
+      connectAnimation,
+      frontierAnimation,
+      scanAnimation,
+      displayValAnimation,
+      popAnimation
+    );
     grid.forEach((row) => row.forEach((tile) => tile.setVal(3)));
-    result.forEach((tile) => {
-      let [r, c] = tile;
-      grid[r][c].setVal(0);
-    });
+    animatorRef.current.playAnimations(animations, 0.08, true);
+    // result.forEach((tile) => {
+    //   let [r, c] = tile;
+    //   grid[r][c].setVal(0);
+    // });
   };
   const generateDFS = () => {
     resetPath();
     grid.forEach((row) => row.forEach((tile) => tile.setVal(3)));
     //eslint-disable-next-line no-unused-vars
-    let [result, animations] = recursiveBacktracking(
-      grid,
-      frontierAnimation,
-      connectAnimation
-    );
+    let [result, animations] = recursiveBacktracking(grid, frontierAnimation, connectAnimation);
     let animation_queue = [...animations]; //, ...finishAnimation(grid)];
-    // result.forEach((tile) => {
-    //   let [r, c] = tile;
-    //   grid[r][c].setVal(0);
-    // });
     animatorRef.current.playAnimations(animation_queue, 2, true);
   };
   const generateHuntAndKill = () => {
@@ -182,18 +192,12 @@ function App() {
     grid.forEach((row) => row.forEach((tile) => tile.setVal(3)));
     let [result, animations] = huntAndKill(
       grid,
-      connectAnimation,
       scanAnimation,
       clearScanAnimation,
       wallAnimation,
-      traverseAnimation,
-      scanAnimation
+      traverseAnimation
     );
     let animation_queue = [...animations]; //, ...finishAnimation(grid)];
-    // result.forEach((tile) => {
-    //   let [r, c] = tile;
-    //   grid[r][c].setVal(0);
-    // });
     animatorRef.current.playAnimations(animation_queue, 2, true);
   };
   const generatePrims = () => {
@@ -202,10 +206,6 @@ function App() {
     //eslint-disable-next-line no-unused-vars
     let [result, animations] = prims(grid, frontierAnimation, connectAnimation);
     let animation_queue = [...animations, ...finishAnimation(grid)];
-    // result.forEach((tile) => {
-    //   let [r, c] = tile;
-    //   grid[r][c].setVal(0);
-    // });
     animatorRef.current.playAnimations(animation_queue);
   };
 
@@ -232,14 +232,16 @@ function App() {
             {mySolved ? 'Clear Path' : 'Solve It!'}
           </button>
         </div> */}
-        <div className='w-full h-full flex overflow-auto p-4'>
+        <div className='w-full h-full flex overflow-auto p-1'>
           <div ref={gridContainerRef} className='flex-1 h-auto flex'>
-            <div className='border border-slate-600' style={gridStyle}>
+            <div className='border-0 border-slate-600' style={gridStyle}>
               {grid &&
                 grid.map((row) =>
                   row.map((square) => (
                     <GridSquare
                       key={square.uuid}
+                      size={squareSize.current}
+                      rows={rows}
                       square={square}
                       modeRef={mode}
                       setValue={setValue}

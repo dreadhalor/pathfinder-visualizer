@@ -2,6 +2,9 @@ $standard-duration: 0.3s;
 .tile {
   transition-property: opacity;
   transition-duration: 0.4s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .pop {

@@ -40,8 +40,6 @@ function connect(n1, n2, edges, animations, connectAnimation) {
   edges.set(n1, n2);
   let edge = expandEdge([n1, n2]);
   if (connectAnimation) {
-    // for (let node of edge.reverse())
-    //   animations.push(() => connectAnimation(node));
     animations.push(() => {
       for (let node of edge) connectAnimation(node);
     });

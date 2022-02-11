@@ -16,44 +16,50 @@ export const finishAnimation = (grid) => {
   return animation_queue;
 };
 
-export const connectAnimationGenerator = (grid) => (tile) =>
-  connectAnimation(grid, tile);
+export const connectAnimationGenerator = (grid) => (tile) => connectAnimation(grid, tile);
 const connectAnimation = (grid, [r, c]) => {
   let tile = grid[r][c];
   tile.setVal(0);
   tile.animate(1);
 };
+export const popAnimationGenerator = (grid) => (tile) => popAnimation(grid, tile);
+const popAnimation = (grid, [r, c]) => {
+  let tile = grid[r][c];
+  tile.animate(2);
+};
 
-export const frontierAnimationGenerator = (grid) => (tile) =>
-  frontierAnimation(grid, tile);
+export const frontierAnimationGenerator = (grid) => (tile) => frontierAnimation(grid, tile);
 const frontierAnimation = (grid, [r, c]) => {
   let tile = grid[r][c];
   tile.setVal(4);
   tile.animate(1);
 };
-export const wallAnimationGenerator = (grid) => (tile) =>
-  wallAnimation(grid, tile);
+export const wallAnimationGenerator = (grid) => (tile) => wallAnimation(grid, tile);
 const wallAnimation = (grid, [r, c]) => {
   let tile = grid[r][c];
   tile.setVal(3);
 };
-export const scanAnimationGenerator = (grid) => (tile) =>
-  scanAnimation(grid, tile);
+export const scanAnimationGenerator = (grid) => (tile) => scanAnimation(grid, tile);
 const scanAnimation = (grid, [r, c]) => {
   let tile = grid[r][c];
   tile.setVal(5);
   // tile.animate(1);
 };
-export const traverseAnimationGenerator = (grid) => (tile) =>
-  traverseAnimation(grid, tile);
+export const traverseAnimationGenerator = (grid) => (tile) => traverseAnimation(grid, tile);
 const traverseAnimation = (grid, [r, c]) => {
   let tile = grid[r][c];
   tile.setVal(6);
   tile.animate(1);
 };
-export const scanAnchorAnimationGenerator = (grid) => (tile) =>
-  scanAnchorAnimation(grid, tile);
+export const scanAnchorAnimationGenerator = (grid) => (tile) => scanAnchorAnimation(grid, tile);
 const scanAnchorAnimation = (grid, [r, c]) => {
   let tile = grid[r][c];
   tile.setVal(7);
+};
+
+export const displayValAnimationGenerator = (grid) => (tile, displayVal) =>
+  displayValAnimation(grid, tile, displayVal);
+const displayValAnimation = (grid, [r, c], displayVal) => {
+  let tile = grid[r][c];
+  tile.setDisplayVal(displayVal);
 };
