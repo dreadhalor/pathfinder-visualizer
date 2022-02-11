@@ -56,7 +56,7 @@ export const ellers = (
     //for (let j = 0; j < row.length; j++) {
     //let displayVal = sets_copy.find(row[j]);
     // console.log(row);
-    let row_edges = [row[0], row.at(-1)];
+    let row_edges = [row[0], row[row.length - 1]];
     let full_row = expandEdge(row_edges);
     let nodes = new GridSet(full_row);
     for (let [[p_r, p_c], [c_r, c_c]] of vertical_edges)
