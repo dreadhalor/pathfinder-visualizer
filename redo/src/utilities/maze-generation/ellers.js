@@ -7,7 +7,8 @@ import { coinFlips, pickN } from '../randomizers';
 
 export const ellers = (grid) => {
   let anim_params = ellersAnimations(grid);
-  let { displayValAnimation, popAnimation } = anim_params;
+  // let { displayValAnimation, popAnimation } = anim_params;
+  let { displayValAnimation } = anim_params;
   let animations = [];
   let rows = getPathNodesByRow(grid);
   let selected_edges = [];
@@ -42,7 +43,7 @@ export const ellers = (grid) => {
       nodes.add([(p_r + c_r) / 2, (p_c + c_c) / 2]);
     animations.push(() => {
       for (let node of nodes.toArray()) {
-        popAnimation(node);
+        // popAnimation(node);
         displayValAnimation(node, null);
       }
     });
@@ -54,7 +55,7 @@ export const ellers = (grid) => {
 //randomly connect adjacent tiles (or all unconnected if last row)
 const horizontals = (grid, row, sets, edges, last_row, animations, anim_params) => {
   let { displayValAnimation, connectAnimation } = anim_params;
-  let count = 0;
+  // let count = 0;
   let added_edges = [];
   let sets_copy = new GridUnionFind().transferData(sets.transferData());
   for (let j = 0; j < row.length; j++) {
@@ -78,17 +79,16 @@ const horizontals = (grid, row, sets, edges, last_row, animations, anim_params) 
         displayValAnimation(tile, whatever);
         connectAnimation(tile);
       });
-      // connectFullEdge(n1, n2, animations, );
-      count++;
-    } //else traverse(n1, animations, connectAnimation);
-    //animations.push(() => grid[n1[0]][n1[1]].setDisplayVal(sets.find(n1)));
+
+      // count++;
+    }
   }
   return added_edges;
 };
 //connect downpaths
 const verticals = (grid, horizontal_edges, sets, edges, last_row, animations, anim_params) => {
   let { displayValAnimation, connectAnimation } = anim_params;
-  let count = 0;
+  // let count = 0;
   let added_edges = [];
   if (last_row) return added_edges;
   for (let set of sets.sets()) {
@@ -111,7 +111,7 @@ const verticals = (grid, horizontal_edges, sets, edges, last_row, animations, an
       let edge = expandEdge([parent, child]);
       full_set.addMultiple(edge);
 
-      count++;
+      // count++;
     }
     for (let [n1, n2] of horizontal_edges) {
       if (JSON.stringify(set).includes(JSON.stringify(n1))) {

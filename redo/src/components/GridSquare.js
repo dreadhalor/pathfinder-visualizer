@@ -37,10 +37,6 @@ const GridSquare = ({ size, rows, square, setValue, modeRef, dragValRef }) => {
     transitionProperty: 'none',
     boxShadow: 'none',
   };
-  const scan_anchor_style = {
-    backgroundColor: '#00d000',
-    transitionProperty: 'none',
-  };
   const scan_traverse_style = {
     backgroundColor: '#0ae627',
   };
@@ -50,6 +46,7 @@ const GridSquare = ({ size, rows, square, setValue, modeRef, dragValRef }) => {
       return {
         ...gridSquareSize,
         backgroundColor: getEllersBackground(),
+        transitionProperty: 'none',
       };
     }
     if (val === 0 && pathVal === 0) return { ...gridSquareSize, ...resetStyle };
@@ -60,7 +57,7 @@ const GridSquare = ({ size, rows, square, setValue, modeRef, dragValRef }) => {
     if (pathVal === 1) return { ...gridSquareSize, ...traversed_style };
     if (val === 5) return { ...gridSquareSize, ...scan_style };
     if (val === 6) return { ...gridSquareSize, ...scan_traverse_style };
-    if (val === 7) return { ...gridSquareSize, ...scan_anchor_style };
+    if (val === 7) return { ...gridSquareSize, ...frontier_style };
     if (val === 4) return { ...gridSquareSize, ...frontier_style };
     return gridSquareSize;
   };

@@ -122,7 +122,25 @@ function App() {
     animatorRef.current.flushAnimationQueue();
     for (let i = 0; i < rows; i++) {
       for (let j = 0; j < cols; j++) {
-        if (grid[i][j].pathVal) grid[i][j].setPathVal(0);
+        let tile = grid[i][j];
+        if (tile.pathVal) tile.setPathVal(0);
+        tile.setDisplayVal(null);
+        switch (tile.val) {
+          case 4:
+            tile.setVal(0);
+            break;
+          case 5:
+            tile.setVal(3);
+            break;
+          case 6:
+            tile.setVal(0);
+            break;
+          case 7:
+            tile.setVal(3);
+            break;
+          default:
+            break;
+        }
       }
     }
     navRef.current.forceRender();

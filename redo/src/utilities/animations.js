@@ -53,7 +53,7 @@ export const primsAnimations = (grid) => {
       tile.animate(1);
     }),
     frontierAnimation: animationGenerator(grid, (tile) => {
-      tile.setVal(4);
+      tile.setVal(7);
       tile.animate(1);
     }),
   };
@@ -89,7 +89,7 @@ export const ellersAnimations = (grid) => {
       tile.setVal(0);
       tile.animate(1);
     }),
-    popAnimation: animationGenerator(grid, (tile) => tile.animate(2)),
+    // popAnimation: animationGenerator(grid, (tile) => tile.animate(2)),
     displayValAnimation: animationGenerator(grid, (tile, displayVal) =>
       tile.setDisplayVal(displayVal)
     ),
