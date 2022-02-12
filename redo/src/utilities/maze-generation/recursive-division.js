@@ -2,11 +2,12 @@ import { traverse } from '../algorithm-methods';
 import { recursiveDivisionAnimations } from '../animations';
 import { GridSet } from '../data-structures/grid-set';
 import { expandEdge, getPathNodesByRow } from '../maze-structures';
+import { coinFlips } from '../randomizers';
 
-export const recursiveDivision = (grid, iterator, direction = 0) => {
-  // console.log(grid);
-  if (grid.length < 1 || grid[0].length < 1) {
-    // console.log('terminating');
+export const recursiveDivision = (grid, iterator) => {
+  let width = grid.length ?? 0,
+    height = grid[0]?.length ?? 0;
+  if (width < 1 || height < 1) {
     return [];
   }
   // if (iterator-- < 0) return [];
@@ -19,62 +20,28 @@ export const recursiveDivision = (grid, iterator, direction = 0) => {
     nodes_right = [];
   let left = [],
     right = [];
-  // console.log('direction: ' + direction);
-  if (!direction) {
+  if (width < height) {
+    // if (coinFlips(1)) {
     let divider = dividePathNodes(grid, nodes, animations, animation);
     if (divider < 1) return animations;
-    // animations.concat()
-    // console.log('middle vertical: ' + divider);
     grid_left = grid.map((row) => row.slice(0, divider));
-    // console.log('grid_left');
-    // console.log(grid_left);
     nodes_left = getPathNodesByRow(grid_left);
     grid_right = grid.map((row) => row.slice(divider + 1));
-    // console.log('grid_right');
-    // console.log(grid_right);
     nodes_right = getPathNodesByRow(grid_right);
-    left = recursiveDivision(grid_left, iterator, !direction);
-    right = recursiveDivision(grid_right, iterator, !direction);
+    left = recursiveDivision(grid_left, iterator);
+    right = recursiveDivision(grid_right, iterator);
   } else {
-    // console.log('grid length: ' + grid.length);
     let divider = dividePathNodesHorizontally(grid, nodes, animations, animation);
     if (divider < 1) return animations;
-    // animations.concat()
-    // console.log('middle horizontal: ' + divider);
     grid_left = grid.slice(0, divider);
-    // console.log('grid_left');
-    // console.log(grid_left);
     nodes_left = getPathNodesByRow(grid_left);
     grid_right = grid.slice(divider + 1);
-    // console.log('grid_right');
-    // console.log(grid_right);
     nodes_right = getPathNodesByRow(grid_right);
-    left = recursiveDivision(grid_left, iterator, !direction);
-    right = recursiveDivision(grid_right, iterator, !direction);
+    left = recursiveDivision(grid_left, iterator);
+    right = recursiveDivision(grid_right, iterator);
   }
-
-  // let left = dividePathNodes(
-  //   grid_left,
-  //   nodes_left,
-  //   animations,
-  //   recursiveDivisionAnimations(grid_left).animation
-  // );
-
-  // let right = dividePathNodes(
-  //   grid_right,
-  //   nodes_right,
-  //   animations,
-  //   recursiveDivisionAnimations(grid_right).animation
-  // );
-
-  // console.log(divider);
   if (left.length > 0) animations = animations.concat(left);
-  // else console.log('left is empty');
   if (right.length > 0) animations = animations.concat(right);
-  // else console.log('right is empty');
-  //if (right.length > 0) animations = animations.concat(right);
-  // console.log('animations length: ' + animations.length);
-  // console.log('animations: ' + animations);
   return animations;
 };
 
@@ -90,22 +57,15 @@ function dividePathNodes(grid, nodes, animations, animation) {
   let whatever = prenormalized_hole_y - (prenormalized_hole_y % 2);
   let hole = edge.at(whatever);
   edge.delete(hole);
-  // edge.popRandom();
   let tiles = edge.toArray();
-  for (let tile of tiles) {
-    traverse(tile, animations, animation);
-  }
-  // traverseFullEdge(edge.at(0), edge.at(edge.size() - 1), animations, animation);
+  for (let tile of tiles) traverse(tile, animations, animation);
   return wall_col;
 }
 function dividePathNodesHorizontally(grid, nodes, animations, animation) {
   let row_options = nodes.length - 1;
-  // console.log(row_options);
-  // console.log(nodes);
   if (row_options < 1) return -1;
   let random_row = Math.floor(Math.random() * row_options);
   random_row = random_row - (random_row % 2);
-  // console.log(random_row);
   let wall_row = random_row + 1;
   let start_coord = [wall_row, 0];
   let end_coord = [wall_row, grid[0].length - 1];
@@ -114,11 +74,7 @@ function dividePathNodesHorizontally(grid, nodes, animations, animation) {
   let whatever = prenormalized_hole_x - (prenormalized_hole_x % 2);
   let hole = edge.at(whatever);
   edge.delete(hole);
-  // edge.popRandom();
   let tiles = edge.toArray();
-  for (let tile of tiles) {
-    traverse(tile, animations, animation);
-  }
-  // traverseFullEdge(edge.at(0), edge.at(edge.size() - 1), animations, animation);
+  for (let tile of tiles) traverse(tile, animations, animation);
   return wall_row;
 }

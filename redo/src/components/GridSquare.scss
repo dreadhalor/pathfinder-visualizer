@@ -6,6 +6,8 @@ $standard-duration: 0.3s;
   justify-content: center;
   align-items: center;
   box-shadow: 4px 4px 0px 0px #404040;
+  &:hover {
+  }
 }
 
 .pop {
@@ -81,7 +83,7 @@ $standard-duration: 0.3s;
   }
   50% {
     transform: scale(1.3);
-    box-shadow: 3px 3px 0px 0px black;
+    box-shadow: 3px 3px 1px 1px black;
   }
   100% {
     // box-shadow: 1px 1px 0px 0px #404040;

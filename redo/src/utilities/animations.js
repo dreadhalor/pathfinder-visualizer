@@ -99,7 +99,7 @@ export const ellersAnimations = (grid) => {
 export const recursiveDivisionAnimations = (grid) => {
   return {
     animation: animationGenerator(grid, (tile) => {
-      //console.log(tile);
+      //FIX THIS, USING A NULL CHECK IS A COP-OUT
       if (tile) tile.setVal(3);
     }),
   };

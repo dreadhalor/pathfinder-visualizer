@@ -1,7 +1,4 @@
 import React, { useImperativeHandle, useState } from 'react';
-import Button from '@mui/material/Button';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
 import BasicMenu from './BasicMenu';
 
 const TopNav = (
@@ -31,12 +28,12 @@ const TopNav = (
   useImperativeHandle(ref, () => ({ forceRender }));
 
   let options = [
-    { title: `Kruskal's`, onClick: generateKruskals },
+    { title: `Kruskal's Algorithm`, onClick: generateKruskals },
     { title: `Recursive Backtracking`, onClick: generateDFS },
-    { title: `Prim's`, onClick: generatePrims },
-    { title: `Hunt-and-Kill`, onClick: generateHuntAndKill },
+    { title: `Prim's Algorithm`, onClick: generatePrims },
+    { title: `Hunt-and-Kill Algorithm`, onClick: generateHuntAndKill },
     { title: `Recursive Division`, onClick: generateRecursiveDivision },
-    { title: `Eller's`, onClick: generateEllers },
+    { title: `Eller's Algorithm`, onClick: generateEllers },
   ];
 
   return (

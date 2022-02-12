@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import './GridSquare.scss';
 
-const GridSquare = ({ size, rows, square, setValue, modeRef }) => {
+const GridSquare = ({ size, rows, square, setValue, modeRef, dragValRef }) => {
   const gridSquareSize = {
     width: size,
     height: size,
@@ -36,9 +36,6 @@ const GridSquare = ({ size, rows, square, setValue, modeRef }) => {
   const scan_anchor_style = {
     backgroundColor: '#00d000',
     transitionProperty: 'none',
-  };
-  const scan_no_wall_borders = {
-    border: 0,
   };
   const scan_traverse_style = {
     backgroundColor: '#0ae627',
@@ -127,10 +124,6 @@ const GridSquare = ({ size, rows, square, setValue, modeRef }) => {
     square.pathVal = pathVal;
   }, [pathVal]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const clicked = () => {
-    setValue(square.uuid);
-  };
-
   const animationEnd = (event) => {
     let animation_name = event.animationName;
     if (animation_name === 'just_pop') {
@@ -147,10 +140,31 @@ const GridSquare = ({ size, rows, square, setValue, modeRef }) => {
 
   // console.log('square rendered, size: ' + size);
 
+  const clicked = (event) => {
+    event.preventDefault();
+    return setValue(square.uuid);
+  };
+  const mouseDown = (event) => {
+    dragValRef.current = val;
+    clicked(event);
+  };
+  const mouseUp = (event) => {
+    dragValRef.current = null;
+  };
+  const mouseEnter = (event) => {
+    if (event.buttons && dragValRef.current === val) clicked(event);
+  };
+  const mouseLeave = (event) => {
+    if (!event.buttons) dragValRef.current = null;
+  };
+
   return (
     <div
       ref={tileRef}
-      onMouseDown={clicked}
+      onPointerDown={mouseDown}
+      onPointerUp={mouseUp}
+      onPointerLeave={mouseLeave}
+      onPointerEnter={mouseEnter}
       style={getStyle()}
       className={getClassName()}
       onAnimationEnd={animationEnd}

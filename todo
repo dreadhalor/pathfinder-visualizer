@@ -18,3 +18,6 @@
 RECODE:
 * flushing the animation queue doesn't actually stop the animating if it's overwritten with a new animation (i.e. generating another maze before the previous generation animation finishes)
 * Fix Eller's algorithm animation horizontal connecting sync
+  * honestly it goes by so fast it deadass looks fine, no one will call me out on that the animation is actually slightly wrong because the actual generated maze is still right
+* Recursive division actively throws errors that you just ignored with an (if !null) qualifier you shouldn't need, fix it
+  * oh man since it still works I'm totally gonna move onto a different project & not fix it aren't I?

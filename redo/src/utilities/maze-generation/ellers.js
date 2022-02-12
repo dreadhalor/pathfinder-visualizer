@@ -35,16 +35,11 @@ export const ellers = (grid) => {
       animations,
       anim_params
     );
-    //clear current row in preparation for the next
-    //for (let j = 0; j < row.length; j++) {
-    //let displayVal = sets_copy.find(row[j]);
-    // console.log(row);
     let row_edges = [row[0], row[row.length - 1]];
     let full_row = expandEdge(row_edges);
     let nodes = new GridSet(full_row);
     for (let [[p_r, p_c], [c_r, c_c]] of vertical_edges)
       nodes.add([(p_r + c_r) / 2, (p_c + c_c) / 2]);
-    // console.log(nodes);
     animations.push(() => {
       for (let node of nodes.toArray()) {
         popAnimation(node);
@@ -110,16 +105,11 @@ const verticals = (grid, horizontal_edges, sets, edges, last_row, animations, an
       sets.union(parent, child);
       edges.push([parent, child]);
       added_edges.push([parent, child]);
-      //traverse(parent, animations, scanAnimation);
       whatever = sets.find(parent);
       set_id = sets.find(parent);
-      // console.log(set_id);
 
       let edge = expandEdge([parent, child]);
       full_set.addMultiple(edge);
-
-      // connectFullEdge(, animations, (tile) => displayValAnimation(tile, whatever));
-      // connectFullEdge(parent, child, animations, connectAnimation);
 
       count++;
     }
@@ -129,11 +119,9 @@ const verticals = (grid, horizontal_edges, sets, edges, last_row, animations, an
         let match = false;
         for (let node of expanded) {
           let displayVal = sets.find(node);
-          // console.log(displayVal);
           if (displayVal !== set_id) match = true;
           if (match) full_set.add(node);
         }
-        // full_set.addMultiple(expanded);
       }
     }
 

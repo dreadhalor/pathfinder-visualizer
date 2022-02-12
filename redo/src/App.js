@@ -40,6 +40,7 @@ function App() {
   const solved = useRef(false);
   const navRef = useRef();
   const animatorRef = useRef(new Animator());
+  const dragValRef = useRef(null);
   const finished = () => animatorRef.current.playAnimations([...finishAnimation(grid)]);
   animatorRef.current.setFinishFunction(finished);
 
@@ -47,22 +48,29 @@ function App() {
     let tile_match = candidate_square.uuid === uuid;
     let val_match = candidate_square.val === val;
     let exact_match = tile_match && val_match;
-    if (exact_match) candidate_square.setVal(0);
-    else if (tile_match) {
+    if (exact_match) {
+      candidate_square.setVal(0);
+      return 0;
+    } else if (tile_match) {
       if (val === 3 && candidate_square.pathVal === 2) resetPath();
       candidate_square.setVal(val);
+      return val;
     } else if (val_match) {
       if (val === 1 || val === 2) candidate_square.setVal(0);
     }
+    return null;
   };
   const setValue = (square_uuid, val = mode.current) => {
+    let value_set = null;
     if (((val === 1 || val === 2) && solved.current) || animatorRef.current.animationsLeft() > 0)
       resetPath();
     for (let i = 0; i < rows; i++) {
       for (let j = 0; j < cols; j++) {
-        setValueCheck(grid[i][j], square_uuid, val);
+        let possible = setValueCheck(grid[i][j], square_uuid, val);
+        if (possible) value_set = possible;
       }
     }
+    return value_set;
   };
   //eslint-disable-next-line react-hooks/exhaustive-deps
   useLayoutEffect(() => {
@@ -108,13 +116,30 @@ function App() {
   };
   const resetWalls = () => {
     resetPath();
-    grid.forEach((row) => row.forEach((tile) => tile.setVal(0)));
+    grid.forEach((row) =>
+      row.forEach((tile) => {
+        tile.setDisplayVal(null);
+        if (tile.val !== 1 && tile.val !== 2) tile.setVal(0);
+      })
+    );
+  };
+  const wallifyItAll = () => {
+    resetPath();
+    grid.forEach((row) =>
+      row.forEach((tile) => {
+        tile.setVal(3);
+        tile.setDisplayVal(null);
+      })
+    );
   };
   const solve = () => {
     let start = null;
     for (let i = 0; i < rows; i++) {
       for (let j = 0; j < cols; j++) {
-        if (grid[i][j].val === 1) start = [i, j];
+        if (grid[i][j].val === 1) {
+          start = [i, j];
+          break;
+        }
       }
     }
     let animation_queue = [];
@@ -134,36 +159,29 @@ function App() {
   };
 
   const generateKruskals = () => {
-    resetPath();
-    grid.forEach((row) => row.forEach((tile) => tile.setVal(3)));
-    let [result, animations] = kruskals(grid, animatorRef); //eslint-disable-line no-unused-vars
-    //let animation_queue = [...animations, ...finishAnimation(grid)];
-    //animatorRef.current.playAnimations(animation_queue);
+    wallifyItAll();
+    kruskals(grid, animatorRef);
   };
   const generateEllers = () => {
-    resetPath();
+    wallifyItAll();
     let [result, animations] = ellers(grid); //eslint-disable-line no-unused-vars
-    grid.forEach((row) => row.forEach((tile) => tile.setVal(3)));
     animatorRef.current.playAnimations(animations, 0.08, true);
   };
   const generateDFS = () => {
-    resetPath();
-    grid.forEach((row) => row.forEach((tile) => tile.setVal(3)));
+    wallifyItAll();
     //eslint-disable-next-line no-unused-vars
     let [result, animations] = recursiveBacktracking(grid);
     let animation_queue = [...animations]; //, ...finishAnimation(grid)];
     animatorRef.current.playAnimations(animation_queue, 2, true);
   };
   const generateHuntAndKill = () => {
-    resetPath();
-    grid.forEach((row) => row.forEach((tile) => tile.setVal(3)));
+    wallifyItAll();
     let [result, animations] = huntAndKill(grid); //eslint-disable-line no-unused-vars
     let animation_queue = [...animations]; //, ...finishAnimation(grid)];
     animatorRef.current.playAnimations(animation_queue, 2, true);
   };
   const generatePrims = () => {
-    resetPath();
-    grid.forEach((row) => row.forEach((tile) => tile.setVal(3)));
+    wallifyItAll();
     //eslint-disable-next-line no-unused-vars
     let [result, animations] = prims(grid);
     let animation_queue = [...animations, ...finishAnimation(grid)];
@@ -171,7 +189,7 @@ function App() {
   };
   const generateRecursiveDivision = () => {
     resetWalls();
-    animatorRef.current.playAnimations(recursiveDivision(grid, 10, 0), 0, true);
+    animatorRef.current.playAnimations(recursiveDivision(grid, 10), 0, true);
   };
 
   return (
@@ -210,8 +228,9 @@ function App() {
                       size={squareSize.current}
                       rows={rows}
                       square={square}
-                      modeRef={mode}
                       setValue={setValue}
+                      dragValRef={dragValRef}
+                      modeRef={mode}
                     />
                   ))
                 )}
