@@ -4,57 +4,40 @@ import {
   traverseEdgeForward,
   walk,
 } from '../algorithm-methods';
+import { huntAndKillAnimations } from '../animations';
 import { GridAdjacencyList } from '../data-structures/grid-adjacency-list';
 import { GridSet } from '../data-structures/grid-set';
 import { getFullEdges, getMazeAdjacencyList } from '../maze-structures';
 
-export const huntAndKill = (
-  grid,
-  scan_animation,
-  clearScanAnimation,
-  wall_animation,
-  traverseAnimation
-) => {
-  let params = {
-    adjacency_list: getMazeAdjacencyList(grid),
-    visited: new GridSet(),
-    edges: new GridAdjacencyList(),
-    animations: [],
-    forward_animation: traverseAnimation,
-    hunt_refs: {
-      start: null,
-      scanned: new GridSet(),
-    },
-    wall_animation,
-    scan_animation,
-    skip_first: true,
-  };
-  params.node = params.adjacency_list.getRandom();
-  traverse(params.node, params.animations, traverseAnimation);
+export const huntAndKill = (grid) => {
+  let [params, anim_params] = parseParams(grid);
+
+  traverse(params.node, anim_params.animation_queue, anim_params.traverseAnimation);
 
   while (params.node) {
-    if (params.hunt_refs.start) traverse(params.node, params.animations, scan_animation);
-    walk(params);
-    params.animations.push(() => {
-      clearScanAnimation(path_set);
+    if (params.hunt_refs.start)
+      traverse(params.node, anim_params.animation_queue, anim_params.scanAnimation);
+    walk(params, anim_params);
+    anim_params.animation_queue.push(() => {
+      anim_params.clearScanAnimation(path_set);
     });
-    params.node = hunt(params);
-    params.animations.push(() => {
-      clearScanAnimation(path_set);
+    params.node = hunt(params, anim_params);
+    anim_params.animation_queue.push(() => {
+      anim_params.clearScanAnimation(path_set);
     });
     //there is no reason this should work because we're accessing it before initialization up there ^^
     let path_set = new GridSet(getFullEdges(params.edges.entries()).flat(1));
   }
   let result = getFullEdges(params.edges.entries()).flat(1);
-  return [result, params.animations];
+  return [result, anim_params.animation_queue];
 };
 
-const hunt = ({ hunt_refs, adjacency_list, visited, animations, scan_animation }) => {
+const hunt = ({ hunt_refs, adjacency_list, visited }, { animation_queue, scanAnimation }) => {
   let scanned = new GridSet();
   let crossed_empty_cell = false;
   let node = hunt_refs.start || adjacency_list.at(0);
   let prev_scan = null;
-  traverse(node, animations, scan_animation);
+  traverse(node, animation_queue, scanAnimation);
   while (node) {
     scanned.add(node);
     if (visited.has(node)) {
@@ -63,10 +46,10 @@ const hunt = ({ hunt_refs, adjacency_list, visited, animations, scan_animation }
         hunt_refs.scanned.add(node);
       }
     } else crossed_empty_cell = true;
-    if (prev_scan) traverseEdgeForward(prev_scan, node, animations, scan_animation);
+    if (prev_scan) traverseEdgeForward(prev_scan, node, animation_queue, scanAnimation);
     else if (hunt_refs.start)
-      traverseEdgeForward(hunt_refs.start, node, animations, scan_animation);
-    else traverse(node, animations, scan_animation);
+      traverseEdgeForward(hunt_refs.start, node, animation_queue, scanAnimation);
+    else traverse(node, animation_queue, scanAnimation);
     let is_visited = visited.has(node);
     let neighbors = adjacency_list.get(node);
     if (is_visited && getRandomUnvisitedNeighbor(node, adjacency_list, visited)) return node;
@@ -78,3 +61,22 @@ const hunt = ({ hunt_refs, adjacency_list, visited, animations, scan_animation }
   }
   return null;
 };
+
+function parseParams(grid) {
+  let params = {
+    adjacency_list: getMazeAdjacencyList(grid),
+    visited: new GridSet(),
+    edges: new GridAdjacencyList(),
+    hunt_refs: {
+      start: null,
+      scanned: new GridSet(),
+    },
+    skip_first: true,
+  };
+  let anim_params = {
+    animation_queue: [],
+    ...huntAndKillAnimations(grid),
+  };
+  params.node = params.adjacency_list.getRandom();
+  return [params, anim_params];
+}

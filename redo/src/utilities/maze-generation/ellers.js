@@ -1,24 +1,13 @@
-import {
-  connectEdgeBackwards,
-  connectFullEdge,
-  traverse,
-  traverseEdgeBackwards,
-  traverseEdgeForward,
-  traverseFullEdge,
-} from '../algorithm-methods';
+import { connectFullEdge, traverse } from '../algorithm-methods';
+import { ellersAnimations } from '../animations';
 import { GridSet } from '../data-structures/grid-set';
 import { GridUnionFind } from '../data-structures/grid-union-find';
 import { expandEdge, getFullEdges, getPathNodesByRow } from '../maze-structures';
 import { coinFlips, pickN } from '../randomizers';
 
-export const ellers = (
-  grid,
-  connectAnimation,
-  frontierAnimation,
-  scanAnimation,
-  displayValAnimation,
-  popAnimation
-) => {
+export const ellers = (grid) => {
+  let anim_params = ellersAnimations(grid);
+  let { displayValAnimation, popAnimation } = anim_params;
   let animations = [];
   let rows = getPathNodesByRow(grid);
   let selected_edges = [];
@@ -35,10 +24,7 @@ export const ellers = (
       selected_edges,
       last_row,
       animations,
-      connectAnimation,
-      frontierAnimation,
-      displayValAnimation,
-      popAnimation
+      anim_params
     );
     let vertical_edges = verticals(
       grid,
@@ -47,10 +33,7 @@ export const ellers = (
       selected_edges,
       last_row,
       animations,
-      connectAnimation,
-      scanAnimation,
-      displayValAnimation,
-      popAnimation
+      anim_params
     );
     //clear current row in preparation for the next
     //for (let j = 0; j < row.length; j++) {
@@ -74,18 +57,8 @@ export const ellers = (
 };
 
 //randomly connect adjacent tiles (or all unconnected if last row)
-const horizontals = (
-  grid,
-  row,
-  sets,
-  edges,
-  last_row,
-  animations,
-  connectAnimation,
-  frontierAnimation,
-  displayValAnimation,
-  popAnimation
-) => {
+const horizontals = (grid, row, sets, edges, last_row, animations, anim_params) => {
+  let { displayValAnimation, connectAnimation } = anim_params;
   let count = 0;
   let added_edges = [];
   let sets_copy = new GridUnionFind().transferData(sets.transferData());
@@ -118,18 +91,8 @@ const horizontals = (
   return added_edges;
 };
 //connect downpaths
-const verticals = (
-  grid,
-  horizontal_edges,
-  sets,
-  edges,
-  last_row,
-  animations,
-  connectAnimation,
-  scanAnimation,
-  displayValAnimation,
-  popAnimation
-) => {
+const verticals = (grid, horizontal_edges, sets, edges, last_row, animations, anim_params) => {
+  let { displayValAnimation, connectAnimation } = anim_params;
   let count = 0;
   let added_edges = [];
   if (last_row) return added_edges;

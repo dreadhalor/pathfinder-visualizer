@@ -11,6 +11,7 @@ const TopNav = (
     generateDFS,
     generateHuntAndKill,
     generatePrims,
+    generateRecursiveDivision,
   },
   ref
 ) => {
@@ -21,15 +22,11 @@ const TopNav = (
   };
 
   const [ignore, forceRenderCounter] = useState(0); // eslint-disable-line no-unused-vars
-  const forceRender = () =>
-    forceRenderCounter((prev_counter) => prev_counter + 1);
+  const forceRender = () => forceRenderCounter((prev_counter) => prev_counter + 1);
   useImperativeHandle(ref, () => ({ forceRender }));
 
   return (
-    <div
-      ref={ref}
-      className='border-b border-slate-500 bg-slate-200 flex flex-row overflow-auto'
-    >
+    <div ref={ref} className='border-b border-slate-500 bg-slate-200 flex flex-row overflow-auto'>
       <span className='flex-1'></span>
       <p className='font-bold my-auto ml-2'>Tile type:</p>
       <div className='my-auto flex flex-row'>
@@ -106,6 +103,12 @@ const TopNav = (
         onClick={generatePrims}
       >
         Prim's
+      </button>
+      <button
+        className='my-1 mx-1 font-bold bg-blue-300 hover:bg-blue-400 p-1 rounded-lg'
+        onClick={generateRecursiveDivision}
+      >
+        Recusive Division
       </button>
       <span className='flex-1'></span>
     </div>

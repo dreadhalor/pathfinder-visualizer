@@ -147,7 +147,7 @@ const GridSquare = ({ size, rows, square, setValue, modeRef }) => {
   return (
     <div
       ref={tileRef}
-      onClick={clicked}
+      onMouseDown={clicked}
       style={getStyle()}
       className={getClassName()}
       onAnimationEnd={animationEnd}

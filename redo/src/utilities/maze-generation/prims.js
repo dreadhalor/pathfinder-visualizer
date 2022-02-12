@@ -1,14 +1,12 @@
-import { shuffle } from 'lodash';
+import { getRandomVisitedNeighbor } from '../algorithm-methods';
+import { primsAnimations } from '../animations';
 import { GridAdjacencyList } from '../data-structures/grid-adjacency-list';
 import { GridSet } from '../data-structures/grid-set';
-import {
-  expandEdge,
-  getFullEdges,
-  getMazeAdjacencyList,
-} from '../maze-structures';
+import { expandEdge, getFullEdges, getMazeAdjacencyList } from '../maze-structures';
 
-export const prims = (grid, frontierAnimation, connectAnimation) => {
+export const prims = (grid) => {
   let animations = [];
+  let { frontierAnimation, connectAnimation } = primsAnimations(grid);
   const adjacency_list = getMazeAdjacencyList(grid);
   let edges = new GridAdjacencyList();
   let visited = new GridSet();
@@ -20,9 +18,8 @@ export const prims = (grid, frontierAnimation, connectAnimation) => {
     visited.add(next);
     let neighbors = adjacency_list.get(next);
     let unvisited = neighbors.filter((node) => !visited.has(node));
-    connector = shuffle(neighbors.filter((node) => visited.has(node)))[0];
-    if (connector)
-      connect(next, connector, edges, animations, connectAnimation);
+    connector = getRandomVisitedNeighbor(next, adjacency_list, visited);
+    if (connector) connect(next, connector, edges, animations, connectAnimation);
     addToFrontier(unvisited, frontier, animations, frontierAnimation);
   }
 
