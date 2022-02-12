@@ -18,13 +18,13 @@ export class GridSet {
   };
   has = (coords) => this.set.has(JSON.stringify(coords));
   toArray = () => [...this.set].map((str) => JSON.parse(str));
-  at = (index) =>
-    index < this.size() ? JSON.parse([...this.set][index]) : null;
+  at = (index) => (index < this.size() ? JSON.parse([...this.set][index]) : null);
   popRandom = () => {
     let coords = this.at(Math.floor(Math.random() * this.set.size));
     if (coords) this.set.delete(JSON.stringify(coords));
     return coords;
   };
+  delete = (coords) => this.set.delete(JSON.stringify(coords));
   size = () => this.set.size;
   clone = () => {
     let copy = [...this.set];

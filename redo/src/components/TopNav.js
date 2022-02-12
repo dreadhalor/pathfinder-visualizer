@@ -1,4 +1,8 @@
 import React, { useImperativeHandle, useState } from 'react';
+import Button from '@mui/material/Button';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import BasicMenu from './BasicMenu';
 
 const TopNav = (
   {
@@ -12,6 +16,7 @@ const TopNav = (
     generateHuntAndKill,
     generatePrims,
     generateRecursiveDivision,
+    resetWalls,
   },
   ref
 ) => {
@@ -24,6 +29,15 @@ const TopNav = (
   const [ignore, forceRenderCounter] = useState(0); // eslint-disable-line no-unused-vars
   const forceRender = () => forceRenderCounter((prev_counter) => prev_counter + 1);
   useImperativeHandle(ref, () => ({ forceRender }));
+
+  let options = [
+    { title: `Kruskal's`, onClick: generateKruskals },
+    { title: `Recursive Backtracking`, onClick: generateDFS },
+    { title: `Prim's`, onClick: generatePrims },
+    { title: `Hunt-and-Kill`, onClick: generateHuntAndKill },
+    { title: `Recursive Division`, onClick: generateRecursiveDivision },
+    { title: `Eller's`, onClick: generateEllers },
+  ];
 
   return (
     <div ref={ref} className='border-b border-slate-500 bg-slate-200 flex flex-row overflow-auto'>
@@ -73,42 +87,12 @@ const TopNav = (
       >
         {solvedRef.current ? 'Clear Path' : 'Solve It!'}
       </button>
-      <span className='my-auto font-bold'>Generate:</span>
+      <BasicMenu options={options} />
       <button
-        className='my-1 mx-1 font-bold bg-blue-300 hover:bg-blue-400 p-1 rounded-lg'
-        onClick={generateKruskals}
+        className='my-1 mx-2 font-bold bg-blue-300 hover:bg-blue-400 p-1 rounded-lg'
+        onClick={resetWalls}
       >
-        Kruskal's
-      </button>
-      <button
-        className='my-1 mx-1 font-bold bg-blue-300 hover:bg-blue-400 p-1 rounded-lg'
-        onClick={generateEllers}
-      >
-        Eller's
-      </button>
-      <button
-        className='my-1 mx-1 font-bold bg-blue-300 hover:bg-blue-400 p-1 rounded-lg'
-        onClick={generateDFS}
-      >
-        DFS
-      </button>
-      <button
-        className='my-1 mx-1 font-bold bg-blue-300 hover:bg-blue-400 p-1 rounded-lg'
-        onClick={generateHuntAndKill}
-      >
-        Hunt-and-Kill
-      </button>
-      <button
-        className='my-1 mx-1 font-bold bg-blue-300 hover:bg-blue-400 p-1 rounded-lg'
-        onClick={generatePrims}
-      >
-        Prim's
-      </button>
-      <button
-        className='my-1 mx-1 font-bold bg-blue-300 hover:bg-blue-400 p-1 rounded-lg'
-        onClick={generateRecursiveDivision}
-      >
-        Recusive Division
+        Clear Walls
       </button>
       <span className='flex-1'></span>
     </div>

@@ -4,6 +4,7 @@ export class Animator {
     this.delay = 0;
     this.complete = finish_function;
     this.play_finish = false;
+    this.open_queue = false;
   }
 
   setFinishFunction = (fxn) => (this.complete = fxn);
@@ -18,6 +19,21 @@ export class Animator {
     //     () => this.animationLoop(frames_per_refresh),
     //     1000 / 60 / threads
     //   );
+  };
+  startOpenQueue = () => {
+    this.flushAnimationQueue();
+    this.open_queue = true;
+    this.openAnimationLoop(1);
+  };
+  closeOpenQueue = (finishFxn = false) => {
+    this.play_finish = finishFxn;
+    this.open_queue = false;
+  };
+  pushOneToOpenQueue = (animation) => {
+    if (animation) this.animation_queue.push(animation);
+  };
+  pushMultipleToOpenQueue = (animations) => {
+    if (animations) this.animation_queue = this.animation_queue.concat(animations);
   };
   animationsLeft = () => this.animation_queue.length;
   flushAnimationQueue = () => {
@@ -38,5 +54,11 @@ export class Animator {
         );
       } else requestAnimationFrame(() => this.animationLoop(frames_per_refresh));
     } else if (this.play_finish) this.complete();
+  }
+  openAnimationLoop(frames_per_refresh = 1) {
+    let animations = this.animation_queue.splice(0, frames_per_refresh);
+    for (let animation of animations) if (animation) animation();
+    if (this.open_queue) requestAnimationFrame(() => this.openAnimationLoop(frames_per_refresh));
+    else this.animationLoop(frames_per_refresh);
   }
 }

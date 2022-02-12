@@ -98,6 +98,9 @@ export const ellersAnimations = (grid) => {
 
 export const recursiveDivisionAnimations = (grid) => {
   return {
-    animation: animationGenerator(grid, (tile) => tile.setVal(3)),
+    animation: animationGenerator(grid, (tile) => {
+      //console.log(tile);
+      if (tile) tile.setVal(3);
+    }),
   };
 };

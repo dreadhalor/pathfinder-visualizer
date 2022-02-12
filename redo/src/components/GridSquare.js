@@ -8,6 +8,9 @@ const GridSquare = ({ size, rows, square, setValue, modeRef }) => {
   };
   const wall_style = {
     opacity: 0,
+    boxShadow: 'none',
+    transitionProperty: 'opacity',
+    transitionDuration: '0.4s',
   };
   const start_style = {
     backgroundColor: '#05ff05',
@@ -28,6 +31,7 @@ const GridSquare = ({ size, rows, square, setValue, modeRef }) => {
   const scan_style = {
     backgroundColor: '#80ff91',
     transitionProperty: 'none',
+    boxShadow: 'none',
   };
   const scan_anchor_style = {
     backgroundColor: '#00d000',
@@ -38,7 +42,6 @@ const GridSquare = ({ size, rows, square, setValue, modeRef }) => {
   };
   const scan_traverse_style = {
     backgroundColor: '#0ae627',
-    // transitionProperty: 'none',
   };
 
   const getStyle = () => {

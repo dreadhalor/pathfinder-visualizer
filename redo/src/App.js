@@ -106,6 +106,10 @@ function App() {
     }
     navRef.current.forceRender();
   };
+  const resetWalls = () => {
+    resetPath();
+    grid.forEach((row) => row.forEach((tile) => tile.setVal(0)));
+  };
   const solve = () => {
     let start = null;
     for (let i = 0; i < rows; i++) {
@@ -132,9 +136,9 @@ function App() {
   const generateKruskals = () => {
     resetPath();
     grid.forEach((row) => row.forEach((tile) => tile.setVal(3)));
-    let [result, animations] = kruskals(grid); //eslint-disable-line no-unused-vars
-    let animation_queue = [...animations, ...finishAnimation(grid)];
-    animatorRef.current.playAnimations(animation_queue);
+    let [result, animations] = kruskals(grid, animatorRef); //eslint-disable-line no-unused-vars
+    //let animation_queue = [...animations, ...finishAnimation(grid)];
+    //animatorRef.current.playAnimations(animation_queue);
   };
   const generateEllers = () => {
     resetPath();
@@ -166,9 +170,8 @@ function App() {
     animatorRef.current.playAnimations(animation_queue);
   };
   const generateRecursiveDivision = () => {
-    resetPath();
-    grid.forEach((row) => row.forEach((tile) => tile.setVal(0)));
-    animatorRef.current.playAnimations(recursiveDivision(grid), true);
+    resetWalls();
+    animatorRef.current.playAnimations(recursiveDivision(grid, 10, 0), 0, true);
   };
 
   return (
@@ -185,6 +188,7 @@ function App() {
         generateHuntAndKill={generateHuntAndKill}
         generatePrims={generatePrims}
         generateRecursiveDivision={generateRecursiveDivision}
+        resetWalls={resetWalls}
       />
       <div className='w-full flex-1 relative min-h-0'>
         {/* <div className='absolute w-full flex flex-col pointer-events-none z-10'>
