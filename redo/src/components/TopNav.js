@@ -37,7 +37,7 @@ const TopNav = (
   ];
 
   return (
-    <div ref={ref} className='border-b border-slate-500 bg-slate-200 flex flex-row overflow-auto'>
+    <div ref={ref} className='bg-slate-200 flex flex-row overflow-auto'>
       <span className='flex-1'></span>
       <p className='font-bold my-auto ml-2'>Tile type:</p>
       <div className='my-auto flex flex-row'>

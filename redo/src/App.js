@@ -44,6 +44,9 @@ function App() {
   const finished = () => animatorRef.current.playAnimations([...finishAnimation(grid)]);
   animatorRef.current.setFinishFunction(finished);
 
+  const checkForPathReset = () => {
+    return animatorRef.current.animationsLeft() > 0;
+  };
   const setValueCheck = (candidate_square, uuid, val) => {
     let tile_match = candidate_square.uuid === uuid;
     let val_match = candidate_square.val === val;
@@ -53,24 +56,34 @@ function App() {
       return 0;
     } else if (tile_match) {
       if (val === 3 && candidate_square.pathVal === 2) resetPath();
+      if (val === 1 || val === 2) {
+        if (candidate_square.val === 3) return null;
+        resetPath();
+        removeVal(val);
+      }
       candidate_square.setVal(val);
       return val;
-    } else if (val_match) {
-      if (val === 1 || val === 2) candidate_square.setVal(0);
     }
     return null;
   };
   const setValue = (square_uuid, val = mode.current) => {
     let value_set = null;
-    if (((val === 1 || val === 2) && solved.current) || animatorRef.current.animationsLeft() > 0)
-      resetPath();
     for (let i = 0; i < rows; i++) {
       for (let j = 0; j < cols; j++) {
         let possible = setValueCheck(grid[i][j], square_uuid, val);
-        if (possible) value_set = possible;
+        if ((possible ?? null) !== null) value_set = possible;
       }
     }
+    if ((value_set ?? null) !== null && checkForPathReset()) resetPath();
     return value_set;
+  };
+  const removeVal = (val) => {
+    for (let i = 0; i < rows; i++) {
+      for (let j = 0; j < cols; j++) {
+        let tile = grid[i][j];
+        if (tile.val === val) tile.setVal(0);
+      }
+    }
   };
   //eslint-disable-next-line react-hooks/exhaustive-deps
   useLayoutEffect(() => {
@@ -209,14 +222,6 @@ function App() {
         resetWalls={resetWalls}
       />
       <div className='w-full flex-1 relative min-h-0'>
-        {/* <div className='absolute w-full flex flex-col pointer-events-none z-10'>
-          <button
-            className='solve-button mx-auto mt-2 font-bold bg-blue-300 hover:bg-blue-400 p-1 rounded-lg pointer-events-auto'
-            onClick={mySolved ? resetPath : beginSolveFxn}
-          >
-            {mySolved ? 'Clear Path' : 'Solve It!'}
-          </button>
-        </div> */}
         <div className='w-full h-full flex overflow-auto p-1'>
           <div ref={gridContainerRef} className='flex-1 h-auto flex min-w-0 min-h-0'>
             <div className='border-0 border-slate-600' style={gridStyle}>

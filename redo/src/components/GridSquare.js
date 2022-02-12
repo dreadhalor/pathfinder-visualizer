@@ -6,6 +6,10 @@ const GridSquare = ({ size, rows, square, setValue, modeRef, dragValRef }) => {
     width: size,
     height: size,
   };
+  const resetStyle = {
+    transitionProperty: 'background-color',
+    transitionDuration: '0.3s',
+  };
   const wall_style = {
     opacity: 0,
     boxShadow: 'none',
@@ -48,6 +52,7 @@ const GridSquare = ({ size, rows, square, setValue, modeRef, dragValRef }) => {
         backgroundColor: getEllersBackground(),
       };
     }
+    if (val === 0 && pathVal === 0) return { ...gridSquareSize, ...resetStyle };
     if (val === 2) return { ...gridSquareSize, ...end_style };
     if (val === 1) return { ...gridSquareSize, ...start_style };
     if (val === 3) return { ...gridSquareSize, ...wall_style };
