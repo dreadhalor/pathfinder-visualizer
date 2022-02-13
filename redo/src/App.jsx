@@ -33,7 +33,6 @@ function App() {
     return new_grid;
   };
   const [grid, setGrid] = useState(createNewGrid(5, 5));
-  //const grid = useRef();
 
   const gridContainerRef = useRef();
   const mode = useRef(1);
@@ -90,6 +89,8 @@ function App() {
     resetGridSize();
   }, []); //eslint-disable-line react-hooks/exhaustive-deps
 
+  const resetCounter = useRef(2);
+
   function resetGridSize() {
     let w = gridContainerRef.current.clientWidth,
       h = gridContainerRef.current.clientHeight;
@@ -102,6 +103,9 @@ function App() {
     setRows(new_rows); //eslint-disable-line react-hooks/exhaustive-deps
     setCols(new_cols); //eslint disable-line exhaustive-deps
     setGrid(createNewGrid(new_rows, new_cols)); //eslint disable-line exhaustive-deps
+    if (new_rows === 1 && resetCounter.current-- <= 0) {
+      setTimeout(resetGridSize, 200);
+    }
   }
   useEffect(() => {
     window.addEventListener('resize', resetGridSize);
