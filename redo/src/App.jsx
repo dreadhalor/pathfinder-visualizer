@@ -18,7 +18,6 @@ import { recursiveDivision } from './utilities/maze-generation/recursive-divisio
 function App() {
   const [rows, setRows] = useState(25);
   const [cols, setCols] = useState(39);
-  // const [grid, setGrid] = useState();
   let squareSize = useRef(25);
 
   const createNewGrid = (num_rows, num_cols) => {
@@ -89,7 +88,7 @@ function App() {
     resetGridSize();
   }, []); //eslint-disable-line react-hooks/exhaustive-deps
 
-  const resetCounter = useRef(2);
+  const resetCounter = useRef(5);
 
   function resetGridSize() {
     let w = gridContainerRef.current.clientWidth,
@@ -100,12 +99,11 @@ function App() {
     let new_cols = Math.floor(w / squareSize.current);
     if (new_cols % 2 === 0 && new_cols > 0) new_cols--;
     animatorRef.current.flushAnimationQueue();
-    setRows(new_rows); //eslint-disable-line react-hooks/exhaustive-deps
-    setCols(new_cols); //eslint disable-line exhaustive-deps
-    setGrid(createNewGrid(new_rows, new_cols)); //eslint disable-line exhaustive-deps
-    if (new_rows === 1 && resetCounter.current-- <= 0) {
-      setTimeout(resetGridSize, 200);
-    }
+    setRows(() => new_rows); //eslint-disable-line react-hooks/exhaustive-deps
+    setCols(() => new_cols); //eslint disable-line exhaustive-deps
+    setGrid(() => createNewGrid(new_rows, new_cols)); //eslint disable-line exhaustive-deps
+    // resetCounter.current--;
+    if (new_rows === 1) setTimeout(resetGridSize, 10);
   }
   useEffect(() => {
     window.addEventListener('resize', resetGridSize);
@@ -200,7 +198,8 @@ function App() {
   const generateEllers = () => {
     wallifyItAll();
     let [result, animations] = ellers(grid); //eslint-disable-line no-unused-vars
-    animatorRef.current.playAnimations(animations, 0.08, true);
+    // animatorRef.current.playAnimations(animations, 0.08, true);
+    animatorRef.current.playAnimations(animations, 1, true);
   };
   const generateDFS = () => {
     wallifyItAll();
@@ -245,8 +244,11 @@ function App() {
       />
       <div className='w-full flex-1 relative min-h-0'>
         <div className='w-full h-full flex overflow-auto p-1'>
-          <div ref={gridContainerRef} className='flex-1 h-auto flex min-w-0 min-h-0'>
-            <div className='border-0 border-slate-600' style={gridStyle}>
+          <div
+            ref={gridContainerRef}
+            className={(rows <= 1 ? 'opacity-0 ' : '') + 'flex-1 h-full flex min-w-0'}
+          >
+            <div style={gridStyle}>
               {grid &&
                 grid.map((row) =>
                   row.map((square) => (

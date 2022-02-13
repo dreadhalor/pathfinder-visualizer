@@ -2,7 +2,6 @@ import { traverse } from '../algorithm-methods';
 import { recursiveDivisionAnimations } from '../animations';
 import { GridSet } from '../data-structures/grid-set';
 import { expandEdge, getPathNodesByRow } from '../maze-structures';
-import { coinFlips } from '../randomizers';
 
 export const recursiveDivision = (grid, iterator) => {
   let width = grid.length ?? 0,
@@ -15,33 +14,27 @@ export const recursiveDivision = (grid, iterator) => {
   let { animation } = recursiveDivisionAnimations(grid);
   let nodes = getPathNodesByRow(grid);
   let grid_left = null,
-    nodes_left = [];
-  let grid_right = null,
-    nodes_right = [];
-  let left = [],
-    right = [];
+    grid_right = null;
+
+  let left_animations = [],
+    right_animations = [];
   if (width < height) {
-    // if (coinFlips(1)) {
     let divider = dividePathNodes(grid, nodes, animations, animation);
     if (divider < 1) return animations;
     grid_left = grid.map((row) => row.slice(0, divider));
-    nodes_left = getPathNodesByRow(grid_left);
     grid_right = grid.map((row) => row.slice(divider + 1));
-    nodes_right = getPathNodesByRow(grid_right);
-    left = recursiveDivision(grid_left, iterator);
-    right = recursiveDivision(grid_right, iterator);
+    left_animations = recursiveDivision(grid_left, iterator);
+    right_animations = recursiveDivision(grid_right, iterator);
   } else {
     let divider = dividePathNodesHorizontally(grid, nodes, animations, animation);
     if (divider < 1) return animations;
     grid_left = grid.slice(0, divider);
-    nodes_left = getPathNodesByRow(grid_left);
     grid_right = grid.slice(divider + 1);
-    nodes_right = getPathNodesByRow(grid_right);
-    left = recursiveDivision(grid_left, iterator);
-    right = recursiveDivision(grid_right, iterator);
+    left_animations = recursiveDivision(grid_left, iterator);
+    right_animations = recursiveDivision(grid_right, iterator);
   }
-  if (left.length > 0) animations = animations.concat(left);
-  if (right.length > 0) animations = animations.concat(right);
+  if (left_animations.length > 0) animations = animations.concat(left_animations);
+  if (right_animations.length > 0) animations = animations.concat(right_animations);
   return animations;
 };
 
