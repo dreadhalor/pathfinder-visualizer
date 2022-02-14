@@ -3,7 +3,7 @@ import './App.scss';
 import { v4 as uuidv4 } from 'uuid';
 import GridSquare from './components/GridSquare';
 import TopNav from './components/TopNav';
-import { bfs } from './utilities/solvers/bfs';
+import { bfs, bfs_raw } from './utilities/solvers/bfs';
 import {
   kruskals,
   ellers,
@@ -45,7 +45,7 @@ function App() {
   const checkForPathReset = () => {
     return animatorRef.current.animationsLeft() > 0;
   };
-  const setValueCheck = (candidate_square, uuid, val) => {
+  const setValueCheck = (candidate_square, uuid, val, reset_override = false) => {
     let tile_match = candidate_square.uuid === uuid;
     let val_match = candidate_square.val === val;
     let exact_match = tile_match && val_match;
@@ -53,10 +53,10 @@ function App() {
       candidate_square.setVal(0);
       return 0;
     } else if (tile_match) {
-      if (val === 3 && candidate_square.pathVal === 2) resetPath();
+      if (val === 3 && candidate_square.pathVal === 2 && !reset_override) resetPath();
       if (val === 1 || val === 2) {
         if (candidate_square.val === 3) return null;
-        resetPath();
+        if (!reset_override) resetPath();
         removeVal(val);
       }
       candidate_square.setVal(val);
@@ -64,15 +64,15 @@ function App() {
     }
     return null;
   };
-  const setValue = (square_uuid, val = mode.current) => {
+  const setValue = (square_uuid, val = mode.current, reset_override = false) => {
     let value_set = null;
     for (let i = 0; i < rows; i++) {
       for (let j = 0; j < cols; j++) {
-        let possible = setValueCheck(grid[i][j], square_uuid, val);
+        let possible = setValueCheck(grid[i][j], square_uuid, val, reset_override);
         if ((possible ?? null) !== null) value_set = possible;
       }
     }
-    if ((value_set ?? null) !== null && checkForPathReset()) resetPath();
+    if ((value_set ?? null) !== null && checkForPathReset() && !reset_override) resetPath();
     return value_set;
   };
   const removeVal = (val) => {
@@ -87,8 +87,21 @@ function App() {
   useLayoutEffect(() => {
     resetGridSize();
   }, []); //eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    let middle_row = Math.floor(rows / 2);
+    let potential_start = getTile([middle_row, 1]);
+    let potential_end = getTile([middle_row, cols - 2]);
+    if (potential_start) {
+      setValue(potential_start.uuid, 1);
+      potential_start.animate(1);
+    }
+    if (potential_end) {
+      setValue(potential_end.uuid, 2);
+      potential_end.animate(1);
+    }
+  }, [grid]); //eslint-disable-line react-hooks/exhaustive-deps
 
-  const resetCounter = useRef(5);
+  // const resetCounter = useRef(5);
 
   function resetGridSize() {
     let w = gridContainerRef.current.clientWidth,
@@ -191,39 +204,95 @@ function App() {
     }
   };
 
+  const getTile = (coords) => {
+    if (coords) return grid?.[coords[0]]?.[coords[1]];
+  };
+  const getStartAndEnd = () => {
+    let start = null,
+      end = null;
+    for (let i = 0; i < rows; i++) {
+      for (let j = 0; j < cols; j++) {
+        if (grid[i][j].val === 1) start = [i, j];
+        if (grid[i][j].val === 2) end = [i, j];
+      }
+    }
+    return [start, end];
+  };
+  const getClosestPathSquare = (new_grid, coords, val) => {
+    return bfs_raw({
+      maze: new_grid,
+      start_coords: coords,
+      solution_func: (tile_val) => tile_val === val,
+    });
+  };
+  const resetStartAndEnd = (old_start, old_end) => {
+    let new_grid = grid.map((row) =>
+      row.map((square) => {
+        if (square.val === 1 || square.val === 2) return 0;
+        return square.val;
+      })
+    );
+    let start = getClosestPathSquare(new_grid, old_start, 0);
+    let end = getClosestPathSquare(new_grid, old_end, 0);
+
+    if (start) {
+      let tile = getTile(start);
+      // setValue(tile.uuid, 1, true); //lol fuck it
+      tile.setVal(1);
+      tile.animate(1);
+    }
+    if (end) {
+      let tile = getTile(end);
+      // setValue(tile.uuid, 2, true);
+      tile.setVal(2);
+      tile.animate(1);
+    }
+  };
   const generateKruskals = () => {
+    let [start, end] = getStartAndEnd();
     wallifyItAll();
     kruskals(grid, animatorRef);
+    animatorRef.current.pushOneToOpenQueue(() => resetStartAndEnd(start, end));
+    animatorRef.current.closeOpenQueue(true);
   };
   const generateEllers = () => {
+    let [start, end] = getStartAndEnd();
     wallifyItAll();
-    let [result, animations] = ellers(grid); //eslint-disable-line no-unused-vars
-    // animatorRef.current.playAnimations(animations, 0.08, true);
+    //eslint-disable-next-line no-unused-vars
+    let [result, animations] = ellers(grid);
+    animations = animations.concat(() => resetStartAndEnd(start, end));
+
     animatorRef.current.playAnimations(animations, 1, true);
   };
   const generateDFS = () => {
+    let [start, end] = getStartAndEnd();
     wallifyItAll();
     //eslint-disable-next-line no-unused-vars
     let [result, animations] = recursiveBacktracking(grid);
-    let animation_queue = [...animations]; //, ...finishAnimation(grid)];
-    animatorRef.current.playAnimations(animation_queue, 2, true);
+    animations = animations.concat(() => resetStartAndEnd(start, end));
+
+    animatorRef.current.playAnimations(animations, 2, true);
   };
   const generateHuntAndKill = () => {
+    let [start, end] = getStartAndEnd();
     wallifyItAll();
     let [result, animations] = huntAndKill(grid); //eslint-disable-line no-unused-vars
-    let animation_queue = [...animations]; //, ...finishAnimation(grid)];
-    animatorRef.current.playAnimations(animation_queue, 2, true);
+    animations = animations.concat(() => resetStartAndEnd(start, end));
+    animatorRef.current.playAnimations(animations, 2, true);
   };
   const generatePrims = () => {
+    let [start, end] = getStartAndEnd();
     wallifyItAll();
     //eslint-disable-next-line no-unused-vars
     let [result, animations] = prims(grid);
-    let animation_queue = [...animations, ...finishAnimation(grid)];
-    animatorRef.current.playAnimations(animation_queue);
+    animations = animations.concat(() => resetStartAndEnd(start, end));
+    animatorRef.current.playAnimations(animations, 2, true);
   };
   const generateRecursiveDivision = () => {
+    let [start, end] = getStartAndEnd();
     resetWalls();
-    animatorRef.current.playAnimations(recursiveDivision(grid, 10), 0, true);
+    let result = recursiveDivision(grid, 10).concat(() => resetStartAndEnd(start, end));
+    animatorRef.current.playAnimations(result, 1, true);
   };
 
   return (
@@ -243,7 +312,8 @@ function App() {
         resetWalls={resetWalls}
       />
       <div className='w-full flex-1 relative min-h-0'>
-        <div className='w-full h-full flex overflow-auto p-1'>
+        <div className='w-full h-full top-0 left-0 absolute bg-transparent'></div>
+        <div className='w-full h-full top-0 left-0 absolute flex overflow-auto p-1'>
           <div
             ref={gridContainerRef}
             className={(rows <= 1 ? 'opacity-0 ' : '') + 'flex-1 h-full flex min-w-0'}

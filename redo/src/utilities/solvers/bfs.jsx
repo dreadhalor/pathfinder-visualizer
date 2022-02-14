@@ -1,3 +1,5 @@
+import { GridSet } from '../data-structures/grid-set';
+
 export const bfs = ({
   maze,
   start_coords,
@@ -17,9 +19,7 @@ export const bfs = ({
     queue.push(start_coords);
     pathMap.set(JSON.stringify(start_coords), null);
     if (animate)
-      animation_queue.push(() =>
-        traversal_animation_func(maze[start_coords[0]][start_coords[1]])
-      );
+      animation_queue.push(() => traversal_animation_func(maze[start_coords[0]][start_coords[1]]));
   }
   let unsolved = true;
   while (queue.length > 0) {
@@ -40,11 +40,7 @@ export const bfs = ({
       }
       if (check_solved_func(maze_copy[r - 1][c])) unsolved = false;
     }
-    if (
-      unsolved &&
-      r < rows - 1 &&
-      isValidNeighbor(maze_copy, pathMap, r + 1, c)
-    ) {
+    if (unsolved && r < rows - 1 && isValidNeighbor(maze_copy, pathMap, r + 1, c)) {
       queue.push([r + 1, c]);
       pathMap.set(JSON.stringify([r + 1, c]), [r, c]);
       if (animate) {
@@ -62,11 +58,7 @@ export const bfs = ({
       }
       if (check_solved_func(maze_copy[r][c - 1])) unsolved = false;
     }
-    if (
-      unsolved &&
-      c < cols - 1 &&
-      isValidNeighbor(maze_copy, pathMap, r, c + 1)
-    ) {
+    if (unsolved && c < cols - 1 && isValidNeighbor(maze_copy, pathMap, r, c + 1)) {
       queue.push([r, c + 1]);
       pathMap.set(JSON.stringify([r, c + 1]), [r, c]);
       if (animate) {
@@ -100,4 +92,37 @@ const isValidNeighbor = (map, pathMap, row, col) => {
   if (pathMap.has(JSON.stringify([row, col]))) return false;
   let val = map[row][col].val;
   return val !== 3;
+};
+
+export const bfs_raw = ({ maze, start_coords, solution_func }) => {
+  let rows = maze?.length ?? 0,
+    cols = maze?.[0]?.length ?? 0;
+  let visited = new GridSet();
+  let queue = [];
+  if (start_coords) {
+    queue.push(start_coords);
+    visited.add(start_coords);
+  }
+  while (queue.length > 0) {
+    let [r, c] = queue.shift();
+    // console.log(r + ',' + c);
+    if (solution_func(maze[r][c])) return [r, c];
+    if (r > 0 && !visited.has([r - 1, c])) {
+      queue.push([r - 1, c]);
+      visited.add([r - 1, c]);
+    }
+    if (r < rows - 1 && !visited.has([r + 1, c])) {
+      queue.push([r + 1, c]);
+      visited.add([r + 1, c]);
+    }
+    if (c > 0 && !visited.has([r, c - 1])) {
+      queue.push([r, c - 1]);
+      visited.add([r, c - 1]);
+    }
+    if (c < cols - 1 && !visited.has([r, c + 1])) {
+      queue.push([r, c + 1]);
+      visited.add([r, c + 1]);
+    }
+  }
+  return null;
 };

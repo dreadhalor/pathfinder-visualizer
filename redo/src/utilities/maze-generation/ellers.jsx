@@ -7,7 +7,6 @@ import { coinFlips, pickN } from '../randomizers';
 
 export const ellers = (grid) => {
   let anim_params = ellersAnimations(grid);
-  // let { displayValAnimation, popAnimation } = anim_params;
   let { displayValAnimation } = anim_params;
   let animations = [];
   let rows = getPathNodesByRow(grid);
@@ -49,7 +48,8 @@ export const ellers = (grid) => {
     });
     sets.removeMultiple(row);
   }
-  return [getFullEdges(selected_edges).flat(1), animations];
+  let result = getFullEdges(selected_edges).flat(1);
+  return [result, animations];
 };
 
 //randomly connect adjacent tiles (or all unconnected if last row)

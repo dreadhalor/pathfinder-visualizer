@@ -68,6 +68,9 @@ function dividePathNodesHorizontally(grid, nodes, animations, animation) {
   let hole = edge.at(whatever);
   edge.delete(hole);
   let tiles = edge.toArray();
-  for (let tile of tiles) traverse(tile, animations, animation);
+  for (let tile of tiles) {
+    traverse(tile, animations, animation);
+    // tile
+  }
   return wall_row;
 }
