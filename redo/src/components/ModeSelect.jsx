@@ -11,7 +11,7 @@ const ModeSelect = ({ modeRef, renderParent }) => {
     renderParent();
   };
   return (
-    <Box sx={{ minWidth: 120 }}>
+    <Box sx={{ minWidth: 60 }}>
       <FormControl fullWidth variant='standard'>
         <InputLabel id='mode-select-label'>Tile Type</InputLabel>
         <Select

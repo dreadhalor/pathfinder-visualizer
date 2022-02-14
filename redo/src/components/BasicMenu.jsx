@@ -3,7 +3,7 @@ import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 
-const BasicMenu = ({ options }) => {
+const BasicMenu = ({ options, title }) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -23,7 +23,7 @@ const BasicMenu = ({ options }) => {
         aria-expanded={open ? 'true' : undefined}
         onClick={handleClick}
       >
-        Generate Maze
+        {title}
       </Button>
       <Menu
         id='basic-menu'

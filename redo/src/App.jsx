@@ -43,7 +43,7 @@ function App() {
   animatorRef.current.setFinishFunction(finished);
 
   const checkForPathReset = () => {
-    return animatorRef.current.animationsLeft() > 0;
+    return animatorRef.current.animationsLeft() > 0 || solved.current;
   };
   const setValueCheck = (candidate_square, uuid, val, reset_override = false) => {
     let tile_match = candidate_square.uuid === uuid;
@@ -87,7 +87,9 @@ function App() {
   useLayoutEffect(() => {
     resetGridSize();
   }, []); //eslint-disable-line react-hooks/exhaustive-deps
-  useEffect(() => {
+  useEffect(() => fullResetStartAndEnd(), [grid]); //eslint-disable-line react-hooks/exhaustive-deps
+
+  const fullResetStartAndEnd = () => {
     let middle_row = Math.floor(rows / 2);
     let potential_start = getTile([middle_row, 1]);
     let potential_end = getTile([middle_row, cols - 2]);
@@ -99,7 +101,7 @@ function App() {
       setValue(potential_end.uuid, 2);
       potential_end.animate(1);
     }
-  }, [grid]); //eslint-disable-line react-hooks/exhaustive-deps
+  };
 
   // const resetCounter = useRef(5);
 

@@ -22,7 +22,7 @@ const TopNav = (
   const forceRender = () => forceRenderCounter((prev_counter) => prev_counter + 1);
   useImperativeHandle(ref, () => ({ forceRender }));
 
-  let options = [
+  let maze_options = [
     { title: `Kruskal's Algorithm`, onClick: generateKruskals },
     { title: `Recursive Backtracking`, onClick: generateDFS },
     { title: `Prim's Algorithm`, onClick: generatePrims },
@@ -30,20 +30,22 @@ const TopNav = (
     { title: `Recursive Division`, onClick: generateRecursiveDivision },
     { title: `Eller's Algorithm`, onClick: generateEllers },
   ];
+  let solve_options = [{ title: `Dijkstra's Algorithm/BFS`, onClick: solve }];
 
   return (
-    <div ref={ref} className='bg-slate-200 flex flex-row overflow-auto'>
+    <div ref={ref} className='bg-slate-200 flex flex-row overflow-auto px-2'>
       <span className='flex-1'></span>
       <ModeSelect modeRef={modeRef} renderParent={forceRender} />
+      <BasicMenu title={'Solve It!'} options={solve_options} />
       <button
         className='my-1 mx-2 font-bold bg-blue-300 hover:bg-blue-400 p-1 rounded-lg'
-        onClick={solvedRef.current ? clearPath : solve}
+        onClick={clearPath}
       >
-        {solvedRef.current ? 'Clear Path' : 'Solve It!'}
+        Clear Path
       </button>
-      <BasicMenu options={options} />
+      <BasicMenu title={'Generate Maze'} options={maze_options} />
       <button
-        className='my-1 mx-2 font-bold bg-blue-300 hover:bg-blue-400 p-1 rounded-lg'
+        className='my-1 ml-2 font-bold bg-blue-300 hover:bg-blue-400 p-1 rounded-lg'
         onClick={() => resetWalls(true)}
       >
         Clear Walls

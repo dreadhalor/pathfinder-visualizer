@@ -25,3 +25,6 @@ RECODE:
   - but also even at full screen maze generation is pretty instantaneous so maybe it won't be worth it
 * Possibly figure out a way to fix Prim's algorithm's animation (a brand new bug introduced by making the background-color transition by default!)
 * The detection for auto-placing start & end tiles is hacky
+  * maybe it's not, fuck you
+* put in a-star search, maybe put in DFS, relabel BFS as (Dijkstra's/BFS), then change the 'scale 1.3' animation to '3d translate' in the z-axis, that might fix all the graphical quirks
+* the start & end nodes don't reappear if you interrupt maze generation by clearing the walls (which maybe you shouldn't be allowed to do anyway but fuck it)

@@ -105,7 +105,6 @@ export const bfs_raw = ({ maze, start_coords, solution_func }) => {
   }
   while (queue.length > 0) {
     let [r, c] = queue.shift();
-    // console.log(r + ',' + c);
     if (solution_func(maze[r][c])) return [r, c];
     if (r > 0 && !visited.has([r - 1, c])) {
       queue.push([r - 1, c]);
