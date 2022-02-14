@@ -34,7 +34,7 @@ function App() {
   const [grid, setGrid] = useState(createNewGrid(5, 5));
 
   const gridContainerRef = useRef();
-  const mode = useRef(1);
+  const mode = useRef(3);
   const solved = useRef(false);
   const navRef = useRef();
   const animatorRef = useRef(new Animator());
@@ -312,7 +312,6 @@ function App() {
         resetWalls={resetWalls}
       />
       <div className='w-full flex-1 relative min-h-0'>
-        <div className='w-full h-full top-0 left-0 absolute bg-transparent'></div>
         <div className='w-full h-full top-0 left-0 absolute flex overflow-auto p-1'>
           <div
             ref={gridContainerRef}

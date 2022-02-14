@@ -143,7 +143,7 @@ const GridSquare = ({ size, rows, square, setValue, modeRef, dragValRef }) => {
   // console.log('square rendered, size: ' + size);
 
   const clicked = (event) => {
-    event.preventDefault();
+    // event.preventDefault();
     return setValue(square.uuid);
   };
   const mouseDown = (event) => {

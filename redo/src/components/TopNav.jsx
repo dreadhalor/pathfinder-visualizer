@@ -1,5 +1,6 @@
 import React, { useImperativeHandle, useState } from 'react';
 import BasicMenu from './BasicMenu';
+import ModeSelect from './ModeSelect';
 
 const TopNav = (
   {
@@ -39,8 +40,9 @@ const TopNav = (
   return (
     <div ref={ref} className='bg-slate-200 flex flex-row overflow-auto'>
       <span className='flex-1'></span>
-      <p className='font-bold my-auto ml-2'>Tile type:</p>
-      <div className='my-auto flex flex-row'>
+      {/* <p className='font-bold my-auto ml-2'>Tile type:</p> */}
+      <ModeSelect modeRef={modeRef} renderParent={forceRender} />
+      {/* <div className='my-auto flex flex-row'>
         <span className='px-1 flex flex-row'>
           <input
             checked={modeRef.current === 1}
@@ -77,7 +79,7 @@ const TopNav = (
           />
           <label htmlFor='wall'>Wall</label>
         </span>
-      </div>
+      </div> */}
       <button
         className='my-1 mx-2 font-bold bg-blue-300 hover:bg-blue-400 p-1 rounded-lg'
         onClick={solvedRef.current ? clearPath : solve}
