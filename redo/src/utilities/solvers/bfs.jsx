@@ -84,7 +84,7 @@ export const bfs = ({
       let [r, c] = reverse_path[i];
       if (animate) animation_queue.push(() => path_animation_func(maze[r][c]));
     }
-  } else alert('No solution found!');
+  }
   return end;
 };
 

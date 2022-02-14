@@ -160,15 +160,23 @@ function App() {
     }
     navRef.current.forceRender();
   };
-  const resetWalls = () => {
+  const resetWalls = (animate_tiles = false) => {
+    let [start, end] = getStartAndEnd();
     resetPath();
-    grid.forEach((row) =>
-      row.forEach((tile) => {
-        tile.setDisplayVal(null);
-        if (tile.val !== 1 && tile.val !== 2) tile.setVal(0);
-      })
-    );
+    for (let i = 0; i < rows; i++) {
+      for (let j = 0; j < cols; j++) {
+        let tile = grid[i][j];
+        if (start && i === start[0] && j === start[1]) {
+          tile.setVal(1);
+          if (animate_tiles) tile.animate(1);
+        } else if (end && i === end[0] && j === end[1]) {
+          tile.setVal(2);
+          if (animate_tiles) tile.animate(1);
+        } else tile.setVal(0);
+      }
+    }
   };
+
   const wallifyItAll = () => {
     resetPath();
     grid.forEach((row) =>
@@ -179,6 +187,7 @@ function App() {
     );
   };
   const solve = () => {
+    resetPath();
     let start = null;
     for (let i = 0; i < rows; i++) {
       for (let j = 0; j < cols; j++) {
@@ -197,11 +206,16 @@ function App() {
       path_animation_func: (tile) => tile.setPathVal(2),
       animation_queue,
     });
+    animation_queue.push(() => {
+      if (!end) {
+        gridContainerRef.current.classList.remove('no-solution');
+        void gridContainerRef.current.offsetWidth;
+        gridContainerRef.current.classList.add('no-solution');
+      }
+    });
     animatorRef.current.playAnimations(animation_queue, 3);
-    if (end) {
-      solved.current = true;
-      navRef.current.forceRender();
-    }
+    solved.current = true;
+    navRef.current.forceRender();
   };
 
   const getTile = (coords) => {
@@ -290,7 +304,7 @@ function App() {
   };
   const generateRecursiveDivision = () => {
     let [start, end] = getStartAndEnd();
-    resetWalls();
+    resetWalls(false);
     let result = recursiveDivision(grid, 10).concat(() => resetStartAndEnd(start, end));
     animatorRef.current.playAnimations(result, 1, true);
   };
