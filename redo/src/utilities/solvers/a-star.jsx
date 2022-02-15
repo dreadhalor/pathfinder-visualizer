@@ -19,6 +19,7 @@ export const aStar = ({
   let adjacency_list = getSolverAdjacencyList(maze);
   let end = null;
   const h_weight = 1;
+  if (!start_coords || !end_coords) return [null, animations];
 
   let safeguard = 1000;
   open.add(start_coords);
@@ -71,7 +72,7 @@ export const aStar = ({
     animations.push(() => path_animation(maze[r][c]));
     path_node = pathMap.get(path_node);
   }
-  return animations;
+  return [end, animations];
 };
 
 const cost = ([node_r, node_c], [ref_r, ref_c]) => {

@@ -262,13 +262,20 @@ function App() {
   const solveAStar = () => {
     let [start, end] = getStartAndEnd();
     resetPath();
-    let animations = aStar({
+    let [result, animations] = aStar({
       maze: grid,
       start_coords: start,
       end_coords: end,
       traverse_animation: (tile) => tile.setPathVal(1),
       frontier_animation: (tile) => tile.setPathVal(3),
       path_animation: (tile) => tile.setPathVal(2),
+    });
+    animations.push(() => {
+      if (!result) {
+        gridContainerRef.current.classList.remove('no-solution');
+        void gridContainerRef.current.offsetWidth;
+        gridContainerRef.current.classList.add('no-solution');
+      }
     });
     animatorRef.current.playAnimations(animations, 6);
     solved.current = true;
