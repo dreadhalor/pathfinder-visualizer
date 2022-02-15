@@ -264,7 +264,6 @@ function App() {
     let endpoints = getStartAndEnd();
     let start = endpoints[0];
     resetPath();
-    // let animation_queue = [];
     let [end, animations] = dfs({
       maze: grid,
       start_coords: start,

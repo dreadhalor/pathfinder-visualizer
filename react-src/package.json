@@ -1,15 +1,19 @@
 {
-  "name": "algorithm-visualizer",
+  "name": "pathfinder-visualizer",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@testing-library/jest-dom": "^5.16.1",
+    "@emotion/react": "^11.7.1",
+    "@emotion/styled": "^11.6.0",
+    "@mui/material": "^5.4.1",
+    "@testing-library/jest-dom": "^5.16.2",
     "@testing-library/react": "^12.1.2",
     "@testing-library/user-event": "^13.5.0",
+    "lodash": "^4.17.21",
+    "node-sass": "^7.0.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-scripts": "5.0.0",
-    "sass": "^1.49.0",
     "uuid": "^8.3.2",
     "web-vitals": "^2.1.4"
   },
@@ -39,7 +43,7 @@
   },
   "devDependencies": {
     "autoprefixer": "^10.4.2",
-    "postcss": "^8.4.5",
+    "postcss": "^8.4.6",
     "tailwindcss": "^3.0.18"
   }
 }

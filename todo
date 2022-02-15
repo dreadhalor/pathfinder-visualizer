@@ -1,21 +1,3 @@
-- fix the stupid 'unlisted dependency' crap React keeps pulling with every time I use useEffect
-  - turns out React is just whiny, it's actually fine & an acceptable practice
-- GridPane padding on the right & ONLY THE RIGHT doesn't work on Safari, who the hell knows why
-  - literally top, left & BOTTOM work PERFECTLY FINE, WHAT?!
-- the animation is fucked when managed by a global grid state, figure out a way to break up that state into individual objects ASAP
-  - for now we just did the workaround where we make the tile a smart component & manually pass its state change method to the parent
-- transform: scale(0.9) fucks with the mouse detection & makes it flicker when on the border of a wall that's set to opacity any less than 1
-  - opacity 1 is fine, 0.99 is fucked, anything else <1 is fucked
-  - removing the border math also somehow works just fine
-  - it's fixed when putting it into another nested container but then it fucks the animation
-  - there is sub-pixel math going on because I can switch from one box to another without visibly moving the mouse
-  - truly this is one of the largest conundrums I've ever had
-  - I miss Angular so much
-- the mouse detection is kinda fucked, all the border detection is offset to the left
-- fix the drag-out-from-border detection, the current solution is janky as hell
-
-RECODE:
-
 - flushing the animation queue doesn't actually stop the animating if it's overwritten with a new animation (i.e. generating another maze before the previous generation animation finishes)
 - Fix Eller's algorithm animation horizontal connecting sync
   - honestly it goes by so fast it deadass looks fine, no one will call me out on that the animation is actually slightly wrong because the actual generated maze is still right
@@ -26,5 +8,5 @@ RECODE:
 * Possibly figure out a way to fix Prim's algorithm's animation (a brand new bug introduced by making the background-color transition by default!)
 * The detection for auto-placing start & end tiles is hacky
   * maybe it's not, fuck you
-* put in a-star search, maybe put in DFS, relabel BFS as (Dijkstra's/BFS), then change the 'scale 1.3' animation to '3d translate' in the z-axis, that might fix all the graphical quirks
 * the start & end nodes don't reappear if you interrupt maze generation by clearing the walls (which maybe you shouldn't be allowed to do anyway but fuck it)
+  * it's not a bug, it's a feature! ;)
