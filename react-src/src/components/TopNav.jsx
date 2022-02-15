@@ -34,8 +34,8 @@ const TopNav = (
   ];
   let solve_options = [
     { title: `Dijkstra's Algorithm/BFS`, onClick: solveBFS },
-    { title: `Depth-First Search`, onClick: solveDFS },
     { title: `A* Algorithm`, onClick: solveAStar },
+    { title: `Depth-First Search`, onClick: solveDFS },
   ];
 
   return (
