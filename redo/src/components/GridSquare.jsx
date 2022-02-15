@@ -24,10 +24,12 @@ const GridSquare = ({ size, rows, square, setValue, modeRef, dragValRef }) => {
   };
   const on_path_style = {
     backgroundColor: 'yellow',
-    boxSizing: 'border-box',
   };
   const traversed_style = {
     backgroundColor: 'lightblue',
+  };
+  const a_star_frontier_style = {
+    backgroundColor: '#a3ffaf',
   };
   const frontier_style = {
     backgroundColor: '#ffa3a3',
@@ -55,6 +57,7 @@ const GridSquare = ({ size, rows, square, setValue, modeRef, dragValRef }) => {
     if (val === 3) return { ...gridSquareSize, ...wall_style };
     if (pathVal === 2) return { ...gridSquareSize, ...on_path_style };
     if (pathVal === 1) return { ...gridSquareSize, ...traversed_style };
+    if (pathVal === 3) return { ...gridSquareSize, ...a_star_frontier_style };
     if (val === 5) return { ...gridSquareSize, ...scan_style };
     if (val === 6) return { ...gridSquareSize, ...scan_traverse_style };
     if (val === 7) return { ...gridSquareSize, ...frontier_style };

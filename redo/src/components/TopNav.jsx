@@ -5,7 +5,8 @@ import ModeSelect from './ModeSelect';
 const TopNav = (
   {
     modeRef,
-    solve,
+    solveBFS,
+    solveAStar,
     clearPath,
     solvedRef,
     generateKruskals,
@@ -30,7 +31,10 @@ const TopNav = (
     { title: `Recursive Division`, onClick: generateRecursiveDivision },
     { title: `Eller's Algorithm`, onClick: generateEllers },
   ];
-  let solve_options = [{ title: `Dijkstra's Algorithm/BFS`, onClick: solve }];
+  let solve_options = [
+    { title: `Dijkstra's Algorithm/BFS`, onClick: solveBFS },
+    { title: `A* Algorithm`, onClick: solveAStar },
+  ];
 
   return (
     <div ref={ref} className='bg-slate-200 flex flex-row overflow-auto px-2'>

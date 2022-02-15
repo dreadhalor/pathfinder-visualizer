@@ -53,6 +53,21 @@ export const getMazeAdjacencyList = (grid) => {
   }
   return adjacencyList;
 };
+export const getSolverAdjacencyList = (grid) => {
+  const [rows, cols] = getDimensions(grid);
+  let adjacencyList = new GridAdjacencyList();
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      let neighbors = [];
+      if (j < cols - 1 && grid[i][j + 1].val !== 3) neighbors.push([i, j + 1]);
+      if (j > 0 && grid[i][j - 1].val !== 3) neighbors.push([i, j - 1]);
+      if (i < rows - 1 && grid[i + 1][j].val !== 3) neighbors.push([i + 1, j]);
+      if (i > 0 && grid[i - 1][j].val !== 3) neighbors.push([i - 1, j]);
+      adjacencyList.set([i, j], neighbors);
+    }
+  }
+  return adjacencyList;
+};
 export const expandEdge = (edge_tuple) => {
   let [[node_r, node_c], [next_r, next_c]] = edge_tuple;
   let full_edge = [];

@@ -14,6 +14,7 @@ import {
 import { Animator } from './utilities/animator';
 import { finishAnimation } from './utilities/animations';
 import { recursiveDivision } from './utilities/maze-generation/recursive-division';
+import { aStar } from './utilities/solvers/a-star';
 
 function App() {
   const [rows, setRows] = useState(25);
@@ -134,6 +135,52 @@ function App() {
     gridTemplateColumns: `repeat(${cols}, auto)`,
   };
 
+  const getTile = (coords) => {
+    if (coords) return grid?.[coords[0]]?.[coords[1]];
+  };
+  const getStartAndEnd = () => {
+    let start = null,
+      end = null;
+    for (let i = 0; i < rows; i++) {
+      for (let j = 0; j < cols; j++) {
+        if (grid[i][j].val === 1) start = [i, j];
+        if (grid[i][j].val === 2) end = [i, j];
+        if (start && end) break;
+      }
+    }
+    return [start, end];
+  };
+  const getClosestPathSquare = (new_grid, coords, val) => {
+    return bfs_raw({
+      maze: new_grid,
+      start_coords: coords,
+      solution_func: (tile_val) => tile_val === val,
+    });
+  };
+  const resetStartAndEnd = (old_start, old_end) => {
+    let new_grid = grid.map((row) =>
+      row.map((square) => {
+        if (square.val === 1 || square.val === 2) return 0;
+        return square.val;
+      })
+    );
+    let start = getClosestPathSquare(new_grid, old_start, 0);
+    let end = getClosestPathSquare(new_grid, old_end, 0);
+
+    if (start) {
+      let tile = getTile(start);
+      // setValue(tile.uuid, 1, true); //lol fuck it
+      tile.setVal(1);
+      tile.animate(1);
+    }
+    if (end) {
+      let tile = getTile(end);
+      // setValue(tile.uuid, 2, true);
+      tile.setVal(2);
+      tile.animate(1);
+    }
+  };
+
   const resetPath = () => {
     solved.current = false;
     animatorRef.current.flushAnimationQueue();
@@ -188,17 +235,10 @@ function App() {
       })
     );
   };
-  const solve = () => {
+  const solveBFS = () => {
+    let endpoints = getStartAndEnd();
+    let start = endpoints[0];
     resetPath();
-    let start = null;
-    for (let i = 0; i < rows; i++) {
-      for (let j = 0; j < cols; j++) {
-        if (grid[i][j].val === 1) {
-          start = [i, j];
-          break;
-        }
-      }
-    }
     let animation_queue = [];
     let end = bfs({
       maze: grid,
@@ -219,51 +259,22 @@ function App() {
     solved.current = true;
     navRef.current.forceRender();
   };
-
-  const getTile = (coords) => {
-    if (coords) return grid?.[coords[0]]?.[coords[1]];
-  };
-  const getStartAndEnd = () => {
-    let start = null,
-      end = null;
-    for (let i = 0; i < rows; i++) {
-      for (let j = 0; j < cols; j++) {
-        if (grid[i][j].val === 1) start = [i, j];
-        if (grid[i][j].val === 2) end = [i, j];
-      }
-    }
-    return [start, end];
-  };
-  const getClosestPathSquare = (new_grid, coords, val) => {
-    return bfs_raw({
-      maze: new_grid,
-      start_coords: coords,
-      solution_func: (tile_val) => tile_val === val,
+  const solveAStar = () => {
+    let [start, end] = getStartAndEnd();
+    resetPath();
+    let animations = aStar({
+      maze: grid,
+      start_coords: start,
+      end_coords: end,
+      traverse_animation: (tile) => tile.setPathVal(1),
+      frontier_animation: (tile) => tile.setPathVal(3),
+      path_animation: (tile) => tile.setPathVal(2),
     });
+    animatorRef.current.playAnimations(animations, 6);
+    solved.current = true;
+    navRef.current.forceRender();
   };
-  const resetStartAndEnd = (old_start, old_end) => {
-    let new_grid = grid.map((row) =>
-      row.map((square) => {
-        if (square.val === 1 || square.val === 2) return 0;
-        return square.val;
-      })
-    );
-    let start = getClosestPathSquare(new_grid, old_start, 0);
-    let end = getClosestPathSquare(new_grid, old_end, 0);
 
-    if (start) {
-      let tile = getTile(start);
-      // setValue(tile.uuid, 1, true); //lol fuck it
-      tile.setVal(1);
-      tile.animate(1);
-    }
-    if (end) {
-      let tile = getTile(end);
-      // setValue(tile.uuid, 2, true);
-      tile.setVal(2);
-      tile.animate(1);
-    }
-  };
   const generateKruskals = () => {
     let [start, end] = getStartAndEnd();
     wallifyItAll();
@@ -316,7 +327,8 @@ function App() {
       <TopNav
         ref={navRef}
         modeRef={mode}
-        solve={solve}
+        solveBFS={solveBFS}
+        solveAStar={solveAStar}
         solvedRef={solved}
         clearPath={resetPath}
         generateKruskals={generateKruskals}

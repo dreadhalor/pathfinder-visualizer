@@ -3,6 +3,7 @@ export class GridAdjacencyList {
     this.list = map || new Map();
   }
 
+  has = (coords) => this.list.get(JSON.stringify(coords)) !== undefined;
   get = (coords) => this.list.get(JSON.stringify(coords));
   at = (index) => JSON.parse([...this.list.keys()][index]);
   getRandom = () => this.at(Math.floor(Math.random() * this.list.size));

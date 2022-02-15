@@ -11,9 +11,7 @@ import { getFullEdges, getMazeAdjacencyList } from '../maze-structures';
 
 export const huntAndKill = (grid) => {
   let [params, anim_params] = parseParams(grid);
-
   traverse(params.node, anim_params.animation_queue, anim_params.traverseAnimation);
-
   while (params.node) {
     if (params.hunt_refs.start)
       traverse(params.node, anim_params.animation_queue, anim_params.scanAnimation);
