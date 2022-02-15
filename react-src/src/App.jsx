@@ -256,7 +256,7 @@ function App() {
         gridContainerRef.current.classList.add('no-solution');
       }
     });
-    animatorRef.current.playAnimations(animations, 3);
+    animatorRef.current.playAnimations(animations, 6);
     solved.current = true;
     navRef.current.forceRender();
   };
@@ -279,7 +279,7 @@ function App() {
         gridContainerRef.current.classList.add('no-solution');
       }
     });
-    animatorRef.current.playAnimations(animations, 3);
+    animatorRef.current.playAnimations(animations, 6);
     solved.current = true;
     navRef.current.forceRender();
   };
@@ -301,7 +301,7 @@ function App() {
         gridContainerRef.current.classList.add('no-solution');
       }
     });
-    animatorRef.current.playAnimations(animations, 3);
+    animatorRef.current.playAnimations(animations, 6);
     solved.current = true;
     navRef.current.forceRender();
   };
