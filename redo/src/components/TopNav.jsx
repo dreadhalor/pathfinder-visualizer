@@ -6,6 +6,7 @@ const TopNav = (
   {
     modeRef,
     solveBFS,
+    solveDFS,
     solveAStar,
     clearPath,
     solvedRef,
@@ -33,6 +34,7 @@ const TopNav = (
   ];
   let solve_options = [
     { title: `Dijkstra's Algorithm/BFS`, onClick: solveBFS },
+    { title: `Depth-First Search`, onClick: solveDFS },
     { title: `A* Algorithm`, onClick: solveAStar },
   ];
 

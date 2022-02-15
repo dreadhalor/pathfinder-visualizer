@@ -20,8 +20,7 @@ export const aStar = ({
   let end = null;
   const h_weight = 1;
   if (!start_coords || !end_coords) return [null, animations];
-
-  let safeguard = 1000;
+  // let safeguard = 1000;
   open.add(start_coords);
   animations.push(() => frontier_animation(maze[start_coords[0]][start_coords[1]]));
   costs.set(start_coords, getCosts(start_coords, start_coords, end_coords, costs));

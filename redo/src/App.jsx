@@ -15,6 +15,7 @@ import { Animator } from './utilities/animator';
 import { finishAnimation } from './utilities/animations';
 import { recursiveDivision } from './utilities/maze-generation/recursive-division';
 import { aStar } from './utilities/solvers/a-star';
+import { dfs } from './utilities/solvers/dfs';
 
 function App() {
   const [rows, setRows] = useState(25);
@@ -239,23 +240,46 @@ function App() {
     let endpoints = getStartAndEnd();
     let start = endpoints[0];
     resetPath();
-    let animation_queue = [];
-    let end = bfs({
+    let [end, animations] = bfs({
       maze: grid,
       start_coords: start,
-      check_solved_func: (tile) => tile.val === 2,
-      traversal_animation_func: (tile) => tile.setPathVal(1),
-      path_animation_func: (tile) => tile.setPathVal(2),
-      animation_queue,
+      solution_func: (tile) => tile.val === 2,
+      frontier_animation: (tile) => tile.setPathVal(3),
+      traversal_animation: (tile) => tile.setPathVal(1),
+      path_animation: (tile) => tile.setPathVal(2),
     });
-    animation_queue.push(() => {
+    animations.push(() => {
       if (!end) {
         gridContainerRef.current.classList.remove('no-solution');
         void gridContainerRef.current.offsetWidth;
         gridContainerRef.current.classList.add('no-solution');
       }
     });
-    animatorRef.current.playAnimations(animation_queue, 3);
+    animatorRef.current.playAnimations(animations, 3);
+    solved.current = true;
+    navRef.current.forceRender();
+  };
+  const solveDFS = () => {
+    let endpoints = getStartAndEnd();
+    let start = endpoints[0];
+    resetPath();
+    // let animation_queue = [];
+    let [end, animations] = dfs({
+      maze: grid,
+      start_coords: start,
+      solution_func: (tile) => tile.val === 2,
+      frontier_animation: (tile) => tile.setPathVal(3),
+      traversal_animation: (tile) => tile.setPathVal(1),
+      path_animation: (tile) => tile.setPathVal(2),
+    });
+    animations.push(() => {
+      if (!end) {
+        gridContainerRef.current.classList.remove('no-solution');
+        void gridContainerRef.current.offsetWidth;
+        gridContainerRef.current.classList.add('no-solution');
+      }
+    });
+    animatorRef.current.playAnimations(animations, 3);
     solved.current = true;
     navRef.current.forceRender();
   };
@@ -277,7 +301,7 @@ function App() {
         gridContainerRef.current.classList.add('no-solution');
       }
     });
-    animatorRef.current.playAnimations(animations, 6);
+    animatorRef.current.playAnimations(animations, 3);
     solved.current = true;
     navRef.current.forceRender();
   };
@@ -335,6 +359,7 @@ function App() {
         ref={navRef}
         modeRef={mode}
         solveBFS={solveBFS}
+        solveDFS={solveDFS}
         solveAStar={solveAStar}
         solvedRef={solved}
         clearPath={resetPath}
