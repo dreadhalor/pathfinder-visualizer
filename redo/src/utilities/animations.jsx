@@ -54,7 +54,7 @@ export const primsAnimations = (grid) => {
     }),
     frontierAnimation: animationGenerator(grid, (tile) => {
       tile.setVal(7);
-      tile.animate(1);
+      // tile.animate(1);
     }),
   };
 };

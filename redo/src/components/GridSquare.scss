@@ -73,6 +73,7 @@ $standard-duration: 0.3s;
 @keyframes just_pop {
   0% {
     opacity: 0.5;
+    // transform: translate3d(0, 0, 1px);
     transform: scale(1.2);
     // box-shadow: 2px 2px 2px 2px black;
   }

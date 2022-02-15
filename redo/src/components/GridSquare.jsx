@@ -33,6 +33,7 @@ const GridSquare = ({ size, rows, square, setValue, modeRef, dragValRef }) => {
   };
   const frontier_style = {
     backgroundColor: '#ffa3a3',
+    // boxShadow: 'none',
   };
   const scan_style = {
     backgroundColor: '#80ff91',

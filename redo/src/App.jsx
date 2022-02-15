@@ -134,6 +134,7 @@ function App() {
     display: 'grid',
     gap: '0px',
     gridTemplateColumns: `repeat(${cols}, auto)`,
+    // perspective: '100px',
   };
 
   const getTile = (coords) => {
@@ -341,16 +342,15 @@ function App() {
   const generatePrims = () => {
     let [start, end] = getStartAndEnd();
     wallifyItAll();
-    //eslint-disable-next-line no-unused-vars
-    let [result, animations] = prims(grid);
+    let [result, animations] = prims(grid); //eslint-disable-line no-unused-vars
     animations = animations.concat(() => resetStartAndEnd(start, end));
     animatorRef.current.playAnimations(animations, 2, true);
   };
   const generateRecursiveDivision = () => {
     let [start, end] = getStartAndEnd();
     resetWalls(false);
-    let result = recursiveDivision(grid, 10).concat(() => resetStartAndEnd(start, end));
-    animatorRef.current.playAnimations(result, 1, true);
+    let animations = recursiveDivision(grid, 10).concat(() => resetStartAndEnd(start, end));
+    animatorRef.current.playAnimations(animations, 1, true);
   };
 
   return (
