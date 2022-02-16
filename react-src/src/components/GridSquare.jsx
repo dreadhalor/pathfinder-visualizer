@@ -66,7 +66,7 @@ const GridSquare = ({ size, rows, square, setValue, modeRef, dragValRef }) => {
     return gridSquareSize;
   };
   const getClassName = () => {
-    let className = 'tile border-l border-t border-slate-400 bg-white';
+    let className = 'tile border-l border-t border-slate-500 bg-white';
     if (val === 3) className += ' fade';
     if (pathVal === 1) className += ' animate';
     else if (pathVal === 2) className += ' animate2';
