@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import './GridSquare.scss';
 
 const GridSquare = ({ size, rows, square, setValue, modeRef, dragValRef }) => {
@@ -92,6 +92,7 @@ const GridSquare = ({ size, rows, square, setValue, modeRef, dragValRef }) => {
   };
 
   const [val, setVal] = useState(0);
+  const valRef = useRef(0);
   const [pathVal, setPathVal] = useState(0);
   const [displayVal, setDisplayVal] = useState(null);
 
@@ -116,12 +117,33 @@ const GridSquare = ({ size, rows, square, setValue, modeRef, dragValRef }) => {
     }
   };
 
+  const setValMiddleMan = (fxn) => {
+    let result = fxn();
+    setVal(fxn);
+    square.val = result;
+  };
+
   useEffect(() => {
-    square.setVal = setVal;
+    square.setVal = setValMiddleMan;
     square.setPathVal = setPathVal;
+    square.valRef = valRef;
     square.animate = animate;
     square.setDisplayVal = setDisplayVal;
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    let div = tileRef.current;
+    div.addEventListener('customPointerEnter', mouseEnter);
+    div.addEventListener('customPointerLeave', mouseLeave);
+    div.addEventListener('customPointerDown', mouseDown);
+    div.addEventListener('customPointerUp', mouseUp);
+    return () => {
+      div.removeEventListener('customPointerEnter', mouseEnter);
+      div.removeEventListener('customPointerLeave', mouseLeave);
+      div.removeEventListener('customPointerDown', mouseDown);
+      div.removeEventListener('customPointerUp', mouseUp);
+    };
+  }, [val]);
 
   useEffect(() => {
     square.val = val;
@@ -146,31 +168,54 @@ const GridSquare = ({ size, rows, square, setValue, modeRef, dragValRef }) => {
 
   // console.log('square rendered, size: ' + size);
 
+  //start dragged over end -> dragVal = start, val !== dragVal
+  //end dragged over start -> dragVal = end, val !== dragVal
+  //wall clicked on start -> dragVal = start, val !== mode
+  //start dragged over open tile -> dragVal = start, val === 0
+  //end clicked on start -> dragval = start, val = start, mode = end
+
+  //UTTER SPAGHETTI CODE
   const clicked = (event) => {
-    // event.preventDefault();
+    let dragVal = dragValRef.current;
+    if (dragVal === 1 || dragVal === 2) {
+      if ((val === 1 || val === 2) && val !== dragVal) return null;
+      if ((modeRef.current === 1 && val === 2) || (modeRef.current === 2 && val === 1)) return null;
+      if (modeRef.current === 3 && dragVal === val) return null;
+      toggled.current = true;
+      return setValue(square.uuid, dragVal);
+    }
+    toggled.current = true;
     return setValue(square.uuid);
   };
   const mouseDown = (event) => {
     dragValRef.current = val;
-    clicked(event);
+    if (val !== 1 && val !== 2) clicked(event);
   };
   const mouseUp = (event) => {
+    if (dragValRef.current === val && !toggled.current) clicked();
     dragValRef.current = null;
+    toggled.current = false;
   };
   const mouseEnter = (event) => {
-    if (event.buttons && dragValRef.current === val) clicked(event);
+    let dragVal = dragValRef.current;
+    if (event.detail.buttons) {
+      if (dragVal === val || dragVal === 1 || dragVal === 2) clicked(event);
+    }
   };
   const mouseLeave = (event) => {
-    if (!event.buttons) dragValRef.current = null;
+    if (!event.detail.buttons) dragValRef.current = null;
+    toggled.current = false;
   };
+  const toggled = useRef(false);
 
   return (
     <div
+      id={square.uuid}
       ref={tileRef}
-      onPointerDown={mouseDown}
-      onPointerUp={mouseUp}
-      onPointerLeave={mouseLeave}
-      onPointerEnter={mouseEnter}
+      // onPointerDown={mouseDown}
+      // onPointerUp={mouseUp}
+      // onPointerLeave={mouseLeave}
+      // onPointerEnter={mouseEnter}
       style={getStyle()}
       className={getClassName()}
       onAnimationEnd={animationEnd}

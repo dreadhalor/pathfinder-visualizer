@@ -17,6 +17,7 @@ const BasicMenu = ({ options, title }) => {
   return (
     <div className='my-auto'>
       <Button
+        // style={{ padding: '2px' }}
         id='basic-button'
         aria-controls={open ? 'basic-menu' : undefined}
         aria-haspopup='true'

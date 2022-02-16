@@ -21,9 +21,9 @@ export const clearScanAnimationGenerator = (grid) => (path_set) => {
       let tile = grid[i][j];
       if (tile.val === 5 || tile.val === 6 || tile.val === 7) {
         if (tile.val === 6 || tile.val === 7) {
-          tile.setVal(0);
-        } else if (path_set.has([i, j])) tile.setVal(0);
-        else tile.setVal(3);
+          tile.setVal(() => 0);
+        } else if (path_set.has([i, j])) tile.setVal(() => 0);
+        else tile.setVal(() => 3);
       }
     }
   }
@@ -40,7 +40,7 @@ export const animationGenerator =
 export const kruskalsAnimations = (grid) => {
   return {
     animation: animationGenerator(grid, (tile) => {
-      tile.setVal(0);
+      tile.setVal(() => 0);
       tile.animate(1);
     }),
   };
@@ -49,11 +49,11 @@ export const kruskalsAnimations = (grid) => {
 export const primsAnimations = (grid) => {
   return {
     connectAnimation: animationGenerator(grid, (tile) => {
-      tile.setVal(0);
+      tile.setVal(() => 0);
       tile.animate(1);
     }),
     frontierAnimation: animationGenerator(grid, (tile) => {
-      tile.setVal(7);
+      tile.setVal(() => 7);
       // tile.animate(1);
     }),
   };
@@ -62,10 +62,10 @@ export const primsAnimations = (grid) => {
 export const huntAndKillAnimations = (grid) => {
   return {
     traverseAnimation: animationGenerator(grid, (tile) => {
-      tile.setVal(6);
+      tile.setVal(() => 6);
       tile.animate(1);
     }),
-    scanAnimation: animationGenerator(grid, (tile) => tile.setVal(5)),
+    scanAnimation: animationGenerator(grid, (tile) => tile.setVal(() => 5)),
     clearScanAnimation: clearScanAnimationGenerator(grid),
   };
 };
@@ -73,11 +73,11 @@ export const huntAndKillAnimations = (grid) => {
 export const recursiveBacktrackingAnimations = (grid) => {
   return {
     traverseAnimation: animationGenerator(grid, (tile) => {
-      tile.setVal(4);
+      tile.setVal(() => 4);
       tile.animate(1);
     }),
     backtrackAnimation: animationGenerator(grid, (tile) => {
-      tile.setVal(0);
+      tile.setVal(() => 0);
       tile.animate(1);
     }),
   };
@@ -86,7 +86,7 @@ export const recursiveBacktrackingAnimations = (grid) => {
 export const ellersAnimations = (grid) => {
   return {
     connectAnimation: animationGenerator(grid, (tile) => {
-      tile.setVal(0);
+      tile.setVal(() => 0);
       tile.animate(1);
     }),
     // popAnimation: animationGenerator(grid, (tile) => tile.animate(2)),
@@ -100,7 +100,7 @@ export const recursiveDivisionAnimations = (grid) => {
   return {
     animation: animationGenerator(grid, (tile) => {
       //FIX THIS, USING A NULL CHECK IS A COP-OUT
-      if (tile) tile.setVal(3);
+      if (tile) tile.setVal(() => 3);
     }),
   };
 };

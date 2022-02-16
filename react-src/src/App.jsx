@@ -16,10 +16,11 @@ import { finishAnimation } from './utilities/animations';
 import { recursiveDivision } from './utilities/maze-generation/recursive-division';
 import { aStar } from './utilities/solvers/a-star';
 import { dfs } from './utilities/solvers/dfs';
+import DrawWrapper from './utilities/DrawWrapper';
 
 function App() {
-  const [rows, setRows] = useState(25);
-  const [cols, setCols] = useState(39);
+  const [rows, setRows] = useState();
+  const [cols, setCols] = useState();
   let squareSize = useRef(25);
 
   const createNewGrid = (num_rows, num_cols) => {
@@ -33,9 +34,10 @@ function App() {
     }
     return new_grid;
   };
-  const [grid, setGrid] = useState(createNewGrid(5, 5));
+  const [grid, setGrid] = useState();
 
   const gridContainerRef = useRef();
+  const gridRef = useRef();
   const mode = useRef(3);
   const solved = useRef(false);
   const navRef = useRef();
@@ -52,7 +54,7 @@ function App() {
     let val_match = candidate_square.val === val;
     let exact_match = tile_match && val_match;
     if (exact_match) {
-      candidate_square.setVal(0);
+      candidate_square.setVal(() => 0);
       return 0;
     } else if (tile_match) {
       if (val === 3 && candidate_square.pathVal === 2 && !reset_override) resetPath();
@@ -61,7 +63,7 @@ function App() {
         if (!reset_override) resetPath();
         removeVal(val);
       }
-      candidate_square.setVal(val);
+      candidate_square.setVal(() => val);
       return val;
     }
     return null;
@@ -81,7 +83,7 @@ function App() {
     for (let i = 0; i < rows; i++) {
       for (let j = 0; j < cols; j++) {
         let tile = grid[i][j];
-        if (tile.val === val) tile.setVal(0);
+        if (tile.val === val) tile.setVal(() => 0);
       }
     }
   };
@@ -172,13 +174,13 @@ function App() {
     if (start) {
       let tile = getTile(start);
       // setValue(tile.uuid, 1, true); //lol fuck it
-      tile.setVal(1);
+      tile.setVal(() => 1);
       tile.animate(1);
     }
     if (end) {
       let tile = getTile(end);
       // setValue(tile.uuid, 2, true);
-      tile.setVal(2);
+      tile.setVal(() => 2);
       tile.animate(1);
     }
   };
@@ -193,16 +195,16 @@ function App() {
         tile.setDisplayVal(null);
         switch (tile.val) {
           case 4:
-            tile.setVal(0);
+            tile.setVal(() => 0);
             break;
           case 5:
-            tile.setVal(3);
+            tile.setVal(() => 3);
             break;
           case 6:
-            tile.setVal(0);
+            tile.setVal(() => 0);
             break;
           case 7:
-            tile.setVal(3);
+            tile.setVal(() => 3);
             break;
           default:
             break;
@@ -218,12 +220,12 @@ function App() {
       for (let j = 0; j < cols; j++) {
         let tile = grid[i][j];
         if (start && i === start[0] && j === start[1]) {
-          tile.setVal(1);
+          tile.setVal(() => 1);
           if (animate_tiles) tile.animate(1);
         } else if (end && i === end[0] && j === end[1]) {
-          tile.setVal(2);
+          tile.setVal(() => 2);
           if (animate_tiles) tile.animate(1);
-        } else tile.setVal(0);
+        } else tile.setVal(() => 0);
       }
     }
   };
@@ -232,7 +234,7 @@ function App() {
     resetPath();
     grid.forEach((row) =>
       row.forEach((tile) => {
-        tile.setVal(3);
+        tile.setVal(() => 3);
         tile.setDisplayVal(null);
       })
     );
@@ -374,24 +376,30 @@ function App() {
         <div className='w-full h-full top-0 left-0 absolute flex overflow-auto p-1'>
           <div
             ref={gridContainerRef}
-            className={(rows <= 1 ? 'opacity-0 ' : '') + 'flex-1 h-full flex min-w-0'}
+            className={(rows <= 1 ? 'opacity-0 ' : '') + 'flex-1 h-full flex flex-row min-w-0'}
           >
-            <div style={gridStyle}>
-              {grid &&
-                grid.map((row) =>
-                  row.map((square) => (
-                    <GridSquare
-                      key={square.uuid}
-                      size={squareSize.current}
-                      rows={rows}
-                      square={square}
-                      setValue={setValue}
-                      dragValRef={dragValRef}
-                      modeRef={mode}
-                    />
-                  ))
-                )}
-            </div>
+            <DrawWrapper
+              refToUse={gridRef}
+              className='h-full flex-1 flex'
+              style={{ touchAction: 'none' }}
+            >
+              <div style={gridStyle} ref={gridRef}>
+                {grid &&
+                  grid.map((row) =>
+                    row.map((square) => (
+                      <GridSquare
+                        key={square.uuid}
+                        size={squareSize.current}
+                        rows={rows}
+                        square={square}
+                        setValue={setValue}
+                        dragValRef={dragValRef}
+                        modeRef={mode}
+                      />
+                    ))
+                  )}
+              </div>
+            </DrawWrapper>
           </div>
         </div>
       </div>

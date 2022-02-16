@@ -11,7 +11,7 @@ const ModeSelect = ({ modeRef, renderParent }) => {
     renderParent();
   };
   return (
-    <Box sx={{ minWidth: 60 }}>
+    <Box sx={{ minWidth: 60 }} className='my-auto ml-4 mr-2'>
       <FormControl fullWidth variant='standard'>
         <InputLabel id='mode-select-label'>Tile Type</InputLabel>
         <Select

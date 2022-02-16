@@ -37,25 +37,18 @@ const TopNav = (
     { title: `A* Algorithm`, onClick: solveAStar },
     { title: `Depth-First Search`, onClick: solveDFS },
   ];
+  let clear_options = [
+    { title: `Clear Walls`, onClick: resetWalls },
+    { title: `Clear Path`, onClick: clearPath },
+  ];
 
   return (
     <div ref={ref} className='bg-slate-200 flex flex-row overflow-auto px-2'>
       <span className='flex-1'></span>
       <ModeSelect modeRef={modeRef} renderParent={forceRender} />
       <BasicMenu title={'Solve It!'} options={solve_options} />
-      <button
-        className='my-1 mx-2 font-bold bg-blue-300 hover:bg-blue-400 p-1 rounded-lg'
-        onClick={clearPath}
-      >
-        Clear Path
-      </button>
       <BasicMenu title={'Generate Maze'} options={maze_options} />
-      <button
-        className='my-1 ml-2 font-bold bg-blue-300 hover:bg-blue-400 p-1 rounded-lg'
-        onClick={() => resetWalls(true)}
-      >
-        Clear Walls
-      </button>
+      <BasicMenu title={'Clear Map'} options={clear_options} />
       <span className='flex-1'></span>
     </div>
   );
