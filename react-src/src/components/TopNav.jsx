@@ -33,13 +33,13 @@ const TopNav = (
     { title: `Eller's Algorithm`, onClick: generateEllers },
   ];
   let solve_options = [
-    { title: `Dijkstra's Algorithm/BFS`, onClick: solveBFS },
     { title: `A* Algorithm`, onClick: solveAStar },
+    { title: `Dijkstra's Algorithm/BFS`, onClick: solveBFS },
     { title: `Depth-First Search`, onClick: solveDFS },
   ];
   let clear_options = [
-    { title: `Clear Walls`, onClick: resetWalls },
     { title: `Clear Path`, onClick: clearPath },
+    { title: `Clear Walls`, onClick: resetWalls },
   ];
 
   return (

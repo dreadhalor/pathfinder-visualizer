@@ -1,4 +1,5 @@
 import { shuffle } from 'lodash';
+import { getDirection } from '../algorithm-methods';
 import { GridAdjacencyList } from '../data-structures/grid-adjacency-list';
 import { GridSet } from '../data-structures/grid-set';
 import { getSolverAdjacencyList } from '../maze-structures';
@@ -66,10 +67,17 @@ export const aStar = ({
     }
   }
   let path_node = end;
+  let child = null;
   while (path_node) {
     let [r, c] = path_node;
-    animations.push(() => path_animation(maze[r][c]));
-    path_node = pathMap.get(path_node);
+    let parent = pathMap.get(path_node);
+    let direction = getDirection({ node: path_node, child, parent });
+    animations.push(() => {
+      path_animation(maze[r][c]);
+      maze[r][c].setDirection(direction);
+    });
+    child = path_node;
+    path_node = parent;
   }
   return [end, animations];
 };

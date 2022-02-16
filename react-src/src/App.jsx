@@ -192,6 +192,7 @@ function App() {
       for (let j = 0; j < cols; j++) {
         let tile = grid[i][j];
         if (tile.pathVal) tile.setPathVal(0);
+        tile.setDirection(null);
         tile.setDisplayVal(null);
         switch (tile.val) {
           case 4:

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import './GridSquare.scss';
 
 const GridSquare = ({ size, rows, square, setValue, modeRef, dragValRef }) => {
@@ -17,7 +17,7 @@ const GridSquare = ({ size, rows, square, setValue, modeRef, dragValRef }) => {
     transitionDuration: '0.4s',
   };
   const start_style = {
-    backgroundColor: '#05ff05',
+    backgroundColor: '#00f000',
   };
   const end_style = {
     backgroundColor: '#ff6b6b',
@@ -95,6 +95,7 @@ const GridSquare = ({ size, rows, square, setValue, modeRef, dragValRef }) => {
   const valRef = useRef(0);
   const [pathVal, setPathVal] = useState(0);
   const [displayVal, setDisplayVal] = useState(null);
+  const [direction, setDirection] = useState(null);
 
   const tileRef = useRef();
 
@@ -129,6 +130,7 @@ const GridSquare = ({ size, rows, square, setValue, modeRef, dragValRef }) => {
     square.valRef = valRef;
     square.animate = animate;
     square.setDisplayVal = setDisplayVal;
+    square.setDirection = setDirection;
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
@@ -143,7 +145,7 @@ const GridSquare = ({ size, rows, square, setValue, modeRef, dragValRef }) => {
       div.removeEventListener('customPointerDown', mouseDown);
       div.removeEventListener('customPointerUp', mouseUp);
     };
-  }, [val]);
+  }, [val]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     square.val = val;
@@ -212,15 +214,11 @@ const GridSquare = ({ size, rows, square, setValue, modeRef, dragValRef }) => {
     <div
       id={square.uuid}
       ref={tileRef}
-      // onPointerDown={mouseDown}
-      // onPointerUp={mouseUp}
-      // onPointerLeave={mouseLeave}
-      // onPointerEnter={mouseEnter}
       style={getStyle()}
       className={getClassName()}
       onAnimationEnd={animationEnd}
     >
-      {displayVal ?? ''}
+      {direction ?? displayVal ?? ''}
     </div>
   );
 };

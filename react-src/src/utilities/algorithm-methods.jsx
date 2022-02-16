@@ -61,3 +61,46 @@ export const connectEdgeBackwards = (n1, n2, animations, connectAnimation) => {
     }
   });
 };
+
+export const getDirection = ({ node, child, parent }) => {
+  let [r, c] = node;
+  // let child_to_node = null;
+  let node_to_parent = null;
+  // if (parent) {
+  //   let [p_r, p_c] = parent;
+  //   let diff = [p_r - r, p_c - c];
+  //   if (diff[0] === 1) child_to_node = '↑';
+  //   else if (diff[0] === -1) child_to_node = '↓';
+  //   else if (diff[1] === 1) child_to_node = '←';
+  //   else if (diff[1] === -1) child_to_node = '→';
+  // }
+  if (child) {
+    let [c_r, c_c] = child;
+    let diff = [r - c_r, c - c_c];
+    if (diff[0] === 1) node_to_parent = '↑';
+    else if (diff[0] === -1) node_to_parent = '↓';
+    else if (diff[1] === 1) node_to_parent = '←';
+    else if (diff[1] === -1) node_to_parent = '→';
+  }
+  // let result = child_to_node + node_to_parent;
+  // if (result.length === 1) return result;
+  // switch (result) {
+  //   case '→↓':
+  //     return '↘'; //'⤵';
+  //   case '→↑':
+  //     return '↗'; //'⤴';
+  //   case '←↓':
+  //     return '↙'; //'⤹';
+  //   case '←↑':
+  //     return '↖'; //'⬑';
+  //   case '↓→':
+  //     return '↘'; //'⤷';
+  //   case '↓←':
+  //     return '↙'; //'⤶';
+  //   case '↑→':
+  //     return '↗'; //'↱';
+  //   case '↑←':
+  //     return '↖'; //'↰';
+  // }
+  return node_to_parent;
+};
