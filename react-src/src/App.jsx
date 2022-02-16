@@ -94,9 +94,23 @@ function App() {
   useEffect(() => fullResetStartAndEnd(), [grid]); //eslint-disable-line react-hooks/exhaustive-deps
 
   const fullResetStartAndEnd = () => {
-    let middle_row = Math.floor(rows / 2);
-    let potential_start = getTile([middle_row, 1]);
-    let potential_end = getTile([middle_row, cols - 2]);
+    let potential_start, potential_end;
+    let inset = 3;
+    if (rows <= cols) {
+      let middle_row = Math.floor(rows / 2);
+      let start_row = inset < cols ? inset : cols - 1;
+      let end_row = cols - inset - 1;
+      end_row = end_row >= 0 ? end_row : 0;
+      potential_start = getTile([middle_row, start_row]);
+      potential_end = getTile([middle_row, end_row]);
+    } else {
+      let middle_col = Math.floor(cols / 2);
+      let start_col = inset < rows ? inset : rows - 1;
+      let end_col = rows - inset - 1;
+      end_col = end_col >= 0 ? end_col : 0;
+      potential_start = getTile([start_col, middle_col]);
+      potential_end = getTile([end_col, middle_col]);
+    }
     if (potential_start) {
       setValue(potential_start.uuid, 1);
       potential_start.animate(1);

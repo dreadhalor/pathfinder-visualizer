@@ -39,7 +39,7 @@ const TopNav = (
   ];
   let clear_options = [
     { title: `Clear Path`, onClick: clearPath },
-    { title: `Clear Walls`, onClick: resetWalls },
+    { title: `Clear Walls`, onClick: () => resetWalls(true) },
   ];
 
   return (
