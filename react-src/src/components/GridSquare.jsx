@@ -16,6 +16,9 @@ const GridSquare = ({ size, rows, square, setValue, modeRef, dragValRef }) => {
     transitionProperty: 'opacity',
     transitionDuration: '0.4s',
   };
+  const wall_hover_style = {
+    opacity: 0.7,
+  };
   const start_style = {
     backgroundColor: '#00f000',
   };
@@ -52,6 +55,7 @@ const GridSquare = ({ size, rows, square, setValue, modeRef, dragValRef }) => {
         transitionProperty: 'none',
       };
     }
+    if (pathVal === 4 && val === 0) return { ...gridSquareSize, ...wall_hover_style };
     if (val === 0 && pathVal === 0) return { ...gridSquareSize, ...resetStyle };
     if (val === 2) return { ...gridSquareSize, ...end_style };
     if (val === 1) return { ...gridSquareSize, ...start_style };
@@ -190,10 +194,12 @@ const GridSquare = ({ size, rows, square, setValue, modeRef, dragValRef }) => {
     return setValue(square.uuid);
   };
   const mouseDown = (event) => {
+    setPathVal(() => 4);
     dragValRef.current = val;
     if (val !== 1 && val !== 2) clicked(event);
   };
   const mouseUp = (event) => {
+    setPathVal(() => 0);
     if (dragValRef.current === val && !toggled.current) clicked();
     dragValRef.current = null;
     toggled.current = false;
@@ -201,10 +207,12 @@ const GridSquare = ({ size, rows, square, setValue, modeRef, dragValRef }) => {
   const mouseEnter = (event) => {
     let dragVal = dragValRef.current;
     if (event.detail.buttons) {
+      setPathVal(() => 4);
       if (dragVal === val || dragVal === 1 || dragVal === 2) clicked(event);
     }
   };
   const mouseLeave = (event) => {
+    setPathVal(() => 0);
     if (!event.detail.buttons) dragValRef.current = null;
     toggled.current = false;
   };

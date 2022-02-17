@@ -11,13 +11,13 @@ const DrawWrapper = ({ children, refToUse, style, className }) => {
 
   const moved = (event) => {
     let [x, y] = [event.clientX, event.clientY];
-    for (let square of refToUse.current.children) {
-      let rect = square.getBoundingClientRect();
-      let child = getChild(square.id);
+    for (let child of refToUse.current.children) {
+      let rect = child.getBoundingClientRect();
+      let child_data = getChild(child.id);
       if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
-        if (!child.mouseOver) {
-          child.mouseOver = true;
-          square.dispatchEvent(
+        if (!child_data.mouseOver) {
+          child_data.mouseOver = true;
+          child.dispatchEvent(
             new CustomEvent('customPointerEnter', {
               detail: {
                 buttons: event.buttons,
@@ -25,9 +25,9 @@ const DrawWrapper = ({ children, refToUse, style, className }) => {
             })
           );
         }
-      } else if (child.mouseOver) {
-        child.mouseOver = false;
-        square.dispatchEvent(
+      } else if (child_data.mouseOver) {
+        child_data.mouseOver = false;
+        child.dispatchEvent(
           new CustomEvent('customPointerLeave', {
             detail: {
               buttons: event.buttons,
@@ -39,21 +39,21 @@ const DrawWrapper = ({ children, refToUse, style, className }) => {
   };
   const pointerDown = (event) => {
     let [x, y] = [event.clientX, event.clientY];
-    for (let square of refToUse.current.children) {
-      let rect = square.getBoundingClientRect();
-      let child = getChild(square.id);
+    for (let child of refToUse.current.children) {
+      let rect = child.getBoundingClientRect();
+      let child_data = getChild(child.id);
       if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
-        child.mouseOver = true;
-        square.dispatchEvent(
+        child_data.mouseOver = true;
+        child.dispatchEvent(
           new CustomEvent('customPointerDown', {
             detail: {
               buttons: event.buttons,
             },
           })
         );
-      } else if (child.mouseOver) {
-        child.mouseOver = false;
-        square.dispatchEvent(
+      } else if (child_data.mouseOver) {
+        child_data.mouseOver = false;
+        child.dispatchEvent(
           new CustomEvent('customPointerLeave', {
             detail: {
               buttons: event.buttons,
@@ -65,11 +65,21 @@ const DrawWrapper = ({ children, refToUse, style, className }) => {
   };
   const pointerUp = (event) => {
     let [x, y] = [event.clientX, event.clientY];
-    for (let square of refToUse.current.children) {
-      let rect = square.getBoundingClientRect();
+    for (let child of refToUse.current.children) {
+      let rect = child.getBoundingClientRect();
+      let child_data = getChild(child.id);
       if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
-        square.dispatchEvent(
+        child.dispatchEvent(
           new CustomEvent('customPointerUp', {
+            detail: {
+              buttons: event.buttons,
+            },
+          })
+        );
+      } else if (child_data.mouseOver) {
+        child_data.mouseOver = false;
+        child.dispatchEvent(
+          new CustomEvent('customPointerLeave', {
             detail: {
               buttons: event.buttons,
             },

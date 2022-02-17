@@ -28,7 +28,7 @@ function App() {
     for (let i = 0; i < num_rows; i++) {
       let row = [];
       for (let j = 0; j < num_cols; j++) {
-        row.push({ uuid: uuidv4() });
+        row.push({ uuid: uuidv4(), row: i, col: j });
       }
       new_grid.push(row);
     }
@@ -206,7 +206,7 @@ function App() {
     for (let i = 0; i < rows; i++) {
       for (let j = 0; j < cols; j++) {
         let tile = grid[i][j];
-        if (tile.pathVal) tile.setPathVal(0);
+        if (tile.pathVal) tile.setPathVal(() => 0);
         tile.setDirection(null);
         tile.setDisplayVal(null);
         switch (tile.val) {
@@ -263,9 +263,9 @@ function App() {
       maze: grid,
       start_coords: start,
       solution_func: (tile) => tile.val === 2,
-      frontier_animation: (tile) => tile.setPathVal(3),
-      traversal_animation: (tile) => tile.setPathVal(1),
-      path_animation: (tile) => tile.setPathVal(2),
+      frontier_animation: (tile) => tile.setPathVal(() => 3),
+      traversal_animation: (tile) => tile.setPathVal(() => 1),
+      path_animation: (tile) => tile.setPathVal(() => 2),
     });
     animations.push(() => {
       if (!end) {
@@ -286,9 +286,9 @@ function App() {
       maze: grid,
       start_coords: start,
       solution_func: (tile) => tile.val === 2,
-      frontier_animation: (tile) => tile.setPathVal(3),
-      traversal_animation: (tile) => tile.setPathVal(1),
-      path_animation: (tile) => tile.setPathVal(2),
+      frontier_animation: (tile) => tile.setPathVal(() => 3),
+      traversal_animation: (tile) => tile.setPathVal(() => 1),
+      path_animation: (tile) => tile.setPathVal(() => 2),
     });
     animations.push(() => {
       if (!end) {
@@ -308,9 +308,9 @@ function App() {
       maze: grid,
       start_coords: start,
       end_coords: end,
-      traverse_animation: (tile) => tile.setPathVal(1),
-      frontier_animation: (tile) => tile.setPathVal(3),
-      path_animation: (tile) => tile.setPathVal(2),
+      traverse_animation: (tile) => tile.setPathVal(() => 1),
+      frontier_animation: (tile) => tile.setPathVal(() => 3),
+      path_animation: (tile) => tile.setPathVal(() => 2),
     });
     animations.push(() => {
       if (!result) {
