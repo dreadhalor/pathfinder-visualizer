@@ -207,9 +207,9 @@ const GridSquare = ({ size, rows, square, setValue, modeRef, dragValRef }) => {
   const mouseEnter = (event) => {
     let dragVal = dragValRef.current;
     if (event.detail.buttons) {
-      setPathVal(() => 4);
+      if (dragVal === 3) setPathVal(() => 4);
       if (dragVal === val || dragVal === 1 || dragVal === 2) clicked(event);
-    }
+    } else dragValRef.current = null;
   };
   const mouseLeave = (event) => {
     setPathVal(() => 0);
