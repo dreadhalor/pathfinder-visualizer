@@ -87,7 +87,6 @@ function App() {
       }
     }
   };
-  //eslint-disable-next-line react-hooks/exhaustive-deps
   useLayoutEffect(() => {
     resetGridSize();
   }, []); //eslint-disable-line react-hooks/exhaustive-deps
@@ -136,7 +135,9 @@ function App() {
     setCols(() => new_cols); //eslint disable-line exhaustive-deps
     setGrid(() => createNewGrid(new_rows, new_cols)); //eslint disable-line exhaustive-deps
     // resetCounter.current--;
-    if (new_rows === 1) setTimeout(resetGridSize, 10);
+    if (new_rows <= 1 || new_cols <= 1) {
+      requestAnimationFrame(resetGridSize);
+    }
   }
   useEffect(() => {
     window.addEventListener('resize', resetGridSize);

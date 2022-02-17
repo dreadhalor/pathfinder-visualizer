@@ -41,10 +41,7 @@ export const ellers = (grid) => {
     for (let [[p_r, p_c], [c_r, c_c]] of vertical_edges)
       nodes.add([(p_r + c_r) / 2, (p_c + c_c) / 2]);
     animations.push(() => {
-      for (let node of nodes.toArray()) {
-        // popAnimation(node);
-        displayValAnimation(node, null);
-      }
+      for (let node of nodes.toArray()) displayValAnimation(node, null);
     });
     sets.removeMultiple(row);
   }
