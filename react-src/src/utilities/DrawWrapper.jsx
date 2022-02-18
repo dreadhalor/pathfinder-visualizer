@@ -85,6 +85,7 @@ const DrawWrapper = ({ children, refToUse, style, className }) => {
       let child_data = getChild(child.id);
       if (isInside(coords, child)) {
         child_data.mouseOver = true;
+        moved(event);
         child.dispatchEvent(
           new CustomEvent('customPointerDown', {
             detail: {
