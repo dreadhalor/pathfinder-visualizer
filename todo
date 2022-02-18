@@ -11,3 +11,4 @@
 * the start & end nodes don't reappear if you interrupt maze generation by clearing the walls (which maybe you shouldn't be allowed to do anyway but fuck it)
   * it's not a bug, it's a feature! ;)
 * the logic for handling mouse clicks in squares is utter spaghetti code, not gonna fix it though
+* DrawWrapper interpolation destroys the ability to handle multitouch, use interpolation at your own risk
