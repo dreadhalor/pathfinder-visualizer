@@ -146,7 +146,6 @@ const DrawWrapper = ({ children, refToUse, style, className }) => {
       }
     }
   };
-  const pointerEnter = (event) => moved(event);
 
   return (
     <div
@@ -156,7 +155,6 @@ const DrawWrapper = ({ children, refToUse, style, className }) => {
       onPointerDown={pointerDown}
       onPointerUp={pointerUp}
       onPointerLeave={pointerLeave}
-      onPointerEnter={pointerEnter}
     >
       {children}
     </div>
