@@ -96,7 +96,6 @@ const GridSquare = ({ size, rows, square, setValue, modeRef, dragValRef }) => {
   };
 
   const [val, setVal] = useState(0);
-  const valRef = useRef(0);
   const [pathVal, setPathVal] = useState(0);
   const [displayVal, setDisplayVal] = useState(null);
   const [direction, setDirection] = useState(null);
@@ -131,7 +130,6 @@ const GridSquare = ({ size, rows, square, setValue, modeRef, dragValRef }) => {
   useEffect(() => {
     square.setVal = setValMiddleMan;
     square.setPathVal = setPathVal;
-    square.valRef = valRef;
     square.animate = animate;
     square.setDisplayVal = setDisplayVal;
     square.setDirection = setDirection;
@@ -149,7 +147,7 @@ const GridSquare = ({ size, rows, square, setValue, modeRef, dragValRef }) => {
       div.removeEventListener('customPointerDown', mouseDown);
       div.removeEventListener('customPointerUp', mouseUp);
     };
-  }, [val]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [val, pathVal]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     square.val = val;
@@ -212,7 +210,7 @@ const GridSquare = ({ size, rows, square, setValue, modeRef, dragValRef }) => {
     } else dragValRef.current = null;
   };
   const mouseLeave = (event) => {
-    setPathVal(() => 0);
+    if (pathVal !== 1 && pathVal !== 2 && pathVal !== 3) setPathVal(() => 0);
     if (!event.detail.buttons) dragValRef.current = null;
     toggled.current = false;
   };

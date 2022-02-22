@@ -12,3 +12,4 @@
   * it's not a bug, it's a feature! ;)
 * the logic for handling mouse clicks in squares is utter spaghetti code, not gonna fix it though
 * DrawWrapper interpolation destroys the ability to handle multitouch, use interpolation at your own risk
+* Fixed a bug on desktop where pathval was changed to 0 if mouseover occurs on paths with value 1,2,3 (hacky fix, do not let it survive a recode)
