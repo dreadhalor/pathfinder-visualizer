@@ -2,6 +2,7 @@
 
 /firebase
 /react-src/node_modules
+/react-src/.env
 /.vscode
 
 # dependencies
