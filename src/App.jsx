@@ -1,22 +1,22 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import './App.scss';
-import { v4 as uuidv4 } from 'uuid';
-import GridSquare from './components/GridSquare';
-import TopNav from './components/TopNav';
-import { bfs, bfs_raw } from './utilities/solvers/bfs';
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import "./App.scss";
+import { v4 as uuidv4 } from "uuid";
+import GridSquare from "./components/GridSquare";
+import TopNav from "./components/TopNav";
+import { bfs, bfs_raw } from "./utilities/solvers/bfs";
 import {
   kruskals,
   ellers,
   recursiveBacktracking,
   huntAndKill,
   prims,
-} from './utilities/maze-generation';
-import { Animator } from './utilities/animator';
-import { finishAnimation } from './utilities/animations';
-import { recursiveDivision } from './utilities/maze-generation/recursive-division';
-import { aStar } from './utilities/solvers/a-star';
-import { dfs } from './utilities/solvers/dfs';
-import DrawWrapper from './utilities/DrawWrapper';
+} from "./utilities/maze-generation";
+import { Animator } from "./utilities/animator";
+import { finishAnimation } from "./utilities/animations";
+import { recursiveDivision } from "./utilities/maze-generation/recursive-division";
+import { aStar } from "./utilities/solvers/a-star";
+import { dfs } from "./utilities/solvers/dfs";
+import DrawWrapper from "./utilities/DrawWrapper";
 
 function App() {
   const [rows, setRows] = useState();
@@ -43,13 +43,19 @@ function App() {
   const navRef = useRef();
   const animatorRef = useRef(new Animator());
   const dragValRef = useRef(null);
-  const finished = () => animatorRef.current.playAnimations([...finishAnimation(grid)]);
+  const finished = () =>
+    animatorRef.current.playAnimations([...finishAnimation(grid)]);
   animatorRef.current.setFinishFunction(finished);
 
   const checkForPathReset = () => {
     return animatorRef.current.animationsLeft() > 0 || solved.current;
   };
-  const setValueCheck = (candidate_square, uuid, val, reset_override = false) => {
+  const setValueCheck = (
+    candidate_square,
+    uuid,
+    val,
+    reset_override = false,
+  ) => {
     let tile_match = candidate_square.uuid === uuid;
     let val_match = candidate_square.val === val;
     let exact_match = tile_match && val_match;
@@ -57,7 +63,8 @@ function App() {
       candidate_square.setVal(() => 0);
       return 0;
     } else if (tile_match) {
-      if (val === 3 && candidate_square.pathVal === 2 && !reset_override) resetPath();
+      if (val === 3 && candidate_square.pathVal === 2 && !reset_override)
+        resetPath();
       if (val === 1 || val === 2) {
         if (candidate_square.val === 3) return null;
         if (!reset_override) resetPath();
@@ -68,15 +75,25 @@ function App() {
     }
     return null;
   };
-  const setValue = (square_uuid, val = mode.current, reset_override = false) => {
+  const setValue = (
+    square_uuid,
+    val = mode.current,
+    reset_override = false,
+  ) => {
     let value_set = null;
     for (let i = 0; i < rows; i++) {
       for (let j = 0; j < cols; j++) {
-        let possible = setValueCheck(grid[i][j], square_uuid, val, reset_override);
+        let possible = setValueCheck(
+          grid[i][j],
+          square_uuid,
+          val,
+          reset_override,
+        );
         if ((possible ?? null) !== null) value_set = possible;
       }
     }
-    if ((value_set ?? null) !== null && checkForPathReset() && !reset_override) resetPath();
+    if ((value_set ?? null) !== null && checkForPathReset() && !reset_override)
+      resetPath();
     return value_set;
   };
   const removeVal = (val) => {
@@ -140,16 +157,16 @@ function App() {
     }
   }
   useEffect(() => {
-    window.addEventListener('resize', resetGridSize);
-    return () => window.removeEventListener('resize', resetGridSize);
+    window.addEventListener("resize", resetGridSize);
+    return () => window.removeEventListener("resize", resetGridSize);
   }, []); //eslint-disable-line react-hooks/exhaustive-deps
 
   //console.log('app rendered');
 
   const gridStyle = {
-    margin: 'auto',
-    display: 'grid',
-    gap: '0px',
+    margin: "auto",
+    display: "grid",
+    gap: "0px",
     gridTemplateColumns: `repeat(${cols}, auto)`,
     // perspective: '100px',
   };
@@ -181,7 +198,7 @@ function App() {
       row.map((square) => {
         if (square.val === 1 || square.val === 2) return 0;
         return square.val;
-      })
+      }),
     );
     let start = getClosestPathSquare(new_grid, old_start, 0);
     let end = getClosestPathSquare(new_grid, old_end, 0);
@@ -252,7 +269,7 @@ function App() {
       row.forEach((tile) => {
         tile.setVal(() => 3);
         tile.setDisplayVal(null);
-      })
+      }),
     );
   };
   const solveBFS = () => {
@@ -269,9 +286,9 @@ function App() {
     });
     animations.push(() => {
       if (!end) {
-        gridContainerRef.current.classList.remove('no-solution');
+        gridContainerRef.current.classList.remove("no-solution");
         void gridContainerRef.current.offsetWidth;
-        gridContainerRef.current.classList.add('no-solution');
+        gridContainerRef.current.classList.add("no-solution");
       }
     });
     animatorRef.current.playAnimations(animations, 6);
@@ -292,9 +309,9 @@ function App() {
     });
     animations.push(() => {
       if (!end) {
-        gridContainerRef.current.classList.remove('no-solution');
+        gridContainerRef.current.classList.remove("no-solution");
         void gridContainerRef.current.offsetWidth;
-        gridContainerRef.current.classList.add('no-solution');
+        gridContainerRef.current.classList.add("no-solution");
       }
     });
     animatorRef.current.playAnimations(animations, 6);
@@ -314,9 +331,9 @@ function App() {
     });
     animations.push(() => {
       if (!result) {
-        gridContainerRef.current.classList.remove('no-solution');
+        gridContainerRef.current.classList.remove("no-solution");
         void gridContainerRef.current.offsetWidth;
-        gridContainerRef.current.classList.add('no-solution');
+        gridContainerRef.current.classList.add("no-solution");
       }
     });
     animatorRef.current.playAnimations(animations, 6);
@@ -366,12 +383,14 @@ function App() {
   const generateRecursiveDivision = () => {
     let [start, end] = getStartAndEnd();
     resetWalls(false);
-    let animations = recursiveDivision(grid, 10).concat(() => resetStartAndEnd(start, end));
+    let animations = recursiveDivision(grid, 10).concat(() =>
+      resetStartAndEnd(start, end),
+    );
     animatorRef.current.playAnimations(animations, 1, true);
   };
 
   return (
-    <div className='App site-bg-empty h-full w-full flex flex-col'>
+    <div className="App site-bg-empty flex h-full w-full flex-col">
       <TopNav
         ref={navRef}
         modeRef={mode}
@@ -388,16 +407,19 @@ function App() {
         generateRecursiveDivision={generateRecursiveDivision}
         resetWalls={resetWalls}
       />
-      <div className='w-full flex-1 relative min-h-0'>
-        <div className='w-full h-full top-0 left-0 absolute flex overflow-auto p-1'>
+      <div className="relative min-h-0 w-full flex-1">
+        <div className="absolute left-0 top-0 flex h-full w-full overflow-auto p-1">
           <div
             ref={gridContainerRef}
-            className={(rows <= 1 ? 'opacity-0 ' : '') + 'flex-1 h-full flex flex-row min-w-0'}
+            className={
+              (rows <= 1 ? "opacity-0 " : "") +
+              "flex h-full min-w-0 flex-1 flex-row"
+            }
           >
             <DrawWrapper
               refToUse={gridRef}
-              className='h-full flex-1 flex'
-              style={{ touchAction: 'none' }}
+              className="flex h-full flex-1"
+              style={{ touchAction: "none" }}
             >
               <div style={gridStyle} ref={gridRef}>
                 {grid &&
@@ -412,7 +434,7 @@ function App() {
                         dragValRef={dragValRef}
                         modeRef={mode}
                       />
-                    ))
+                    )),
                   )}
               </div>
             </DrawWrapper>
