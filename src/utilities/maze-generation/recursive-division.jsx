@@ -26,20 +26,27 @@ export const recursiveDivision = (grid, iterator) => {
     left_animations = recursiveDivision(grid_left, iterator);
     right_animations = recursiveDivision(grid_right, iterator);
   } else {
-    let divider = dividePathNodesHorizontally(grid, nodes, animations, animation);
+    let divider = dividePathNodesHorizontally(
+      grid,
+      nodes,
+      animations,
+      animation,
+    );
     if (divider < 1) return animations;
     grid_left = grid.slice(0, divider);
     grid_right = grid.slice(divider + 1);
     left_animations = recursiveDivision(grid_left, iterator);
     right_animations = recursiveDivision(grid_right, iterator);
   }
-  if (left_animations.length > 0) animations = animations.concat(left_animations);
-  if (right_animations.length > 0) animations = animations.concat(right_animations);
+  if (left_animations.length > 0)
+    animations = animations.concat(left_animations);
+  if (right_animations.length > 0)
+    animations = animations.concat(right_animations);
   return animations;
 };
 
 function dividePathNodes(grid, nodes, animations, animation) {
-  let col_options = nodes?.[0].length - 1 ?? -1;
+  let col_options = nodes?.[0].length - 1;
   if (col_options < 1) return -1;
   let random_col = Math.floor(Math.random() * col_options);
   let wall_col = nodes[0][random_col][1] + 1;
