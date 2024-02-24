@@ -1,22 +1,22 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import "./App.scss";
-import { v4 as uuidv4 } from "uuid";
-import GridSquare from "./components/GridSquare";
-import TopNav from "./components/TopNav";
-import { bfs, bfs_raw } from "./utilities/solvers/bfs";
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import './App.scss';
+import { v4 as uuidv4 } from 'uuid';
+import GridSquare from './components/GridSquare';
+import TopNav from './components/TopNav';
+import { bfs, bfs_raw } from './utilities/solvers/bfs';
 import {
   kruskals,
   ellers,
   recursiveBacktracking,
   huntAndKill,
   prims,
-} from "./utilities/maze-generation";
-import { Animator } from "./utilities/animator";
-import { finishAnimation } from "./utilities/animations";
-import { recursiveDivision } from "./utilities/maze-generation/recursive-division";
-import { aStar } from "./utilities/solvers/a-star";
-import { dfs } from "./utilities/solvers/dfs";
-import DrawWrapper from "./utilities/DrawWrapper";
+} from './utilities/maze-generation';
+import { Animator } from './utilities/animator';
+import { finishAnimation } from './utilities/animations';
+import { recursiveDivision } from './utilities/maze-generation/recursive-division';
+import { aStar } from './utilities/solvers/a-star';
+import { dfs } from './utilities/solvers/dfs';
+import DrawWrapper from './utilities/DrawWrapper';
 
 function App() {
   const [rows, setRows] = useState();
@@ -157,16 +157,14 @@ function App() {
     }
   }
   useEffect(() => {
-    window.addEventListener("resize", resetGridSize);
-    return () => window.removeEventListener("resize", resetGridSize);
+    window.addEventListener('resize', resetGridSize);
+    return () => window.removeEventListener('resize', resetGridSize);
   }, []); //eslint-disable-line react-hooks/exhaustive-deps
 
-  //console.log('app rendered');
-
   const gridStyle = {
-    margin: "auto",
-    display: "grid",
-    gap: "0px",
+    margin: 'auto',
+    display: 'grid',
+    gap: '0px',
     gridTemplateColumns: `repeat(${cols}, auto)`,
     // perspective: '100px',
   };
@@ -286,9 +284,9 @@ function App() {
     });
     animations.push(() => {
       if (!end) {
-        gridContainerRef.current.classList.remove("no-solution");
+        gridContainerRef.current.classList.remove('no-solution');
         void gridContainerRef.current.offsetWidth;
-        gridContainerRef.current.classList.add("no-solution");
+        gridContainerRef.current.classList.add('no-solution');
       }
     });
     animatorRef.current.playAnimations(animations, 6);
@@ -309,9 +307,9 @@ function App() {
     });
     animations.push(() => {
       if (!end) {
-        gridContainerRef.current.classList.remove("no-solution");
+        gridContainerRef.current.classList.remove('no-solution');
         void gridContainerRef.current.offsetWidth;
-        gridContainerRef.current.classList.add("no-solution");
+        gridContainerRef.current.classList.add('no-solution');
       }
     });
     animatorRef.current.playAnimations(animations, 6);
@@ -331,9 +329,9 @@ function App() {
     });
     animations.push(() => {
       if (!result) {
-        gridContainerRef.current.classList.remove("no-solution");
+        gridContainerRef.current.classList.remove('no-solution');
         void gridContainerRef.current.offsetWidth;
-        gridContainerRef.current.classList.add("no-solution");
+        gridContainerRef.current.classList.add('no-solution');
       }
     });
     animatorRef.current.playAnimations(animations, 6);
@@ -390,7 +388,7 @@ function App() {
   };
 
   return (
-    <div className="App site-bg-empty flex h-full w-full flex-col">
+    <div className='App site-bg-empty flex h-full w-full flex-col'>
       <TopNav
         ref={navRef}
         modeRef={mode}
@@ -407,19 +405,19 @@ function App() {
         generateRecursiveDivision={generateRecursiveDivision}
         resetWalls={resetWalls}
       />
-      <div className="relative min-h-0 w-full flex-1">
-        <div className="absolute left-0 top-0 flex h-full w-full overflow-auto p-1">
+      <div className='relative min-h-0 w-full flex-1'>
+        <div className='absolute left-0 top-0 flex h-full w-full overflow-auto p-1'>
           <div
             ref={gridContainerRef}
             className={
-              (rows <= 1 ? "opacity-0 " : "") +
-              "flex h-full min-w-0 flex-1 flex-row"
+              (rows <= 1 ? 'opacity-0 ' : '') +
+              'flex h-full min-w-0 flex-1 flex-row'
             }
           >
             <DrawWrapper
               refToUse={gridRef}
-              className="flex h-full flex-1"
-              style={{ touchAction: "none" }}
+              className='flex h-full flex-1'
+              style={{ touchAction: 'none' }}
             >
               <div style={gridStyle} ref={gridRef}>
                 {grid &&
