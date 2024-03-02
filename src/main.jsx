@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './app-.jsx';
+import App from './app.jsx';
 import { DreadUiProvider } from 'dread-ui';
 import 'dread-ui/style.scss';
 import './index.scss';
