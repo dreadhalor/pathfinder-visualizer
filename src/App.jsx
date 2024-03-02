@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import './App.scss';
 import { v4 as uuidv4 } from 'uuid';
 import GridSquare from './components/GridSquare';
-import TopNav from './components/TopNav';
+import TopNav from './components/TopNav.tsx';
 import { bfs, bfs_raw } from './utilities/solvers/bfs';
 import {
   kruskals,
@@ -166,7 +166,6 @@ function App() {
     display: 'grid',
     gap: '0px',
     gridTemplateColumns: `repeat(${cols}, auto)`,
-    // perspective: '100px',
   };
 
   const getTile = (coords) => {
