@@ -24,7 +24,7 @@ interface TopNavProps {
   generateHuntAndKill: () => void;
   generatePrims: () => void;
   generateRecursiveDivision: () => void;
-  resetWalls: (clearWalls: boolean) => void;
+  resetWalls: (animate_tiles: boolean) => void;
 }
 
 const TopNav = (

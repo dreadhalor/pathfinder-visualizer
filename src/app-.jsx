@@ -1,22 +1,22 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import './App.scss';
 import { v4 as uuidv4 } from 'uuid';
-import GridSquare from './components/GridSquare';
-import TopNav from './components/TopNav.tsx';
-import { bfs, bfs_raw } from './utilities/solvers/bfs';
+import GridSquare from './components/grid-square.tsx';
+import TopNav from './components/top-nav.tsx';
+import { bfs, bfs_raw } from './utilities/solvers/bfs.jsx';
 import {
   kruskals,
   ellers,
   recursiveBacktracking,
   huntAndKill,
   prims,
-} from './utilities/maze-generation';
-import { Animator } from './utilities/animator';
-import { finishAnimation } from './utilities/animations';
-import { recursiveDivision } from './utilities/maze-generation/recursive-division';
-import { aStar } from './utilities/solvers/a-star';
-import { dfs } from './utilities/solvers/dfs';
-import DrawWrapper from './utilities/DrawWrapper';
+} from './utilities/maze-generation/index.jsx';
+import { Animator } from './utilities/animator.jsx';
+import { finishAnimation } from './utilities/animations.jsx';
+import { recursiveDivision } from './utilities/maze-generation/recursive-division.jsx';
+import { aStar } from './utilities/solvers/a-star.jsx';
+import { dfs } from './utilities/solvers/dfs.jsx';
+import DrawWrapper from './utilities/DrawWrapper.jsx';
 
 function App() {
   const [rows, setRows] = useState();
