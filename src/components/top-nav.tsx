@@ -10,6 +10,7 @@ import {
   SelectValue,
   SelectContent,
   SelectItem,
+  useAchievements,
 } from 'dread-ui';
 
 interface TopNavProps {
@@ -49,6 +50,8 @@ const TopNav = (
     forceRenderCounter((prevCounter) => prevCounter + 1);
   useImperativeHandle(ref, () => ({ forceRender }));
 
+  const { unlockAchievementById } = useAchievements();
+
   const mazeOptions = [
     { title: `Kruskal's Algorithm`, onClick: generateKruskals },
     { title: `Recursive Backtracking`, onClick: generateDFS },
@@ -66,7 +69,13 @@ const TopNav = (
 
   const clearOptions = [
     { title: `Clear Path`, onClick: clearPath },
-    { title: `Clear Walls`, onClick: () => resetWalls(true) },
+    {
+      title: `Clear Walls`,
+      onClick: () => {
+        unlockAchievementById('clear_walls', 'pathfinder');
+        resetWalls(true);
+      },
+    },
   ];
 
   const handleChange = (value: string) => {

@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './grid-square.scss';
+import { SetValueProps } from '../app';
 
 interface GridSquareProps {
-  size: string;
+  size: number;
   rows: number;
   square: {
     uuid: string;
@@ -14,21 +15,25 @@ interface GridSquareProps {
     setDisplayVal?: (val: number | null) => void;
     setDirection?: (val: string | null) => void;
   };
-  setValue: (uuid: string, newVal?: number) => void;
+  setValue: ({
+    square_uuid,
+    val,
+    reset_override,
+    checkAchievements,
+  }: SetValueProps) => number | null;
   modeRef: React.MutableRefObject<number>;
   dragValRef: React.MutableRefObject<number | null>;
 }
 
-const GridSquare: React.FC<GridSquareProps> = ({
+const GridSquare = ({
   size,
   rows,
   square,
   setValue,
   modeRef,
   dragValRef,
-}) => {
-  // Define styles as a Record<string, React.CSSProperties> for better type checking
-  const gridSquareSize: React.CSSProperties = {
+}: GridSquareProps) => {
+  const gridSquareSize = {
     width: size,
     height: size,
   };
@@ -191,7 +196,7 @@ const GridSquare: React.FC<GridSquareProps> = ({
       div.removeEventListener('customPointerDown', mouseDown);
       div.removeEventListener('customPointerUp', mouseUp);
     };
-  }, [val, pathVal, tileRef.current]);
+  }, [val, pathVal, tileRef.current, setValue]);
 
   useEffect(() => {
     square.val = val;
@@ -227,10 +232,15 @@ const GridSquare: React.FC<GridSquareProps> = ({
         return null;
       if (modeRef.current === 3 && dragVal === val) return null;
       toggled.current = true;
-      return setValue(square.uuid, dragVal);
+      return setValue({
+        square_uuid: square.uuid,
+        val: dragVal,
+        checkAchievements: true,
+      });
     }
     toggled.current = true;
-    return setValue(square.uuid);
+
+    return setValue({ square_uuid: square.uuid, checkAchievements: true });
   };
 
   const mouseDown = () => {

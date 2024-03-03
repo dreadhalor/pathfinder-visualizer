@@ -1,32 +1,55 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import './app.scss';
 import { v4 as uuidv4 } from 'uuid';
-import GridSquare from './components/grid-square.tsx';
-import TopNav from './components/top-nav.tsx';
-import { bfs, bfs_raw } from './utilities/solvers/bfs.jsx';
+import GridSquare from './components/grid-square';
+import TopNav from './components/top-nav';
+import { bfs, bfs_raw } from './utilities/solvers/bfs';
 import {
   kruskals,
   ellers,
   recursiveBacktracking,
   huntAndKill,
   prims,
-} from './utilities/maze-generation/index.jsx';
-import { Animator } from './utilities/animator.jsx';
-import { finishAnimation } from './utilities/animations.jsx';
-import { recursiveDivision } from './utilities/maze-generation/recursive-division.jsx';
-import { aStar } from './utilities/solvers/a-star.jsx';
-import { dfs } from './utilities/solvers/dfs.jsx';
-import DrawWrapper from './utilities/DrawWrapper.jsx';
+} from './utilities/maze-generation/index';
+import { Animator } from './utilities/animator';
+import { finishAnimation } from './utilities/animations';
+import { recursiveDivision } from './utilities/maze-generation/recursive-division';
+import { aStar } from './utilities/solvers/a-star';
+import { dfs } from './utilities/solvers/dfs';
+import DrawWrapper from './utilities/DrawWrapper';
+import { useAchievements } from 'dread-ui';
 
-function App() {
-  const [rows, setRows] = useState();
-  const [cols, setCols] = useState();
-  let squareSize = useRef(25);
+interface Square {
+  uuid: string;
+  row: number;
+  col: number;
+  val?: number;
+  setVal?: React.Dispatch<React.SetStateAction<number>>;
+  pathVal?: number;
+  setPathVal?: React.Dispatch<React.SetStateAction<number>>;
+  animate?: (num: number) => void;
+  setDisplayVal?: (val: number | null) => void;
+  setDirection?: (val: string | null) => void;
+}
 
-  const createNewGrid = (num_rows, num_cols) => {
-    let new_grid = [];
+export type SetValueProps = {
+  square_uuid: string;
+  val?: number;
+  reset_override?: boolean;
+  checkAchievements?: boolean;
+};
+
+const App: React.FC = () => {
+  const [rows, setRows] = useState<number>();
+  const [cols, setCols] = useState<number>();
+  const squareSize = useRef<number>(25);
+
+  const { isUnlockable, unlockAchievementById } = useAchievements();
+
+  const createNewGrid = (num_rows: number, num_cols: number): Square[][] => {
+    let new_grid: Square[][] = [];
     for (let i = 0; i < num_rows; i++) {
-      let row = [];
+      let row: Square[] = [];
       for (let j = 0; j < num_cols; j++) {
         row.push({ uuid: uuidv4(), row: i, col: j });
       }
@@ -34,15 +57,17 @@ function App() {
     }
     return new_grid;
   };
-  const [grid, setGrid] = useState();
 
-  const gridContainerRef = useRef();
-  const gridRef = useRef();
-  const mode = useRef(3);
-  const solved = useRef(false);
-  const navRef = useRef();
-  const animatorRef = useRef(new Animator());
-  const dragValRef = useRef(null);
+  const [grid, setGrid] = useState<Square[][]>();
+
+  const gridContainerRef = useRef<HTMLDivElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+  const mode = useRef<number>(3);
+  const solved = useRef<boolean>(false);
+  const navRef = useRef<any>(null);
+  const animatorRef = useRef<Animator>(new Animator());
+  const dragValRef = useRef<number | null>(null);
+
   const finished = () =>
     animatorRef.current.playAnimations([...finishAnimation(grid)]);
   animatorRef.current.setFinishFunction(finished);
@@ -50,17 +75,18 @@ function App() {
   const checkForPathReset = () => {
     return animatorRef.current.animationsLeft() > 0 || solved.current;
   };
+
   const setValueCheck = (
-    candidate_square,
-    uuid,
-    val,
+    candidate_square: Square,
+    uuid: string,
+    val: number,
     reset_override = false,
   ) => {
     let tile_match = candidate_square.uuid === uuid;
     let val_match = candidate_square.val === val;
     let exact_match = tile_match && val_match;
     if (exact_match) {
-      candidate_square.setVal(() => 0);
+      candidate_square.setVal!(() => 0);
       return 0;
     } else if (tile_match) {
       if (val === 3 && candidate_square.pathVal === 2 && !reset_override)
@@ -70,21 +96,46 @@ function App() {
         if (!reset_override) resetPath();
         removeVal(val);
       }
-      candidate_square.setVal(() => val);
+      candidate_square.setVal!(() => val);
       return val;
     }
     return null;
   };
-  const setValue = (
+
+  const checkDrawingAchievement = (value: number | null) => {
+    switch (value) {
+      case 0:
+        if (isUnlockable('erase_wall', 'pathfinder'))
+          unlockAchievementById('erase_wall', 'pathfinder');
+        break;
+      case 1:
+        if (isUnlockable('move_start', 'pathfinder'))
+          unlockAchievementById('move_start', 'pathfinder');
+        break;
+      case 2:
+        if (isUnlockable('move_end', 'pathfinder'))
+          unlockAchievementById('move_end', 'pathfinder');
+        break;
+      case 3:
+        if (isUnlockable('draw_wall', 'pathfinder'))
+          unlockAchievementById('draw_wall', 'pathfinder');
+        break;
+      default:
+        break;
+    }
+  };
+  const setValue = ({
     square_uuid,
     val = mode.current,
     reset_override = false,
-  ) => {
+    checkAchievements = false,
+  }: SetValueProps) => {
     let value_set = null;
+    if (!rows || !cols || !grid) return null;
     for (let i = 0; i < rows; i++) {
       for (let j = 0; j < cols; j++) {
         let possible = setValueCheck(
-          grid[i][j],
+          grid[i]![j]!,
           square_uuid,
           val,
           reset_override,
@@ -94,13 +145,16 @@ function App() {
     }
     if ((value_set ?? null) !== null && checkForPathReset() && !reset_override)
       resetPath();
+    if (checkAchievements) checkDrawingAchievement(value_set);
     return value_set;
   };
-  const removeVal = (val) => {
+  const removeVal = (val: number) => {
+    if (!rows || !cols || !grid) return;
     for (let i = 0; i < rows; i++) {
       for (let j = 0; j < cols; j++) {
-        let tile = grid[i][j];
-        if (tile.val === val) tile.setVal(() => 0);
+        let tile = grid[i]![j];
+        if (!tile) continue;
+        if (tile.val === val) tile.setVal!(() => 0);
       }
     }
   };
@@ -112,6 +166,7 @@ function App() {
   const fullResetStartAndEnd = () => {
     let potential_start, potential_end;
     let inset = 3;
+    if (!rows || !cols || !grid) return;
     if (rows <= cols) {
       let middle_row = Math.floor(rows / 2);
       let start_row = inset < cols ? inset : cols - 1;
@@ -128,18 +183,17 @@ function App() {
       potential_end = getTile([end_col, middle_col]);
     }
     if (potential_start) {
-      setValue(potential_start.uuid, 1);
-      potential_start.animate(1);
+      setValue({ square_uuid: potential_start.uuid, val: 1 });
+      potential_start.animate!(1);
     }
     if (potential_end) {
-      setValue(potential_end.uuid, 2);
-      potential_end.animate(1);
+      setValue({ square_uuid: potential_end.uuid, val: 2 });
+      potential_end.animate!(1);
     }
   };
 
-  // const resetCounter = useRef(5);
-
   function resetGridSize() {
+    if (!gridContainerRef.current) return;
     let w = gridContainerRef.current.clientWidth,
       h = gridContainerRef.current.clientHeight;
     squareSize.current = w < 600 ? 20 : 25;
@@ -151,7 +205,6 @@ function App() {
     setRows(() => new_rows); //eslint-disable-line react-hooks/exhaustive-deps
     setCols(() => new_cols); //eslint disable-line exhaustive-deps
     setGrid(() => createNewGrid(new_rows, new_cols)); //eslint disable-line exhaustive-deps
-    // resetCounter.current--;
     if (new_rows <= 1 || new_cols <= 1) {
       requestAnimationFrame(resetGridSize);
     }
@@ -168,47 +221,58 @@ function App() {
     gridTemplateColumns: `repeat(${cols}, auto)`,
   };
 
-  const getTile = (coords) => {
+  const getTile = (coords: [number, number]) => {
     if (coords) return grid?.[coords[0]]?.[coords[1]];
   };
   const getStartAndEnd = () => {
     let start = null,
       end = null;
+    if (!rows || !cols || !grid) return [start, end];
     for (let i = 0; i < rows; i++) {
       for (let j = 0; j < cols; j++) {
-        if (grid[i][j].val === 1) start = [i, j];
-        if (grid[i][j].val === 2) end = [i, j];
+        if (grid[i]![j]!.val === 1) start = [i, j];
+        if (grid[i]![j]!.val === 2) end = [i, j];
         if (start && end) break;
       }
     }
-    return [start, end];
+    return [start, end] as [[number, number], [number, number]];
   };
-  const getClosestPathSquare = (new_grid, coords, val) => {
+  const getClosestPathSquare = (
+    new_grid: number[][],
+    coords: [number, number],
+    val: number,
+  ) => {
     return bfs_raw({
       maze: new_grid,
       start_coords: coords,
-      solution_func: (tile_val) => tile_val === val,
-    });
+      solution_func: (tile_val: number) => tile_val === val,
+    }) as [number, number] | null;
   };
-  const resetStartAndEnd = (old_start, old_end) => {
+  const resetStartAndEnd = (
+    old_start: [number, number],
+    old_end: [number, number],
+  ) => {
+    if (!rows || !cols || !grid) return;
     let new_grid = grid.map((row) =>
       row.map((square) => {
+        if (!square.val) return 0;
         if (square.val === 1 || square.val === 2) return 0;
         return square.val;
       }),
     );
+
     let start = getClosestPathSquare(new_grid, old_start, 0);
     let end = getClosestPathSquare(new_grid, old_end, 0);
 
     if (start) {
       let tile = getTile(start);
-      // setValue(tile.uuid, 1, true); //lol fuck it
+      if (!tile?.setVal || !tile?.animate) return;
       tile.setVal(() => 1);
       tile.animate(1);
     }
     if (end) {
       let tile = getTile(end);
-      // setValue(tile.uuid, 2, true);
+      if (!tile?.setVal || !tile?.animate) return;
       tile.setVal(() => 2);
       tile.animate(1);
     }
@@ -217,9 +281,18 @@ function App() {
   const resetPath = () => {
     solved.current = false;
     animatorRef.current.flushAnimationQueue();
+    if (!rows || !cols || !grid) return;
     for (let i = 0; i < rows; i++) {
       for (let j = 0; j < cols; j++) {
-        let tile = grid[i][j];
+        let tile = grid[i]![j];
+        if (
+          !tile ||
+          !tile.setPathVal ||
+          !tile.setDirection ||
+          !tile.setDisplayVal ||
+          !tile.setVal
+        )
+          continue;
         if (tile.pathVal) tile.setPathVal(() => 0);
         tile.setDirection(null);
         tile.setDisplayVal(null);
@@ -246,9 +319,11 @@ function App() {
   const resetWalls = (animate_tiles = false) => {
     let [start, end] = getStartAndEnd();
     resetPath();
+    if (!rows || !cols || !grid) return;
     for (let i = 0; i < rows; i++) {
       for (let j = 0; j < cols; j++) {
-        let tile = grid[i][j];
+        let tile = grid[i]![j];
+        if (!tile || !tile.setVal || !tile.animate) continue;
         if (start && i === start[0] && j === start[1]) {
           tile.setVal(() => 1);
           if (animate_tiles) tile.animate(1);
@@ -262,8 +337,10 @@ function App() {
 
   const wallifyItAll = () => {
     resetPath();
+    if (!rows || !cols || !grid) return;
     grid.forEach((row) =>
       row.forEach((tile) => {
+        if (!tile.setVal || !tile.setDisplayVal) return;
         tile.setVal(() => 3);
         tile.setDisplayVal(null);
       }),
@@ -276,13 +353,16 @@ function App() {
     let [end, animations] = bfs({
       maze: grid,
       start_coords: start,
-      solution_func: (tile) => tile.val === 2,
-      frontier_animation: (tile) => tile.setPathVal(() => 3),
-      traversal_animation: (tile) => tile.setPathVal(() => 1),
-      path_animation: (tile) => tile.setPathVal(() => 2),
+      solution_func: (tile: Square) => tile.val === 2,
+      frontier_animation: (tile: Square) => tile.setPathVal!(() => 3),
+      traversal_animation: (tile: Square) => tile?.setPathVal!(() => 1),
+      path_animation: (tile: Square) => tile.setPathVal!(() => 2),
     });
+    if (!animations) return;
     animations.push(() => {
-      if (!end) {
+      if (end) unlockAchievementById('solve_bfs', 'pathfinder');
+      else unlockAchievementById('no_solution', 'pathfinder');
+      if (!end && gridContainerRef.current) {
         gridContainerRef.current.classList.remove('no-solution');
         void gridContainerRef.current.offsetWidth;
         gridContainerRef.current.classList.add('no-solution');
@@ -299,13 +379,16 @@ function App() {
     let [end, animations] = dfs({
       maze: grid,
       start_coords: start,
-      solution_func: (tile) => tile.val === 2,
-      frontier_animation: (tile) => tile.setPathVal(() => 3),
-      traversal_animation: (tile) => tile.setPathVal(() => 1),
-      path_animation: (tile) => tile.setPathVal(() => 2),
+      solution_func: (tile: Square) => tile.val === 2,
+      frontier_animation: (tile: Square) => tile.setPathVal!(() => 3),
+      traversal_animation: (tile: Square) => tile.setPathVal!(() => 1),
+      path_animation: (tile: Square) => tile.setPathVal!(() => 2),
     });
+    if (!animations) return;
     animations.push(() => {
-      if (!end) {
+      if (end) unlockAchievementById('solve_dfs', 'pathfinder');
+      else unlockAchievementById('no_solution', 'pathfinder');
+      if (!end && gridContainerRef.current) {
         gridContainerRef.current.classList.remove('no-solution');
         void gridContainerRef.current.offsetWidth;
         gridContainerRef.current.classList.add('no-solution');
@@ -322,12 +405,14 @@ function App() {
       maze: grid,
       start_coords: start,
       end_coords: end,
-      traverse_animation: (tile) => tile.setPathVal(() => 1),
-      frontier_animation: (tile) => tile.setPathVal(() => 3),
-      path_animation: (tile) => tile.setPathVal(() => 2),
+      traverse_animation: (tile: Square) => tile.setPathVal!(() => 1),
+      frontier_animation: (tile: Square) => tile.setPathVal!(() => 3),
+      path_animation: (tile: Square) => tile.setPathVal!(() => 2),
     });
     animations.push(() => {
-      if (!result) {
+      if (result) unlockAchievementById('solve_astar', 'pathfinder');
+      else unlockAchievementById('no_solution', 'pathfinder');
+      if (!result && gridContainerRef.current) {
         gridContainerRef.current.classList.remove('no-solution');
         void gridContainerRef.current.offsetWidth;
         gridContainerRef.current.classList.add('no-solution');
@@ -342,47 +427,68 @@ function App() {
     let [start, end] = getStartAndEnd();
     wallifyItAll();
     kruskals(grid, animatorRef);
-    animatorRef.current.pushOneToOpenQueue(() => resetStartAndEnd(start, end));
+    unlockAchievementById('generate_kruskals', 'pathfinder');
+    animatorRef.current.pushOneToOpenQueue(() => {
+      if (!start || !end) return;
+      resetStartAndEnd(start, end);
+    });
     animatorRef.current.closeOpenQueue(true);
   };
   const generateEllers = () => {
     let [start, end] = getStartAndEnd();
     wallifyItAll();
-    //eslint-disable-next-line no-unused-vars
-    let [result, animations] = ellers(grid);
-    animations = animations.concat(() => resetStartAndEnd(start, end));
+    let [_, animations] = ellers(grid);
+    unlockAchievementById('generate_ellers', 'pathfinder');
+    animations = animations.concat(() => {
+      if (!start || !end) return;
+      resetStartAndEnd(start, end);
+    });
 
     animatorRef.current.playAnimations(animations, 1, true);
   };
   const generateDFS = () => {
     let [start, end] = getStartAndEnd();
     wallifyItAll();
-    //eslint-disable-next-line no-unused-vars
-    let [result, animations] = recursiveBacktracking(grid);
-    animations = animations.concat(() => resetStartAndEnd(start, end));
+    let [_, animations] = recursiveBacktracking(grid);
+    unlockAchievementById('generate_recursive_backtracking', 'pathfinder');
+    animations = animations.concat(() => {
+      if (!start || !end) return;
+      resetStartAndEnd(start, end);
+    });
 
     animatorRef.current.playAnimations(animations, 2, true);
   };
   const generateHuntAndKill = () => {
     let [start, end] = getStartAndEnd();
     wallifyItAll();
-    let [result, animations] = huntAndKill(grid); //eslint-disable-line no-unused-vars
-    animations = animations.concat(() => resetStartAndEnd(start, end));
+    let [_, animations] = huntAndKill(grid);
+    unlockAchievementById('generate_hunt_and_kill', 'pathfinder');
+    animations = animations.concat(() => {
+      if (!start || !end) return;
+      resetStartAndEnd(start, end);
+    });
     animatorRef.current.playAnimations(animations, 2, true);
   };
   const generatePrims = () => {
     let [start, end] = getStartAndEnd();
     wallifyItAll();
-    let [result, animations] = prims(grid); //eslint-disable-line no-unused-vars
-    animations = animations.concat(() => resetStartAndEnd(start, end));
+    let [_, animations] = prims(grid);
+    unlockAchievementById('generate_prims', 'pathfinder');
+    animations = animations.concat(() => {
+      if (!start || !end) return;
+      resetStartAndEnd(start, end);
+    });
     animatorRef.current.playAnimations(animations, 2, true);
   };
   const generateRecursiveDivision = () => {
     let [start, end] = getStartAndEnd();
     resetWalls(false);
-    let animations = recursiveDivision(grid, 10).concat(() =>
-      resetStartAndEnd(start, end),
-    );
+
+    let animations = recursiveDivision(grid, 10).concat(() => {
+      if (!start || !end) return;
+      resetStartAndEnd(start, end);
+    });
+    unlockAchievementById('generate_recursive_division', 'pathfinder');
     animatorRef.current.playAnimations(animations, 1, true);
   };
 
@@ -394,7 +500,6 @@ function App() {
         solveBFS={solveBFS}
         solveDFS={solveDFS}
         solveAStar={solveAStar}
-        solvedRef={solved}
         clearPath={resetPath}
         generateKruskals={generateKruskals}
         generateEllers={generateEllers}
@@ -409,7 +514,7 @@ function App() {
           <div
             ref={gridContainerRef}
             className={
-              (rows <= 1 ? 'opacity-0 ' : '') +
+              (rows && rows <= 1 ? 'opacity-0 ' : '') +
               'flex h-full min-w-0 flex-1 flex-row'
             }
           >
@@ -425,7 +530,7 @@ function App() {
                       <GridSquare
                         key={square.uuid}
                         size={squareSize.current}
-                        rows={rows}
+                        rows={rows ?? 0}
                         square={square}
                         setValue={setValue}
                         dragValRef={dragValRef}
@@ -440,6 +545,6 @@ function App() {
       </div>
     </div>
   );
-}
+};
 
 export default App;
