@@ -1,4 +1,5 @@
 import React, { useImperativeHandle, useState, ForwardedRef } from 'react';
+import { Button, ChevronDown } from 'dread-ui';
 import {
   UserMenu,
   DropdownMenu,
@@ -86,7 +87,7 @@ const TopNav = (
   return (
     <div
       ref={ref}
-      className='flex flex-row items-center gap-4 overflow-auto bg-slate-200 px-2 py-1'
+      className='flex flex-row items-center gap-2 overflow-auto bg-slate-200 px-2 py-1'
     >
       <span className='flex-1'></span>
       <Select value={`${modeRef.current}`} onValueChange={handleChange}>
@@ -100,7 +101,12 @@ const TopNav = (
         </SelectContent>
       </Select>
       <DropdownMenu>
-        <DropdownMenuTrigger>Solve It!</DropdownMenuTrigger>
+        <DropdownMenuTrigger asChild>
+          <Button variant='secondary' className='gap-1 rounded-lg pr-2'>
+            Solve It!
+            <ChevronDown />
+          </Button>
+        </DropdownMenuTrigger>
         <DropdownMenuContent>
           {solveOptions.map((option, index) => (
             <DropdownMenuItem key={index} onClick={option.onClick}>
@@ -110,7 +116,12 @@ const TopNav = (
         </DropdownMenuContent>
       </DropdownMenu>
       <DropdownMenu>
-        <DropdownMenuTrigger>Generate Maze</DropdownMenuTrigger>
+        <DropdownMenuTrigger asChild>
+          <Button variant='secondary' className='gap-1 rounded-lg pr-2'>
+            Generate Maze
+            <ChevronDown />
+          </Button>
+        </DropdownMenuTrigger>
         <DropdownMenuContent>
           {mazeOptions.map((option, index) => (
             <DropdownMenuItem key={index} onClick={option.onClick}>
@@ -120,7 +131,12 @@ const TopNav = (
         </DropdownMenuContent>
       </DropdownMenu>
       <DropdownMenu>
-        <DropdownMenuTrigger>Clear Map</DropdownMenuTrigger>
+        <DropdownMenuTrigger asChild>
+          <Button variant='secondary' className='gap-1 rounded-lg pr-2'>
+            Clear Map
+            <ChevronDown />
+          </Button>
+        </DropdownMenuTrigger>
         <DropdownMenuContent>
           {clearOptions.map((option, index) => (
             <DropdownMenuItem key={index} onClick={option.onClick}>
