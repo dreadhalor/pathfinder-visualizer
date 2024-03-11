@@ -105,20 +105,20 @@ const App: React.FC = () => {
   const checkDrawingAchievement = (value: number | null) => {
     switch (value) {
       case 0:
-        if (isUnlockable('erase_wall', 'pathfinder'))
-          unlockAchievementById('erase_wall', 'pathfinder');
+        if (isUnlockable('erase_wall', 'pathfinder-visualizer'))
+          unlockAchievementById('erase_wall', 'pathfinder-visualizer');
         break;
       case 1:
-        if (isUnlockable('move_start', 'pathfinder'))
-          unlockAchievementById('move_start', 'pathfinder');
+        if (isUnlockable('move_start', 'pathfinder-visualizer'))
+          unlockAchievementById('move_start', 'pathfinder-visualizer');
         break;
       case 2:
-        if (isUnlockable('move_end', 'pathfinder'))
-          unlockAchievementById('move_end', 'pathfinder');
+        if (isUnlockable('move_end', 'pathfinder-visualizer'))
+          unlockAchievementById('move_end', 'pathfinder-visualizer');
         break;
       case 3:
-        if (isUnlockable('draw_wall', 'pathfinder'))
-          unlockAchievementById('draw_wall', 'pathfinder');
+        if (isUnlockable('draw_wall', 'pathfinder-visualizer'))
+          unlockAchievementById('draw_wall', 'pathfinder-visualizer');
         break;
       default:
         break;
@@ -360,8 +360,8 @@ const App: React.FC = () => {
     });
     if (!animations) return;
     animations.push(() => {
-      if (end) unlockAchievementById('solve_bfs', 'pathfinder');
-      else unlockAchievementById('no_solution', 'pathfinder');
+      if (end) unlockAchievementById('solve_bfs', 'pathfinder-visualizer');
+      else unlockAchievementById('no_solution', 'pathfinder-visualizer');
       if (!end && gridContainerRef.current) {
         gridContainerRef.current.classList.remove('no-solution');
         void gridContainerRef.current.offsetWidth;
@@ -386,8 +386,8 @@ const App: React.FC = () => {
     });
     if (!animations) return;
     animations.push(() => {
-      if (end) unlockAchievementById('solve_dfs', 'pathfinder');
-      else unlockAchievementById('no_solution', 'pathfinder');
+      if (end) unlockAchievementById('solve_dfs', 'pathfinder-visualizer');
+      else unlockAchievementById('no_solution', 'pathfinder-visualizer');
       if (!end && gridContainerRef.current) {
         gridContainerRef.current.classList.remove('no-solution');
         void gridContainerRef.current.offsetWidth;
@@ -410,8 +410,8 @@ const App: React.FC = () => {
       path_animation: (tile: Square) => tile.setPathVal!(() => 2),
     });
     animations.push(() => {
-      if (result) unlockAchievementById('solve_astar', 'pathfinder');
-      else unlockAchievementById('no_solution', 'pathfinder');
+      if (result) unlockAchievementById('solve_astar', 'pathfinder-visualizer');
+      else unlockAchievementById('no_solution', 'pathfinder-visualizer');
       if (!result && gridContainerRef.current) {
         gridContainerRef.current.classList.remove('no-solution');
         void gridContainerRef.current.offsetWidth;
@@ -427,7 +427,7 @@ const App: React.FC = () => {
     let [start, end] = getStartAndEnd();
     wallifyItAll();
     kruskals(grid, animatorRef);
-    unlockAchievementById('generate_kruskals', 'pathfinder');
+    unlockAchievementById('generate_kruskals', 'pathfinder-visualizer');
     animatorRef.current.pushOneToOpenQueue(() => {
       if (!start || !end) return;
       resetStartAndEnd(start, end);
@@ -438,7 +438,7 @@ const App: React.FC = () => {
     let [start, end] = getStartAndEnd();
     wallifyItAll();
     let [_, animations] = ellers(grid);
-    unlockAchievementById('generate_ellers', 'pathfinder');
+    unlockAchievementById('generate_ellers', 'pathfinder-visualizer');
     animations = animations.concat(() => {
       if (!start || !end) return;
       resetStartAndEnd(start, end);
@@ -450,7 +450,10 @@ const App: React.FC = () => {
     let [start, end] = getStartAndEnd();
     wallifyItAll();
     let [_, animations] = recursiveBacktracking(grid);
-    unlockAchievementById('generate_recursive_backtracking', 'pathfinder');
+    unlockAchievementById(
+      'generate_recursive_backtracking',
+      'pathfinder-visualizer',
+    );
     animations = animations.concat(() => {
       if (!start || !end) return;
       resetStartAndEnd(start, end);
@@ -462,7 +465,7 @@ const App: React.FC = () => {
     let [start, end] = getStartAndEnd();
     wallifyItAll();
     let [_, animations] = huntAndKill(grid);
-    unlockAchievementById('generate_hunt_and_kill', 'pathfinder');
+    unlockAchievementById('generate_hunt_and_kill', 'pathfinder-visualizer');
     animations = animations.concat(() => {
       if (!start || !end) return;
       resetStartAndEnd(start, end);
@@ -473,7 +476,7 @@ const App: React.FC = () => {
     let [start, end] = getStartAndEnd();
     wallifyItAll();
     let [_, animations] = prims(grid);
-    unlockAchievementById('generate_prims', 'pathfinder');
+    unlockAchievementById('generate_prims', 'pathfinder-visualizer');
     animations = animations.concat(() => {
       if (!start || !end) return;
       resetStartAndEnd(start, end);
@@ -488,7 +491,10 @@ const App: React.FC = () => {
       if (!start || !end) return;
       resetStartAndEnd(start, end);
     });
-    unlockAchievementById('generate_recursive_division', 'pathfinder');
+    unlockAchievementById(
+      'generate_recursive_division',
+      'pathfinder-visualizer',
+    );
     animatorRef.current.playAnimations(animations, 1, true);
   };
 

@@ -73,7 +73,7 @@ const TopNav = (
     {
       title: `Clear Walls`,
       onClick: () => {
-        unlockAchievementById('clear_walls', 'pathfinder');
+        unlockAchievementById('clear_walls', 'pathfinder-visualizer');
         resetWalls(true);
       },
     },
