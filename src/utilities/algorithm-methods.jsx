@@ -3,7 +3,7 @@ import { expandEdge } from './maze-structures';
 
 export const walk = (
   { node, adjacency_list, visited, edges, skip_first = false },
-  { animation_queue, traverseAnimation }
+  { animation_queue, traverseAnimation },
 ) => {
   if (node && !skip_first) traverse(node, animation_queue, traverseAnimation);
   while (node) {
@@ -21,9 +21,13 @@ export const walk = (
 };
 
 export const getRandomUnvisitedNeighbor = (node, adjacency_list, visited) =>
-  shuffle(adjacency_list.get(node).filter((neighbor) => !visited.has(neighbor)))[0];
+  shuffle(
+    adjacency_list.get(node).filter((neighbor) => !visited.has(neighbor)),
+  )[0];
 export const getRandomVisitedNeighbor = (node, adjacency_list, visited) =>
-  shuffle(adjacency_list.get(node).filter((neighbor) => visited.has(neighbor)))[0];
+  shuffle(
+    adjacency_list.get(node).filter((neighbor) => visited.has(neighbor)),
+  )[0];
 
 export function traverse(node, animations, animation) {
   animations.push(() => animation(node));
@@ -62,7 +66,7 @@ export const connectEdgeBackwards = (n1, n2, animations, connectAnimation) => {
   });
 };
 
-export const getDirection = ({ node, child, parent }) => {
+export const getDirection = ({ node, child }) => {
   let [r, c] = node;
   // let child_to_node = null;
   let node_to_parent = null;

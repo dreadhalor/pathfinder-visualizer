@@ -5,7 +5,7 @@ import { connectFullEdge } from '../algorithm-methods';
 import { kruskalsAnimations } from '../animations';
 
 export const kruskals = (grid, animatorRef) => {
-  let resultGrid = grid.map((row) => row.map((tile) => 3));
+  let resultGrid = grid.map((row) => row.map(() => 3));
   animatorRef.current.startOpenQueue();
   let { animation } = kruskalsAnimations(grid);
   let [nodes, possible_edges] = getNodesAndEdges(grid);
@@ -14,7 +14,8 @@ export const kruskals = (grid, animatorRef) => {
   let uf = new GridUnionFind(nodes);
   while (possible_edges.length > 0) {
     let [n1, n2] = possible_edges.shift();
-    if (!uf.connected(n1, n2)) connect(n1, n2, selected_edges, uf, animatorRef, animation);
+    if (!uf.connected(n1, n2))
+      connect(n1, n2, selected_edges, uf, animatorRef, animation);
   }
   let result = getFullEdges(selected_edges).flat(1);
   // animatorRef.current.closeOpenQueue(true);

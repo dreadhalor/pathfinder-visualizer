@@ -1,13 +1,15 @@
+/* eslint-disable react/prop-types */
 import { useEffect, useRef } from 'react';
 
 const DrawWrapper = ({ children, refToUse, style, className }) => {
   const data = useRef();
   const lastCoords = useRef();
   const lastChild = useRef();
-  // console.log('wrapper rendered');
+
   useEffect(() => {
     data.current = new Map();
-    for (let child of refToUse.current.children) data.current.set(child.id, { mouseOver: false });
+    for (let child of refToUse.current.children)
+      data.current.set(child.id, { mouseOver: false });
   });
   const getChild = (uuid) => data.current.get(uuid) ?? null;
 
@@ -19,6 +21,7 @@ const DrawWrapper = ({ children, refToUse, style, className }) => {
     var sy = y0 < y1 ? 1 : -1;
     var err = dx - dy;
 
+    // eslint-disable-next-line no-constant-condition
     while (true) {
       result.push([x0, y0]);
 
@@ -49,7 +52,9 @@ const DrawWrapper = ({ children, refToUse, style, className }) => {
   };
   const isInside = ([x, y], child) => {
     let rect = child.getBoundingClientRect();
-    return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+    return (
+      x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom
+    );
   };
   const processMove = (coords, event) => {
     if (lastChild.current && isInside(coords, lastChild.current)) return;
@@ -64,7 +69,7 @@ const DrawWrapper = ({ children, refToUse, style, className }) => {
               detail: {
                 buttons: event.buttons,
               },
-            })
+            }),
           );
         }
       } else if (child_data?.mouseOver) {
@@ -74,7 +79,7 @@ const DrawWrapper = ({ children, refToUse, style, className }) => {
             detail: {
               buttons: event.buttons,
             },
-          })
+          }),
         );
       }
     }
@@ -91,7 +96,7 @@ const DrawWrapper = ({ children, refToUse, style, className }) => {
             detail: {
               buttons: event.buttons,
             },
-          })
+          }),
         );
       } else if (child_data.mouseOver) {
         child_data.mouseOver = false;
@@ -100,7 +105,7 @@ const DrawWrapper = ({ children, refToUse, style, className }) => {
             detail: {
               buttons: event.buttons,
             },
-          })
+          }),
         );
       }
     }
@@ -115,7 +120,7 @@ const DrawWrapper = ({ children, refToUse, style, className }) => {
             detail: {
               buttons: event.buttons,
             },
-          })
+          }),
         );
       } else if (child_data.mouseOver) {
         child_data.mouseOver = false;
@@ -124,7 +129,7 @@ const DrawWrapper = ({ children, refToUse, style, className }) => {
             detail: {
               buttons: event.buttons,
             },
-          })
+          }),
         );
       }
     }
@@ -142,7 +147,7 @@ const DrawWrapper = ({ children, refToUse, style, className }) => {
             detail: {
               buttons: event.buttons,
             },
-          })
+          }),
         );
       }
     }
