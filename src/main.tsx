@@ -2,7 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './app.tsx';
 import { DreadUiProvider } from 'dread-ui';
-import 'dread-ui/style.scss';
+// import 'dread-ui/style.scss';
+import 'dread-ui/built-style.css';
 import './index.scss';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
