@@ -18,19 +18,7 @@ import { aStar } from './utilities/solvers/a-star';
 import { dfs } from './utilities/solvers/dfs';
 import DrawWrapper from './utilities/DrawWrapper';
 import { useAchievements } from 'dread-ui';
-
-interface Square {
-  uuid: string;
-  row: number;
-  col: number;
-  val?: number;
-  setVal?: React.Dispatch<React.SetStateAction<number>>;
-  pathVal?: number;
-  setPathVal?: React.Dispatch<React.SetStateAction<number>>;
-  animate?: (num: number) => void;
-  setDisplayVal?: (val: number | null) => void;
-  setDirection?: (val: string | null) => void;
-}
+import { Square } from './types';
 
 export type SetValueProps = {
   square_uuid: string;
@@ -238,14 +226,14 @@ const App: React.FC = () => {
     return [start, end] as [[number, number], [number, number]];
   };
   const getClosestPathSquare = (
-    new_grid: number[][],
+    new_grid: (Square | number)[][],
     coords: [number, number],
     val: number,
   ) => {
     return bfs_raw({
       maze: new_grid,
       start_coords: coords,
-      solution_func: (tile_val: number) => tile_val === val,
+      solution_func: (tile_val: Square | number) => tile_val === val,
     }) as [number, number] | null;
   };
   const resetStartAndEnd = (
@@ -350,6 +338,7 @@ const App: React.FC = () => {
     let endpoints = getStartAndEnd();
     let start = endpoints[0];
     resetPath();
+    if (!grid) return;
     let [end, animations] = bfs({
       maze: grid,
       start_coords: start,
@@ -359,15 +348,16 @@ const App: React.FC = () => {
       path_animation: (tile: Square) => tile.setPathVal!(() => 2),
     });
     if (!animations) return;
-    animations.push(() => {
-      if (end) unlockAchievementById('solve_bfs', 'pathfinder-visualizer');
-      else unlockAchievementById('no_solution', 'pathfinder-visualizer');
-      if (!end && gridContainerRef.current) {
-        gridContainerRef.current.classList.remove('no-solution');
-        void gridContainerRef.current.offsetWidth;
-        gridContainerRef.current.classList.add('no-solution');
-      }
-    });
+    if (animations)
+      animations.push(() => {
+        if (end) unlockAchievementById('solve_bfs', 'pathfinder-visualizer');
+        else unlockAchievementById('no_solution', 'pathfinder-visualizer');
+        if (!end && gridContainerRef.current) {
+          gridContainerRef.current.classList.remove('no-solution');
+          void gridContainerRef.current.offsetWidth;
+          gridContainerRef.current.classList.add('no-solution');
+        }
+      });
     animatorRef.current.playAnimations(animations, 6);
     solved.current = true;
     navRef.current.forceRender();
@@ -409,6 +399,7 @@ const App: React.FC = () => {
       frontier_animation: (tile: Square) => tile.setPathVal!(() => 3),
       path_animation: (tile: Square) => tile.setPathVal!(() => 2),
     });
+    if (!animations) return;
     animations.push(() => {
       if (result) unlockAchievementById('solve_astar', 'pathfinder-visualizer');
       else unlockAchievementById('no_solution', 'pathfinder-visualizer');
@@ -437,8 +428,9 @@ const App: React.FC = () => {
   const generateEllers = () => {
     let [start, end] = getStartAndEnd();
     wallifyItAll();
-    let [_, animations] = ellers(grid);
+    let [_, animations] = ellers(grid) as [any, Array<() => void>];
     unlockAchievementById('generate_ellers', 'pathfinder-visualizer');
+    if (!animations) return;
     animations = animations.concat(() => {
       if (!start || !end) return;
       resetStartAndEnd(start, end);
@@ -477,6 +469,7 @@ const App: React.FC = () => {
     wallifyItAll();
     let [_, animations] = prims(grid);
     unlockAchievementById('generate_prims', 'pathfinder-visualizer');
+    if (!animations) return;
     animations = animations.concat(() => {
       if (!start || !end) return;
       resetStartAndEnd(start, end);
