@@ -2,7 +2,11 @@ import { connectFullEdge, traverse } from '../algorithm-methods';
 import { ellersAnimations } from '../animations';
 import { GridSet } from '../data-structures/grid-set';
 import { GridUnionFind } from '../data-structures/grid-union-find';
-import { expandEdge, getFullEdges, getPathNodesByRow } from '../maze-structures';
+import {
+  expandEdge,
+  getFullEdges,
+  getPathNodesByRow,
+} from '../maze-structures';
 import { coinFlips, pickN } from '../randomizers';
 
 export const ellers = (grid) => {
@@ -24,7 +28,7 @@ export const ellers = (grid) => {
       selected_edges,
       last_row,
       animations,
-      anim_params
+      anim_params,
     );
     let vertical_edges = verticals(
       grid,
@@ -33,7 +37,7 @@ export const ellers = (grid) => {
       selected_edges,
       last_row,
       animations,
-      anim_params
+      anim_params,
     );
     let row_edges = [row[0], row[row.length - 1]];
     let full_row = expandEdge(row_edges);
@@ -50,7 +54,15 @@ export const ellers = (grid) => {
 };
 
 //randomly connect adjacent tiles (or all unconnected if last row)
-const horizontals = (grid, row, sets, edges, last_row, animations, anim_params) => {
+const horizontals = (
+  grid,
+  row,
+  sets,
+  edges,
+  last_row,
+  animations,
+  anim_params,
+) => {
   let { displayValAnimation, connectAnimation } = anim_params;
   // let count = 0;
   let added_edges = [];
@@ -83,7 +95,15 @@ const horizontals = (grid, row, sets, edges, last_row, animations, anim_params) 
   return added_edges;
 };
 //connect downpaths
-const verticals = (grid, horizontal_edges, sets, edges, last_row, animations, anim_params) => {
+const verticals = (
+  grid,
+  horizontal_edges,
+  sets,
+  edges,
+  last_row,
+  animations,
+  anim_params,
+) => {
   let { displayValAnimation, connectAnimation } = anim_params;
   // let count = 0;
   let added_edges = [];
