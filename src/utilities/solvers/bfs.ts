@@ -1,23 +1,7 @@
-// utilities/solvers/bfs.ts
-
 import { getDirection } from '../algorithm-methods';
 import { GridSet } from '../data-structures/grid-set';
 import { getSolverAdjacencyList } from '../maze-structures';
-import { Coordinates } from '../../types'; // Import Coordinates type
-
-// Define the Square interface based on your application's state
-interface Square {
-  uuid: string;
-  row: number;
-  col: number;
-  val?: number;
-  setVal?: React.Dispatch<React.SetStateAction<number>>;
-  pathVal?: number;
-  setPathVal?: React.Dispatch<React.SetStateAction<number>>;
-  animate?: (num: number) => void;
-  setDisplayVal?: (val: number | null) => void;
-  setDirection?: (val: string | null) => void;
-}
+import { Coordinates, Square } from '../../types';
 
 // Interface for the parameters accepted by the bfs function
 interface BfsParams {

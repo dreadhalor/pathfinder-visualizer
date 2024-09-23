@@ -366,6 +366,7 @@ const App: React.FC = () => {
     let endpoints = getStartAndEnd();
     let start = endpoints[0];
     resetPath();
+    if (!grid) return;
     let [end, animations] = dfs({
       maze: grid,
       start_coords: start,
