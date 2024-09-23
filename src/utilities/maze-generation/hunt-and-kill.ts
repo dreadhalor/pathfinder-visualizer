@@ -36,9 +36,9 @@ export const huntAndKill = (grid: Square[][]) => {
       clearScanAnimation(path_set);
     });
     // hoisting!
-    let path_set = new GridSet(getFullEdges(edges.entries()).flat(1));
+    let path_set = new GridSet(getFullEdges(edges.realEntries()).flat(1));
   }
-  let result = getFullEdges(edges.entries()).flat(1);
+  let result = getFullEdges(edges.realEntries()).flat(1);
   return { result, animations: params.animation_queue };
 };
 

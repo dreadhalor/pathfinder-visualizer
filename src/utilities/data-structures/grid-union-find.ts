@@ -1,10 +1,5 @@
 import { Coordinates } from '../../types';
 
-interface TransferDataParams {
-  setMap: Map<string, number>;
-  count: number;
-}
-
 export class GridUnionFind {
   private setMap: Map<string, number>;
   public count: number; // Number of disconnected components
@@ -140,18 +135,13 @@ export class GridUnionFind {
 
   /**
    * Transfers data to or from the Union-Find structure.
-   * @param params - The data to transfer.
+   * @param uf - The data to transfer.
    * @returns The updated GridUnionFind instance or the current data if no params are provided.
    */
-  transferData(
-    params?: TransferDataParams,
-  ): GridUnionFind | { setMap: Map<string, number>; count: number } {
-    if (!params) {
-      return { setMap: this.setMap, count: this.count };
-    }
-    const { setMap, count } = params;
-    this.setMap = setMap;
-    this.count = count;
+  transferData(uf?: GridUnionFind): GridUnionFind {
+    if (!uf) return this;
+    this.setMap = new Map(uf.setMap);
+    this.count = uf.count;
     return this;
   }
 }

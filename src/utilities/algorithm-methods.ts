@@ -70,7 +70,9 @@ export function traverseEdgeForward(
 ) {
   let edge = expandEdge([n1, n2]);
   for (let i = 1; i < edge.length; i++) {
-    traverse(edge[i], animations, animation);
+    const next = edge[i];
+    if (next === undefined) continue;
+    traverse(next, animations, animation);
   }
 }
 export function traverseEdgeBackwards(
@@ -81,7 +83,9 @@ export function traverseEdgeBackwards(
 ) {
   let edge = expandEdge([n1, n2]);
   for (let i = 0; i < edge.length - 1; i++) {
-    traverse(edge[i], animations, animation);
+    const next = edge[i];
+    if (next === undefined) continue;
+    traverse(next, animations, animation);
   }
 }
 export function traverseFullEdge(
@@ -92,7 +96,9 @@ export function traverseFullEdge(
 ) {
   let edge = expandEdge([n1, n2]);
   for (let i = 0; i < edge.length; i++) {
-    traverse(edge[i], animations, animation);
+    const next = edge[i];
+    if (next === undefined) continue;
+    traverse(next, animations, animation);
   }
 }
 
@@ -116,7 +122,9 @@ export const connectEdgeBackwards = (
   let edge = expandEdge([n1, n2]);
   animations.push(() => {
     for (let i = 0; i < edge.length - 1; i++) {
-      connectAnimation(edge[i]);
+      const next = edge[i];
+      if (next === undefined) continue;
+      connectAnimation(next);
     }
   });
 };

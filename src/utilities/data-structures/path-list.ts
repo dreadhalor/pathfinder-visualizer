@@ -42,6 +42,13 @@ export class PathList {
     ]);
   }
 
+  realEntries(): [Coordinates, Coordinates][] {
+    return this.entries().filter(([, neighbor]) => neighbor !== null) as [
+      Coordinates,
+      Coordinates,
+    ][];
+  }
+
   clone(): PathList {
     return new PathList(new Map(this.list));
   }

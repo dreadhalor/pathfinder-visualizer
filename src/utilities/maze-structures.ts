@@ -1,7 +1,7 @@
 // utilities/maze-structures.ts
 
 import { GridAdjacencyList } from './data-structures/grid-adjacency-list';
-import { Coordinates } from '../types';
+import { Coordinates, Square } from '../types';
 
 /**
  * Retrieves the dimensions of the grid.
@@ -9,8 +9,8 @@ import { Coordinates } from '../types';
  * @param grid - The grid represented as a 2D array.
  * @returns A tuple containing the number of rows and columns.
  */
-export const getDimensions = (grid: any[][]): [number, number] => {
-  return [grid?.length ?? 0, grid?.[0]?.length ?? 0];
+export const getDimensions = (grid: Square[][]) => {
+  return { rows: grid?.length ?? 0, cols: grid?.[0]?.length ?? 0 };
 };
 
 /**
@@ -19,10 +19,8 @@ export const getDimensions = (grid: any[][]): [number, number] => {
  * @param grid - The grid represented as a 2D array.
  * @returns A tuple containing an array of nodes and an array of edge tuples.
  */
-export const getNodesAndEdges = (
-  grid: any[][],
-): [Coordinates[], [Coordinates, Coordinates][]] => {
-  const [rows, cols] = getDimensions(grid);
+export const getNodesAndEdges = (grid: Square[][]) => {
+  const { rows, cols } = getDimensions(grid);
   const nodes: Coordinates[] = [];
   const edges: [Coordinates, Coordinates][] = [];
 
@@ -44,7 +42,7 @@ export const getNodesAndEdges = (
     }
   }
 
-  return [nodes, edges];
+  return { nodes, edges };
 };
 
 /**
@@ -53,8 +51,8 @@ export const getNodesAndEdges = (
  * @param grid - The grid represented as a 2D array.
  * @returns An array where each element is an array of Coordinates for that row.
  */
-export const getPathNodesByRow = (grid: any[][]): Coordinates[][] => {
-  const [rows, cols] = getDimensions(grid);
+export const getPathNodesByRow = (grid: Square[][]): Coordinates[][] => {
+  const { rows, cols } = getDimensions(grid);
   const result: Coordinates[][] = [];
 
   for (let i = 0; i < rows; i += 2) {
@@ -74,8 +72,8 @@ export const getPathNodesByRow = (grid: any[][]): Coordinates[][] => {
  * @param grid - The grid represented as a 2D array.
  * @returns A GridAdjacencyList representing connections between nodes.
  */
-export const getMazeAdjacencyList = (grid: any[][]): GridAdjacencyList => {
-  const [rows, cols] = getDimensions(grid);
+export const getMazeAdjacencyList = (grid: Square[][]): GridAdjacencyList => {
+  const { rows, cols } = getDimensions(grid);
   const adjacencyList = new GridAdjacencyList();
 
   for (let i = 0; i < rows; i += 2) {
@@ -98,17 +96,19 @@ export const getMazeAdjacencyList = (grid: any[][]): GridAdjacencyList => {
  * @param grid - The maze grid represented as a 2D array.
  * @returns A GridAdjacencyList representing connections between accessible nodes.
  */
-export const getSolverAdjacencyList = (grid: any[][]): GridAdjacencyList => {
-  const [rows, cols] = getDimensions(grid);
+export const getSolverAdjacencyList = (grid: Square[][]): GridAdjacencyList => {
+  const { rows, cols } = getDimensions(grid);
   const adjacencyList = new GridAdjacencyList();
 
   for (let i = 0; i < rows; i++) {
     for (let j = 0; j < cols; j++) {
       const neighbors: Coordinates[] = [];
-      if (j < cols - 1 && grid[i]![j + 1].val !== 3) neighbors.push([i, j + 1]);
-      if (j > 0 && grid[i]![j - 1].val !== 3) neighbors.push([i, j - 1]);
-      if (i < rows - 1 && grid[i + 1]![j].val !== 3) neighbors.push([i + 1, j]);
-      if (i > 0 && grid[i - 1]![j].val !== 3) neighbors.push([i - 1, j]);
+      if (j < cols - 1 && grid[i]![j + 1]!.val !== 3)
+        neighbors.push([i, j + 1]);
+      if (j > 0 && grid[i]![j - 1]!.val !== 3) neighbors.push([i, j - 1]);
+      if (i < rows - 1 && grid[i + 1]![j]!.val !== 3)
+        neighbors.push([i + 1, j]);
+      if (i > 0 && grid[i - 1]![j]!.val !== 3) neighbors.push([i - 1, j]);
       adjacencyList.set([i, j], neighbors);
     }
   }

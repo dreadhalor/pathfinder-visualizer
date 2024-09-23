@@ -17,8 +17,8 @@ export const recursiveBacktracking = (grid: Square[][]) => {
     params.node = walk(params);
     params.node = backtrack(params);
   }
-  let result = getFullEdges(params.edges.entries()).flat(1);
-  return [result, params.animation_queue];
+  let result = getFullEdges(params.edges.realEntries()).flat(1);
+  return { result, animations: params.animation_queue };
 };
 
 type BacktrackParams = WalkParams & {

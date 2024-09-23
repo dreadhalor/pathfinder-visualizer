@@ -2,7 +2,7 @@ import { getDimensions } from './maze-structures';
 
 export const finishAnimation = (grid) => {
   let animation_queue = [];
-  let [rows, cols] = getDimensions(grid);
+  let { rows, cols } = getDimensions(grid);
   for (let i = 0; i < rows; i++) {
     let finish_animation = [];
     for (let j = 0; j < cols; j++) {

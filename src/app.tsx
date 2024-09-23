@@ -422,6 +422,7 @@ const App: React.FC = () => {
     let [start, end] = getStartAndEnd();
     console.log('kruskals', start, end);
     wallifyItAll();
+    if (!grid) return;
     kruskals(grid, animatorRef);
     unlockAchievementById('generate_kruskals', 'pathfinder-visualizer');
     animatorRef.current.pushOneToOpenQueue(() => {
@@ -436,7 +437,8 @@ const App: React.FC = () => {
   const generateEllers = () => {
     let [start, end] = getStartAndEnd();
     wallifyItAll();
-    let [_, animations] = ellers(grid) as [any, Array<() => void>];
+    if (!grid) return;
+    let { animations } = ellers(grid);
     unlockAchievementById('generate_ellers', 'pathfinder-visualizer');
     if (!animations) return;
     animations = animations.concat(() => {
@@ -452,7 +454,8 @@ const App: React.FC = () => {
   const generateDFS = () => {
     let [start, end] = getStartAndEnd();
     wallifyItAll();
-    let [_, animations] = recursiveBacktracking(grid);
+    if (!grid) return;
+    let { animations } = recursiveBacktracking(grid);
     unlockAchievementById(
       'generate_recursive_backtracking',
       'pathfinder-visualizer',
@@ -479,7 +482,8 @@ const App: React.FC = () => {
   const generatePrims = () => {
     let [start, end] = getStartAndEnd();
     wallifyItAll();
-    let [_, animations] = prims(grid);
+    if (!grid) return;
+    let { animations } = prims(grid);
     unlockAchievementById('generate_prims', 'pathfinder-visualizer');
     if (!animations) return;
     animations = animations.concat(() => {
@@ -492,7 +496,9 @@ const App: React.FC = () => {
     let [start, end] = getStartAndEnd();
     resetWalls(false);
 
-    let animations = recursiveDivision(grid, 10).concat(() => {
+    if (!grid) return;
+    let { animations } = recursiveDivision(grid, 10);
+    animations = animations.concat(() => {
       if (!start || !end) return;
       resetStartAndEnd(start, end);
     });
