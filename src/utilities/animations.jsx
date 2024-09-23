@@ -15,6 +15,7 @@ export const finishAnimation = (grid) => {
   }
   return animation_queue;
 };
+
 export const clearScanAnimationGenerator = (grid) => (path_set) => {
   for (let i = 0; i < grid.length; i++) {
     for (let j = 0; j < grid[0].length; j++) {
@@ -29,11 +30,19 @@ export const clearScanAnimationGenerator = (grid) => (path_set) => {
   }
 };
 
-//I can't believe this actually works
+// Updated animationGenerator with better logging
 export const animationGenerator =
   (grid, animation) =>
   ([r, c], params) => {
+    console.log('Animation called with:', [r, c], params);
+    if (params === undefined) {
+      console.error('Params are undefined!');
+    }
     let tile = grid[r][c];
+    if (!tile) {
+      console.error(`Tile at [${r}, ${c}] is undefined.`);
+      return;
+    }
     animation(tile, params);
   };
 
@@ -91,7 +100,7 @@ export const ellersAnimations = (grid) => {
     }),
     // popAnimation: animationGenerator(grid, (tile) => tile.animate(2)),
     displayValAnimation: animationGenerator(grid, (tile, displayVal) =>
-      tile.setDisplayVal(displayVal)
+      tile.setDisplayVal(displayVal),
     ),
   };
 };

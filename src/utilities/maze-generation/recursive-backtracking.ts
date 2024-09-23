@@ -1,27 +1,37 @@
+import { Coordinates, Square } from '../../types';
 import {
   getRandomUnvisitedNeighbor,
   traverse,
   traverseEdgeBackwards,
   walk,
+  WalkParams,
 } from '../algorithm-methods';
 import { recursiveBacktrackingAnimations } from '../animations';
-import { GridAdjacencyList } from '../data-structures/grid-adjacency-list';
 import { GridSet } from '../data-structures/grid-set';
+import { PathList } from '../data-structures/path-list';
 import { getFullEdges, getMazeAdjacencyList } from '../maze-structures';
 
-export const recursiveBacktracking = (grid) => {
-  let [params, anim_params] = parseParams(grid);
+export const recursiveBacktracking = (grid: Square[][]) => {
+  let params = parseParams(grid);
   while (params.node) {
-    params.node = walk(params, anim_params);
-    params.node = backtrack(params, anim_params);
+    params.node = walk(params);
+    params.node = backtrack(params);
   }
   let result = getFullEdges(params.edges.entries()).flat(1);
-  return [result, anim_params.animation_queue];
+  return [result, params.animation_queue];
 };
 
-const backtrack = (params, anim_params) => {
-  let { node, adjacency_list, visited, edges } = params;
-  let { animation_queue, backtrackAnimation } = anim_params;
+type BacktrackParams = WalkParams & {
+  backtrackAnimation: (node: Coordinates) => void;
+};
+const backtrack = ({
+  node,
+  adjacency_list,
+  visited,
+  edges,
+  animation_queue,
+  backtrackAnimation,
+}: BacktrackParams) => {
   while (node) {
     //check if we can start a new walk
     let next = getRandomUnvisitedNeighbor(node, adjacency_list, visited);
@@ -40,14 +50,16 @@ const backtrack = (params, anim_params) => {
   return null;
 };
 
-function parseParams(grid) {
+function parseParams(grid: Square[][]) {
   let params = {
+    node: null as Coordinates | null,
     animations: [],
     adjacency_list: getMazeAdjacencyList(grid),
-    edges: new GridAdjacencyList(),
+    edges: new PathList(),
     visited: new GridSet(),
+    animation_queue: new Array<() => void>(),
+    ...recursiveBacktrackingAnimations(grid),
   };
-  let anim_params = { animation_queue: [], ...recursiveBacktrackingAnimations(grid) };
-  params.node = params.adjacency_list.getRandom();
-  return [params, anim_params];
+  params.node = params.adjacency_list!.getRandom()!;
+  return params;
 }

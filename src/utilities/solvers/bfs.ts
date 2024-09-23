@@ -2,6 +2,7 @@ import { getDirection } from '../algorithm-methods';
 import { GridSet } from '../data-structures/grid-set';
 import { getSolverAdjacencyList } from '../maze-structures';
 import { Coordinates, Square } from '../../types';
+import { PathList } from '../data-structures/path-list';
 
 // Interface for the parameters accepted by the bfs function
 interface BfsParams {
@@ -27,139 +28,58 @@ export const bfs = ({
   traversal_animation,
   path_animation,
 }: BfsParams) => {
-  const animations: Array<() => void> = [];
-  const adjacency_list = getSolverAdjacencyList(maze);
-
-  // Use a Map<string, Coordinates | null> for pathMap to map each node to its parent
-  const pathMap: Map<string, Coordinates | null> = new Map();
-  const visited = new GridSet();
-  const queue: Coordinates[] = [];
+  let animations = [];
+  let adjacency_list = getSolverAdjacencyList(maze);
+  let pathMap = new PathList();
+  let visited = new GridSet();
+  let queue: Array<Coordinates> = [];
   let end: Coordinates | null = null;
-
   if (start_coords) {
     queue.push(start_coords);
-    pathMap.set(JSON.stringify(start_coords), null);
-    const tile = maze[start_coords[0]]?.[start_coords[1]];
-    if (tile) {
-      animations.push(() => frontier_animation(tile));
-    }
+    pathMap.set(start_coords, null);
+    const animCoords = maze[start_coords[0]]?.[start_coords[1]];
+    if (animCoords) animations.push(() => frontier_animation(animCoords));
   }
-
   while (queue.length > 0) {
-    const current = queue.shift();
-    if (!current) continue; // Safety check
-
-    const [r, c] = current;
-
-    const currentTile = maze[r]?.[c];
-    if (!currentTile) continue; // Ensure currentTile exists
-
-    if (!visited.has(current)) {
-      visited.add(current);
-      animations.push(() => {
-        traversal_animation(currentTile);
-      });
-
-      if (solution_func(currentTile)) {
-        end = current;
+    const next = queue.shift();
+    if (!next) continue;
+    let [r, c] = next;
+    if (!visited.has(next)) {
+      visited.add(next);
+      const animCoords = maze[r]?.[c];
+      if (!animCoords) continue;
+      animations.push(() => traversal_animation(animCoords));
+      if (solution_func(animCoords)) {
+        end = [r, c];
         break;
       }
-
-      const neighbors =
-        adjacency_list.get(current)?.filter((n) => !visited.has(n)) || [];
-
-      for (const neighbor of neighbors) {
-        queue.push(neighbor);
-        pathMap.set(JSON.stringify(neighbor), current);
-        const neighborTile = maze[neighbor[0]]?.[neighbor[1]];
-        if (neighborTile) {
-          animations.push(() => frontier_animation(neighborTile));
-        }
+      let adjacents = adjacency_list.get(next);
+      if (!adjacents) continue;
+      let neighbors = adjacents.filter((n) => !visited.has(n));
+      for (let [n_r, n_c] of neighbors) {
+        queue.push([n_r, n_c]);
+        pathMap.set([n_r, n_c], [r, c]);
+        const animCoords = maze[n_r]?.[n_c];
+        if (!animCoords) continue;
+        animations.push(() => frontier_animation(animCoords));
       }
     }
   }
-
-  // Reconstruct the path from end to start
-  let path_node: Coordinates | null = end;
-  let child: Coordinates | null = null;
-
+  let path_node = end;
+  let child = null;
   while (path_node) {
-    const [r, c] = path_node;
-    const parent = pathMap.get(JSON.stringify(path_node)) || null;
-    const direction = parent ? getDirection({ node: path_node, parent }) : null;
-
-    const currentTile = maze[r]?.[c];
-    if (currentTile) {
-      animations.push(() => {
-        path_animation(currentTile);
-        if (direction) {
-          currentTile.setDirection?.(direction);
-        }
-      });
-    }
-
+    let [r, c] = path_node;
+    let parent = pathMap.get(path_node) ?? null;
+    let direction = getDirection({ node: path_node, child });
+    const animCoords = maze[r]?.[c];
+    if (!animCoords) continue;
+    animations.push(() => {
+      path_animation(animCoords);
+      animCoords.setDirection?.(direction);
+    });
     child = path_node;
     path_node = parent;
   }
 
   return { end, animations };
-};
-
-// Interface for the parameters accepted by the bfs_raw function
-interface BfsRawParams {
-  maze: (Square | number)[][];
-  start_coords: Coordinates | null;
-  solution_func: (tile: Square | number) => boolean;
-}
-
-/**
- * Performs a raw Breadth-First Search (BFS) on the given maze without animations.
- *
- * @param params - An object containing the maze, start coordinates, and solution function.
- * @returns The end coordinates if a solution is found, otherwise null.
- */
-export const bfs_raw = ({
-  maze,
-  start_coords,
-  solution_func,
-}: BfsRawParams): Coordinates | null => {
-  const rows = maze?.length ?? 0;
-  const cols = maze?.[0]?.length ?? 0;
-  const visited = new GridSet();
-  const queue: Coordinates[] = [];
-
-  if (start_coords) {
-    queue.push(start_coords);
-    visited.add(start_coords);
-  }
-
-  while (queue.length > 0) {
-    const current = queue.shift();
-    if (!current) continue; // Safety check
-
-    const [r, c] = current;
-    const currentTile = maze[r]?.[c];
-    if (!currentTile) continue; // Ensure currentTile exists
-    if (solution_func(currentTile)) return current;
-
-    // Explore neighbors in the order: up, down, left, right
-    const directions: Coordinates[] = [
-      [r - 1, c], // Up
-      [r + 1, c], // Down
-      [r, c - 1], // Left
-      [r, c + 1], // Right
-    ];
-
-    for (const [nr, nc] of directions) {
-      if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
-        const neighborTile = maze[nr]?.[nc];
-        if (neighborTile && !visited.has([nr, nc])) {
-          queue.push([nr, nc]);
-          visited.add([nr, nc]);
-        }
-      }
-    }
-  }
-
-  return null;
 };

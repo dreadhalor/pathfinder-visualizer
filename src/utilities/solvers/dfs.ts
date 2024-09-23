@@ -3,6 +3,7 @@ import { GridAdjacencyList } from '../data-structures/grid-adjacency-list';
 import { GridSet } from '../data-structures/grid-set';
 import { getSolverAdjacencyList } from '../maze-structures';
 import { Coordinates, Square } from '../../types';
+import { PathList } from '../data-structures/path-list';
 
 /**
  * Interface defining the parameters for the DFS function.
@@ -32,7 +33,7 @@ export const dfs = ({
 }: DfsParams) => {
   const animations: Array<() => void> = [];
   const adjacency_list: GridAdjacencyList = getSolverAdjacencyList(maze);
-  const pathMap: Map<string, Coordinates | null> = new Map();
+  const pathMap = new PathList();
   const visited: GridSet = new GridSet();
   const stack: Coordinates[] = [];
   let end: Coordinates | null = null;
@@ -40,7 +41,7 @@ export const dfs = ({
   // Initialize the stack with the start coordinates
   if (start_coords) {
     stack.push(start_coords);
-    pathMap.set(JSON.stringify(start_coords), null);
+    pathMap.set(start_coords, null);
     const tile = maze[start_coords[0]]?.[start_coords[1]];
     if (!tile) return { end: null, animations: [] }; // Safety check
     animations.push(() => frontier_animation(tile));
@@ -72,7 +73,7 @@ export const dfs = ({
 
       for (const neighbor of reversedNeighbors) {
         stack.push(neighbor);
-        pathMap.set(JSON.stringify(neighbor), current);
+        pathMap.set(neighbor, current);
         const neighborTile = maze[neighbor[0]]?.[neighbor[1]];
         if (!neighborTile) continue; // Safety check
         animations.push(() => frontier_animation(neighborTile));
@@ -81,24 +82,18 @@ export const dfs = ({
   }
 
   // Reconstruct the path from end to start
-  let path_node: Coordinates | null = end;
-  let child: Coordinates | null = null;
-
+  let path_node = end;
+  let child = null;
   while (path_node) {
-    const [r, c] = path_node;
-    const parent = pathMap.get(JSON.stringify(path_node)) || null;
-    const direction = parent ? getDirection({ node: path_node, parent }) : null;
-
-    const currentTile = maze[r]?.[c];
-    if (currentTile) {
-      animations.push(() => {
-        path_animation(currentTile);
-        if (direction) {
-          currentTile.setDirection?.(direction);
-        }
-      });
-    }
-
+    let [r, c] = path_node;
+    let parent = pathMap.get(path_node) ?? null;
+    let direction = getDirection({ node: path_node, child });
+    const animCoords = maze[r]?.[c];
+    if (!animCoords) continue;
+    animations.push(() => {
+      path_animation(animCoords);
+      animCoords.setDirection?.(direction);
+    });
     child = path_node;
     path_node = parent;
   }

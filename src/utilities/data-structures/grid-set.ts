@@ -1,11 +1,16 @@
 import { Coordinates } from '../../types';
+import { CoordinateUtils } from './coordinate-utils';
 
 export class GridSet {
   private set: Set<string>;
 
-  constructor(coords_set: Coordinates[] = []) {
+  /**
+   * Initializes the GridSet with an optional array of coordinates.
+   * @param coordsSet - An array of coordinates to initialize the set with.
+   */
+  constructor(coordsSet: Coordinates[] = []) {
     this.set = new Set<string>();
-    this.addMultiple(coords_set);
+    this.addMultiple(coordsSet);
   }
 
   /**
@@ -14,21 +19,23 @@ export class GridSet {
    * @returns The GridSet instance for chaining.
    */
   add(coords: Coordinates): this {
-    this.set.add(JSON.stringify(coords));
+    this.set.add(CoordinateUtils.serialize(coords));
     return this;
   }
 
   /**
    * Adds multiple sets of coordinates to the GridSet.
-   * @param coords_set - An array of coordinates to add.
+   * @param coordsSet - An array of coordinates to add.
    * @returns An array of coordinates that were successfully added.
    */
-  addMultiple(coords_set: Coordinates[]): Coordinates[] {
+  addMultiple(coordsSet: Coordinates[]): Coordinates[] {
     const successes: Coordinates[] = [];
-    for (const coords of coords_set) {
-      const sizeBefore = this.size();
-      this.add(coords);
-      if (this.size() > sizeBefore) successes.push(coords);
+    for (const coords of coordsSet) {
+      const serialized = CoordinateUtils.serialize(coords);
+      if (!this.set.has(serialized)) {
+        this.set.add(serialized);
+        successes.push(coords);
+      }
     }
     return successes;
   }
@@ -39,7 +46,7 @@ export class GridSet {
    * @returns True if the coordinates exist, otherwise false.
    */
   has(coords: Coordinates): boolean {
-    return this.set.has(JSON.stringify(coords));
+    return this.set.has(CoordinateUtils.serialize(coords));
   }
 
   /**
@@ -47,7 +54,7 @@ export class GridSet {
    * @returns An array of coordinates.
    */
   toArray(): Coordinates[] {
-    return [...this.set].map((str) => JSON.parse(str) as Coordinates);
+    return Array.from(this.set).map(CoordinateUtils.deserialize);
   }
 
   /**
@@ -57,9 +64,8 @@ export class GridSet {
    */
   at(index: number): Coordinates | null {
     if (index < 0 || index >= this.size()) return null;
-    const arr = [...this.set];
-    if (!arr[index]) return null;
-    return JSON.parse(arr[index]) as Coordinates;
+    const serialized = Array.from(this.set)[index];
+    return serialized ? CoordinateUtils.deserialize(serialized) : null;
   }
 
   /**
@@ -70,9 +76,12 @@ export class GridSet {
     const size = this.size();
     if (size === 0) return null;
     const index = Math.floor(Math.random() * size);
-    const coords = this.at(index);
-    if (coords) this.set.delete(JSON.stringify(coords));
-    return coords;
+    const serialized = Array.from(this.set)[index];
+    if (serialized) {
+      this.set.delete(serialized);
+      return CoordinateUtils.deserialize(serialized);
+    }
+    return null;
   }
 
   /**
@@ -81,7 +90,7 @@ export class GridSet {
    * @returns True if the coordinates were deleted, otherwise false.
    */
   delete(coords: Coordinates): boolean {
-    return this.set.delete(JSON.stringify(coords));
+    return this.set.delete(CoordinateUtils.serialize(coords));
   }
 
   /**
@@ -97,7 +106,13 @@ export class GridSet {
    * @returns A new instance of GridSet with the same data.
    */
   clone(): GridSet {
-    const copyCoords = this.toArray();
-    return new GridSet(copyCoords);
+    return new GridSet(this.toArray());
+  }
+
+  /**
+   * Clears all elements from the GridSet.
+   */
+  clear(): void {
+    this.set.clear();
   }
 }

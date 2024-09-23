@@ -1,4 +1,6 @@
+// grid-adjacency-list.ts
 import { Coordinates } from '../../types';
+import { CoordinateUtils } from './coordinate-utils';
 
 export class GridAdjacencyList {
   private list: Map<string, Coordinates[]>;
@@ -7,42 +9,22 @@ export class GridAdjacencyList {
     this.list = map || new Map<string, Coordinates[]>();
   }
 
-  /**
-   * Checks if the adjacency list contains the specified coordinates.
-   * @param coords - The coordinates to check.
-   * @returns True if the coordinates exist, otherwise false.
-   */
   has(coords: Coordinates): boolean {
-    return this.list.get(JSON.stringify(coords)) !== undefined;
+    return this.list.has(CoordinateUtils.serialize(coords));
   }
 
-  /**
-   * Retrieves the neighbors of the specified coordinates.
-   * @param coords - The coordinates whose neighbors are to be retrieved.
-   * @returns An array of neighboring coordinates or undefined if not found.
-   */
   get(coords: Coordinates): Coordinates[] | undefined {
-    return this.list.get(JSON.stringify(coords));
+    return this.list.get(CoordinateUtils.serialize(coords));
   }
 
-  /**
-   * Retrieves the coordinates at the specified index.
-   * @param index - The index of the coordinates to retrieve.
-   * @returns The coordinates at the given index.
-   * @throws Error if the index is out of bounds.
-   */
   at(index: number): Coordinates {
     const key = [...this.list.keys()][index];
     if (!key) {
       throw new Error('Index out of bounds');
     }
-    return JSON.parse(key) as Coordinates;
+    return CoordinateUtils.deserialize(key);
   }
 
-  /**
-   * Retrieves a random set of coordinates from the adjacency list.
-   * @returns A random set of coordinates or null if the list is empty.
-   */
   getRandom(): Coordinates | null {
     const size = this.list.size;
     if (size === 0) return null;
@@ -50,33 +32,91 @@ export class GridAdjacencyList {
     return this.at(index);
   }
 
-  /**
-   * Sets the neighbors for the specified coordinates.
-   * @param coords - The coordinates to set neighbors for.
-   * @param neighbors - An array of neighboring coordinates.
-   */
   set(coords: Coordinates, neighbors: Coordinates[]): void {
-    this.list.set(JSON.stringify(coords), neighbors);
+    this.list.set(CoordinateUtils.serialize(coords), neighbors);
   }
 
-  /**
-   * Retrieves all entries in the adjacency list.
-   * @returns An array of tuples containing coordinates and their neighbors.
-   */
   entries(): [Coordinates, Coordinates[]][] {
-    const entries: [Coordinates, Coordinates[]][] = [];
-    for (const [key_node, neighbors] of this.list.entries()) {
-      const parsedKey = JSON.parse(key_node) as Coordinates;
-      entries.push([parsedKey, neighbors]);
-    }
-    return entries;
+    return [...this.list.entries()].map(([key, neighbors]) => [
+      CoordinateUtils.deserialize(key),
+      neighbors,
+    ]);
   }
 
-  /**
-   * Creates a clone of the current adjacency list.
-   * @returns A new instance of GridAdjacencyList with the same data.
-   */
   clone(): GridAdjacencyList {
     return new GridAdjacencyList(new Map(this.list));
+  }
+
+  /**
+   * Creates a GridAdjacencyList from a 2D grid.
+   * Each cell is connected to its walkable neighbors in the 4 cardinal directions.
+   *
+   * @param grid - The 2D grid to convert.
+   * @param isWalkable - Optional predicate to determine if a cell is walkable.
+   *                     If not provided, all cells are considered walkable.
+   * @returns A new GridAdjacencyList representing the adjacency list of the grid.
+   */
+  static fromGrid<T>(
+    grid: T[][],
+    isWalkable?: (cell: T) => boolean,
+  ): GridAdjacencyList {
+    const adjacencyMap = new Map<string, Coordinates[]>();
+    const rows = grid.length;
+    if (rows === 0) return new GridAdjacencyList(adjacencyMap);
+    const cols = grid[0]!.length;
+
+    for (let row = 0; row < rows; row++) {
+      // Ensure that grid[row] is defined and has the correct width
+      const currentRow = grid[row];
+      if (!currentRow || currentRow.length !== cols) {
+        throw new Error(`Row ${row} is undefined or has inconsistent length.`);
+      }
+
+      for (let col = 0; col < cols; col++) {
+        const currentCell = currentRow[col];
+
+        // If a walkable predicate is provided, skip non-walkable cells
+        if (
+          currentCell === undefined ||
+          (isWalkable && !isWalkable(currentCell))
+        ) {
+          continue;
+        }
+
+        const neighbors: Coordinates[] = [];
+        const directions: Coordinates[] = [
+          [row - 1, col], // Up
+          [row + 1, col], // Down
+          [row, col - 1], // Left
+          [row, col + 1], // Right
+        ];
+
+        for (const [nr, nc] of directions) {
+          // Check if the neighbor is within grid bounds
+          if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
+            const neighborRow = grid[nr];
+            if (!neighborRow || neighborRow.length !== cols) {
+              throw new Error(
+                `Neighbor row ${nr} is undefined or has inconsistent length.`,
+              );
+            }
+
+            const neighborCell = neighborRow[nc];
+            if (neighborCell === undefined) continue;
+
+            // If a walkable predicate is provided, ensure the neighbor is walkable
+            if (isWalkable && !isWalkable(neighborCell)) continue;
+            neighbors.push([nr, nc]);
+          }
+        }
+
+        // Add the current cell and its neighbors to the adjacency map
+        adjacencyMap.set(CoordinateUtils.serialize([row, col]), neighbors);
+      }
+    }
+
+    console.log('Adjacency Map:', adjacencyMap);
+
+    return new GridAdjacencyList(adjacencyMap);
   }
 }

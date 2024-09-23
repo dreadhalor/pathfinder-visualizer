@@ -3,6 +3,7 @@ import { getDirection } from '../algorithm-methods';
 import { GridSet } from '../data-structures/grid-set';
 import { getSolverAdjacencyList } from '../maze-structures';
 import { Square, Coordinates } from '../../types';
+import { PathList } from '../data-structures/path-list';
 
 /**
  * Represents the cost associated with a node in the A* algorithm.
@@ -76,7 +77,7 @@ export const aStar = ({
   const animations: Array<() => void> = [];
   const open = new GridSet(); // Stores stringified Coordinates
   const closed = new GridSet(); // Stores stringified Coordinates
-  const pathMap: Map<string, Coordinates | null> = new Map(); // Maps stringified Coordinates to parent Coordinates
+  const pathMap = new PathList(); // Maps stringified Coordinates to parent Coordinates
   const costs: Map<string, Cost> = new Map(); // Maps stringified Coordinates to Cost
   const adjacency_list = getSolverAdjacencyList(maze);
   let end: Coordinates | null = null;
@@ -165,11 +166,11 @@ export const aStar = ({
           new_cost.g + new_cost.h * h_weight
         ) {
           costs.set(JSON.stringify(neighbor), new_cost);
-          pathMap.set(JSON.stringify(neighbor), node);
+          pathMap.set(neighbor, node);
         }
       } else {
         costs.set(JSON.stringify(neighbor), new_cost);
-        pathMap.set(JSON.stringify(neighbor), node);
+        pathMap.set(neighbor, node);
       }
 
       open.add(neighbor);
@@ -181,23 +182,19 @@ export const aStar = ({
   }
 
   // Reconstruct the path from end to start
-  let path_node: Coordinates | null = end;
-  // Removed unused 'child' variable to eliminate warnings
+  let path_node = end;
+  let child = null;
   while (path_node) {
-    const [r, c] = path_node;
-    const parent = pathMap.get(JSON.stringify(path_node)) || null;
-    const direction = parent ? getDirection({ node: path_node, parent }) : null;
-
-    const currentTile = maze[r]?.[c];
-    if (currentTile) {
-      animations.push(() => {
-        path_animation(currentTile);
-        if (direction) {
-          currentTile.setDirection?.(direction);
-        }
-      });
-    }
-
+    let [r, c] = path_node;
+    let parent = pathMap.get(path_node) ?? null;
+    let direction = getDirection({ node: path_node, child });
+    const animCoords = maze[r]?.[c];
+    if (!animCoords) continue;
+    animations.push(() => {
+      path_animation(animCoords);
+      animCoords.setDirection?.(direction);
+    });
+    child = path_node;
     path_node = parent;
   }
 
