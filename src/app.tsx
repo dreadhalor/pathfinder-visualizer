@@ -339,7 +339,7 @@ const App: React.FC = () => {
     let start = endpoints[0];
     resetPath();
     if (!grid) return;
-    let [end, animations] = bfs({
+    const { end, animations } = bfs({
       maze: grid,
       start_coords: start,
       solution_func: (tile: Square) => tile.val === 2,
@@ -367,7 +367,7 @@ const App: React.FC = () => {
     let start = endpoints[0];
     resetPath();
     if (!grid) return;
-    let [end, animations] = dfs({
+    const { end, animations } = dfs({
       maze: grid,
       start_coords: start,
       solution_func: (tile: Square) => tile.val === 2,
@@ -392,7 +392,8 @@ const App: React.FC = () => {
   const solveAStar = () => {
     let [start, end] = getStartAndEnd();
     resetPath();
-    let [result, animations] = aStar({
+    if (!grid) return;
+    let { end: result, animations } = aStar({
       maze: grid,
       start_coords: start,
       end_coords: end,

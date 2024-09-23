@@ -20,7 +20,7 @@ interface DfsParams {
  * Performs a Depth-First Search (DFS) on the given maze.
  *
  * @param params - An object containing the maze, start coordinates, solution function, and animation callbacks.
- * @returns A tuple containing the end coordinates (if found) and an array of animation functions.
+ * @returns An object containing the end coordinates (if found) and an array of animation functions.
  */
 export const dfs = ({
   maze,
@@ -29,7 +29,7 @@ export const dfs = ({
   frontier_animation,
   traversal_animation,
   path_animation,
-}: DfsParams): [Coordinates | null, Array<() => void>] => {
+}: DfsParams) => {
   const animations: Array<() => void> = [];
   const adjacency_list: GridAdjacencyList = getSolverAdjacencyList(maze);
   const pathMap: Map<string, Coordinates | null> = new Map();
@@ -42,7 +42,7 @@ export const dfs = ({
     stack.push(start_coords);
     pathMap.set(JSON.stringify(start_coords), null);
     const tile = maze[start_coords[0]]?.[start_coords[1]];
-    if (!tile) return [null, []]; // Safety check
+    if (!tile) return { end: null, animations: [] }; // Safety check
     animations.push(() => frontier_animation(tile));
   }
 
@@ -103,5 +103,5 @@ export const dfs = ({
     path_node = parent;
   }
 
-  return [end, animations];
+  return { end, animations };
 };

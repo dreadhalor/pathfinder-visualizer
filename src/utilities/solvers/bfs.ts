@@ -17,7 +17,7 @@ interface BfsParams {
  * Performs a Breadth-First Search (BFS) on the given maze.
  *
  * @param params - An object containing the maze, start coordinates, solution function, and animation callbacks.
- * @returns A tuple containing the end coordinates (if found) and an array of animation functions.
+ * @returns An object containing the end coordinates (if found) and an array of animation functions.
  */
 export const bfs = ({
   maze,
@@ -26,7 +26,7 @@ export const bfs = ({
   frontier_animation,
   traversal_animation,
   path_animation,
-}: BfsParams): [Coordinates | null, Array<() => void>] => {
+}: BfsParams) => {
   const animations: Array<() => void> = [];
   const adjacency_list = getSolverAdjacencyList(maze);
 
@@ -102,7 +102,7 @@ export const bfs = ({
     path_node = parent;
   }
 
-  return [end, animations];
+  return { end, animations };
 };
 
 // Interface for the parameters accepted by the bfs_raw function
