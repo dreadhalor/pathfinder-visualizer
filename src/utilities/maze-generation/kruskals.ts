@@ -34,7 +34,7 @@ const connect = (
   edges: [Coordinates, Coordinates][],
   uf: GridUnionFind,
   animatorRef: any,
-  animation: () => void,
+  animation: (node: Coordinates) => void,
 ) => {
   edges.push([n1, n2]);
   uf.union(n1, n2);

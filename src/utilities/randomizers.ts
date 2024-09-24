@@ -1,5 +1,3 @@
-// utilities/randomizers.ts
-
 import { shuffle } from 'lodash';
 
 /**

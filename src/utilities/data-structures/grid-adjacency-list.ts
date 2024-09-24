@@ -1,4 +1,3 @@
-// grid-adjacency-list.ts
 import { Coordinates } from '../../types';
 import { CoordinateUtils } from './coordinate-utils';
 
@@ -114,8 +113,6 @@ export class GridAdjacencyList {
         adjacencyMap.set(CoordinateUtils.serialize([row, col]), neighbors);
       }
     }
-
-    console.log('Adjacency Map:', adjacencyMap);
 
     return new GridAdjacencyList(adjacencyMap);
   }

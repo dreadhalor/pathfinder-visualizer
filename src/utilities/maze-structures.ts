@@ -1,5 +1,3 @@
-// utilities/maze-structures.ts
-
 import { GridAdjacencyList } from './data-structures/grid-adjacency-list';
 import { Coordinates, Square } from '../types';
 

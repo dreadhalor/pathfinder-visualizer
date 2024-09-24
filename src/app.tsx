@@ -58,8 +58,8 @@ const App: React.FC = () => {
   const dragValRef = useRef<number | null>(null);
 
   const finished = () =>
-    animatorRef.current.playAnimations([...finishAnimation(grid)]);
-  animatorRef.current.setFinishFunction(finished);
+    grid && animatorRef.current.playAnimations([...finishAnimation(grid)]);
+  if (finished) animatorRef.current.setFinishFunction(finished);
 
   const checkForPathReset = () => {
     return animatorRef.current.animationsLeft() > 0 || solved.current;
@@ -252,7 +252,6 @@ const App: React.FC = () => {
 
     let start = getClosestPathSquare(new_grid, old_start, 0);
     let end = getClosestPathSquare(new_grid, old_end, 0);
-    console.log('start', start, 'end', end);
 
     if (start) {
       let tile = getTile(start);
@@ -420,16 +419,13 @@ const App: React.FC = () => {
 
   const generateKruskals = () => {
     let [start, end] = getStartAndEnd();
-    console.log('kruskals', start, end);
     wallifyItAll();
     if (!grid) return;
     kruskals(grid, animatorRef);
     unlockAchievementById('generate_kruskals', 'pathfinder-visualizer');
     animatorRef.current.pushOneToOpenQueue(() => {
-      if (!start || !end) {
-        console.log('kruskals - no start or end');
-        return;
-      }
+      if (!start || !end) return;
+
       resetStartAndEnd(start, end);
     });
     animatorRef.current.closeOpenQueue(true);
@@ -442,10 +438,7 @@ const App: React.FC = () => {
     unlockAchievementById('generate_ellers', 'pathfinder-visualizer');
     if (!animations) return;
     animations = animations.concat(() => {
-      if (!start || !end) {
-        console.log('no start or end');
-        return;
-      }
+      if (!start || !end) return;
       resetStartAndEnd(start, end);
     });
 
