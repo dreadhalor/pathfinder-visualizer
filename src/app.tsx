@@ -16,7 +16,7 @@ import { finishAnimation } from './utilities/animations';
 import { recursiveDivision } from './utilities/maze-generation/recursive-division';
 import { aStar } from './utilities/solvers/a-star';
 import { dfs } from './utilities/solvers/dfs';
-import DrawWrapper from './utilities/DrawWrapper';
+import DrawWrapper from './utilities/draw-wrapper';
 import { useAchievements } from 'dread-ui';
 import { Square } from './types';
 import { bfs_raw } from './utilities/solvers/bfs-raw';
