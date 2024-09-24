@@ -1,5 +1,11 @@
 export class Animator {
-  constructor(finish_function) {
+  animation_queue: (() => void)[];
+  delay: number;
+  complete?: () => void;
+  play_finish: boolean;
+  open_queue: boolean;
+
+  constructor(finish_function?: (() => void) | ((...args: any[]) => void)) {
     this.animation_queue = [];
     this.delay = 0;
     this.complete = finish_function;
@@ -7,9 +13,11 @@ export class Animator {
     this.open_queue = false;
   }
 
-  setFinishFunction = (fxn) => (this.complete = fxn);
+  setFinishFunction = (fxn: (() => void) | ((...args: any[]) => void)) =>
+    (this.complete = fxn);
+
   playAnimations = (
-    animation_queue,
+    animation_queue: (() => void)[],
     frames_per_refresh = 1,
     finishFxn = false,
   ) => {
@@ -33,10 +41,14 @@ export class Animator {
     this.play_finish = finishFxn;
     this.open_queue = false;
   };
-  pushOneToOpenQueue = (animation) => {
+  pushOneToOpenQueue = (
+    animation: (() => void) | ((...args: any[]) => void),
+  ) => {
     if (animation) this.animation_queue.push(animation);
   };
-  pushMultipleToOpenQueue = (animations) => {
+  pushMultipleToOpenQueue = (
+    animations: (() => void)[] | ((...args: any[]) => void)[],
+  ) => {
     if (animations)
       this.animation_queue = this.animation_queue.concat(animations);
   };
@@ -61,7 +73,7 @@ export class Animator {
         );
       } else
         requestAnimationFrame(() => this.animationLoop(frames_per_refresh));
-    } else if (this.play_finish) this.complete();
+    } else if (this.play_finish) this.complete?.();
   }
   openAnimationLoop(frames_per_refresh = 1) {
     let animations = this.animation_queue.splice(0, frames_per_refresh);

@@ -8,7 +8,7 @@ const DrawWrapper = ({
   className,
 }: {
   children: React.ReactNode;
-  refToUse: React.MutableRefObject<HTMLDivElement>;
+  refToUse: React.RefObject<HTMLDivElement>;
   style: React.CSSProperties;
   className: string;
 }) => {
@@ -18,7 +18,7 @@ const DrawWrapper = ({
 
   useEffect(() => {
     data.current = new Map();
-    for (let child of refToUse.current.children)
+    for (let child of refToUse.current!.children)
       data.current.set(child.id, { mouseOver: false });
   });
   const getChild = (uuid: string) => data.current!.get(uuid) ?? null;
@@ -77,7 +77,7 @@ const DrawWrapper = ({
       | React.MouseEvent<HTMLDivElement>,
   ) => {
     if (lastChild.current && isInside(coords, lastChild.current)) return;
-    for (let child of refToUse.current.children) {
+    for (let child of refToUse.current!.children) {
       let child_data = getChild(child.id);
       if (isInside(coords, child)) {
         lastChild.current = child as HTMLElement;
@@ -109,7 +109,7 @@ const DrawWrapper = ({
       | React.MouseEvent<HTMLDivElement>,
   ) => {
     let coords: [number, number] = [event.clientX, event.clientY];
-    for (let child of refToUse.current.children) {
+    for (let child of refToUse.current!.children) {
       let child_data = getChild(child.id)!;
       if (isInside(coords, child)) {
         child_data.mouseOver = true;
@@ -139,7 +139,7 @@ const DrawWrapper = ({
       | React.MouseEvent<HTMLDivElement>,
   ) => {
     let coords: [number, number] = [event.clientX, event.clientY];
-    for (let child of refToUse.current.children) {
+    for (let child of refToUse.current!.children) {
       let child_data = getChild(child.id)!;
       if (isInside(coords, child)) {
         child.dispatchEvent(
@@ -169,7 +169,7 @@ const DrawWrapper = ({
     moved(event);
     lastChild.current = null;
     lastCoords.current = null;
-    for (let child of refToUse.current.children) {
+    for (let child of refToUse.current!.children) {
       let child_data = getChild(child.id)!;
       if (child_data.mouseOver) {
         child_data.mouseOver = false;
